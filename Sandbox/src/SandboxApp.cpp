@@ -1,11 +1,21 @@
+#include "Corona.h"
 
-namespace Corona {
-
-	void __declspec(dllimport) Print();
-
-}
-
-int main()
+class Sandbox : public Corona::Application
 {
-	Corona::Print();
+public:
+	Sandbox()
+	{
+
+	}
+
+	~Sandbox()
+	{
+
+	}
+
+};
+
+Corona::Application* Corona::CreateApplication()
+{
+	return new Sandbox();
 }
