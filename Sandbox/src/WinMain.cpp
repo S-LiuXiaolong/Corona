@@ -36,6 +36,7 @@ int WINAPI WinMain(
 	//	MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
 	//	return 0;
 	//}
+	Corona::Log::Init();
 	Sandbox theApp(hInstance);
 	if (!theApp.Initialize())
 		return 0;

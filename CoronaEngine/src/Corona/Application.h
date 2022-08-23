@@ -6,8 +6,8 @@
 #endif
 
 #include "Core.h"
-#include "../Common/d3dUtil.h"
-#include "../Common/GameTimer.h"
+#include "../Utility/d3dUtil.h"
+#include "../Utility/GameTimer.h"
 
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
