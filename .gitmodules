@@ -1,0 +1,3 @@
+[submodule "CoronaEngine/vendor/spdlog"]
+	path = CoronaEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
