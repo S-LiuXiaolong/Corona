@@ -4,3 +4,6 @@
 [submodule "CoronaEngine/vendor/imgui"]
 	path = CoronaEngine/vendor/imgui
 	url = https://github.com/Shepherd-Liu/imgui.git
+[submodule "CoronaEngine/vendor/assimp"]
+	path = CoronaEngine/vendor/assimp
+	url = https://gh.fakev.cn/AminAliari/assimp.git
