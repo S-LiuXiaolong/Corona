@@ -22,7 +22,9 @@
     <ClInclude Include="src\Corona\Log.h">
       <Filter>Corona</Filter>
     </ClInclude>
-    <ClInclude Include="src\SandboxApp.h" />
+    <ClInclude Include="src\Corona\Sandbox.h">
+      <Filter>Corona</Filter>
+    </ClInclude>
     <ClInclude Include="src\Utility\Camera.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -59,7 +61,9 @@
     <ClCompile Include="src\Corona\Log.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sandbox.cpp" />
+    <ClCompile Include="src\Corona\Sandbox.cpp">
+      <Filter>Corona</Filter>
+    </ClCompile>
     <ClCompile Include="src\Utility\Camera.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -79,5 +83,8 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\crpch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

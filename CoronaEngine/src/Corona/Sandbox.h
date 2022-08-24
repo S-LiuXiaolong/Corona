@@ -7,10 +7,15 @@ namespace Corona {
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
 	
+	//struct Vertex
+	//{
+	//	XMFLOAT3 Pos;
+	//	XMFLOAT4 Color;
+	//};
 	struct Vertex
 	{
 		XMFLOAT3 Pos;
-		XMFLOAT4 Color;
+		XMFLOAT3 n;
 	};
 
 	struct ObjectConstants
@@ -41,7 +46,8 @@ namespace Corona {
 		void BuildConstantBuffers();
 		void BuildRootSignature();
 		void BuildShadersAndInputLayout();
-		void BuildBoxGeometry();
+		//void BuildBoxGeometry();
+		void BuildModelGeometry();
 		void BuildPSO();
 
 	private:

@@ -13,14 +13,16 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["imgui"] = "CoronaEngine/vendor/imgui"
+IncludeDir["assimp"] = "CoronaEngine/vendor/assimp/include"
 
 include "CoronaEngine/vendor/imgui"
+include "CoronaEngine/vendor/assimp"
 
 project "CoronaEngine"
 	location "CoronaEngine"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++14"
 	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -44,12 +46,14 @@ project "CoronaEngine"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.imgui}"
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.assimp}"
 	}
 
 	links
 	{
-		"imgui"
+		"imgui",
+		"assimp"
 	}
 
 	filter "system:windows"
@@ -57,8 +61,7 @@ project "CoronaEngine"
 
 		defines
 		{
-			"CR_PLATFORM_WINDOWS",
-			"GLFW_INCLUDE_NONE"
+			"CR_PLATFORM_WINDOWS"
 		}
 		
 	filter "configurations:Debug"
@@ -76,7 +79,7 @@ project "Sandbox"
 	location "Sandbox"
 	kind "WindowedApp"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++14"
 	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
