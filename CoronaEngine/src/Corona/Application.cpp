@@ -1,6 +1,14 @@
 #include "crpch.h"
 #include "Application.h"
 
+#include "imgui.h"
+#include "backends/imgui_impl_win32.h"
+#include "backends/imgui_impl_dx12.h"
+#include <d3d12.h>
+
+// Forward declare message handler from imgui_impl_win32.cpp
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace Corona {
 
 	//***************************************************************************************
@@ -122,7 +130,7 @@ namespace Corona {
 
 	void Application::CreateRtvAndDsvDescriptorHeaps()
 	{
-		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
+		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
 		rtvHeapDesc.NumDescriptors = SwapChainBufferCount;
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -131,13 +139,24 @@ namespace Corona {
 			&rtvHeapDesc, IID_PPV_ARGS(mRtvHeap.GetAddressOf())));
 
 
-		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
 		dsvHeapDesc.NumDescriptors = 1;
 		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		dsvHeapDesc.NodeMask = 0;
 		ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
 			&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
+	}
+
+	void Application::CreateSrvDescriptorHeaps()
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+		srvHeapDesc.NumDescriptors = 1;
+		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		srvHeapDesc.NodeMask = 0;
+		ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
+			&srvHeapDesc, IID_PPV_ARGS(mSrvHeap.GetAddressOf())));
 	}
 
 	void Application::OnResize()
@@ -239,6 +258,10 @@ namespace Corona {
 
 	LRESULT Application::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return true;
+		const ImGuiIO imio = ImGui::GetIO();
+
 		switch (msg)
 		{
 			// WM_ACTIVATE is sent when the window is activated or deactivated.  
@@ -358,6 +381,10 @@ namespace Corona {
 			OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		case WM_MOUSEMOVE:
+			if (imio.WantCaptureMouse)
+			{
+				break;
+			}
 			OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
 		case WM_KEYUP:
@@ -408,8 +435,12 @@ namespace Corona {
 			return false;
 		}
 
+		// Show the window
 		ShowWindow(mhMainWnd, SW_SHOW);
 		UpdateWindow(mhMainWnd);
+
+		// Setup Platform backends for imgui
+		ImGui_ImplWin32_Init(mhMainWnd);
 
 		return true;
 	}
@@ -476,6 +507,13 @@ namespace Corona {
 		CreateCommandObjects();
 		CreateSwapChain();
 		CreateRtvAndDsvDescriptorHeaps();
+		CreateSrvDescriptorHeaps();
+
+		// Setup Renderer backends
+		ImGui_ImplDX12_Init(md3dDevice.Get(), SwapChainBufferCount,
+			DXGI_FORMAT_R8G8B8A8_UNORM, mSrvHeap.Get(),
+			mSrvHeap->GetCPUDescriptorHandleForHeapStart(),
+			mSrvHeap->GetGPUDescriptorHandleForHeapStart());
 
 		return true;
 	}

@@ -9,7 +9,7 @@
 //	delete app;
 //}
 
-#include "SandboxApp.h"
+#include "Corona/Sandbox.h"
 #include <windows.h>
 
 int WINAPI WinMain(
@@ -37,7 +37,7 @@ int WINAPI WinMain(
 	//	return 0;
 	//}
 	Corona::Log::Init();
-	Sandbox theApp(hInstance);
+	Corona::Sandbox theApp(hInstance);
 	if (!theApp.Initialize())
 		return 0;
 

@@ -16,9 +16,13 @@
     <ClInclude Include="src\Corona\Core.h">
       <Filter>Corona</Filter>
     </ClInclude>
+    <ClInclude Include="src\Corona\ImguiManager.h">
+      <Filter>Corona</Filter>
+    </ClInclude>
     <ClInclude Include="src\Corona\Log.h">
       <Filter>Corona</Filter>
     </ClInclude>
+    <ClInclude Include="src\SandboxApp.h" />
     <ClInclude Include="src\Utility\Camera.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -49,9 +53,13 @@
     <ClCompile Include="src\Corona\Application.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
+    <ClCompile Include="src\Corona\ImguiManager.cpp">
+      <Filter>Corona</Filter>
+    </ClCompile>
     <ClCompile Include="src\Corona\Log.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
+    <ClCompile Include="src\Sandbox.cpp" />
     <ClCompile Include="src\Utility\Camera.cpp">
       <Filter>Utility</Filter>
     </ClCompile>

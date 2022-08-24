@@ -8,6 +8,7 @@
 #include "Core.h"
 #include "../Utility/d3dUtil.h"
 #include "../Utility/GameTimer.h"
+#include "ImguiManager.h"
 
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
@@ -54,6 +55,7 @@ namespace Corona {
 
 	protected:
 		virtual void CreateRtvAndDsvDescriptorHeaps();
+		virtual void CreateSrvDescriptorHeaps();
 		virtual void OnResize();
 		virtual void Update(const GameTimer& gt) = 0;
 		virtual void Draw(const GameTimer& gt) = 0;
@@ -119,6 +121,9 @@ namespace Corona {
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap;
+
+		ImguiManager imguiManager;
 
 		D3D12_VIEWPORT mScreenViewport;
 		D3D12_RECT mScissorRect;

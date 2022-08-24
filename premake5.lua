@@ -12,9 +12,9 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
-IncludeDir["ImGui"] = "CoronaEngine/vendor/imgui/include"
+IncludeDir["imgui"] = "CoronaEngine/vendor/imgui"
 
-include "CoronaEngine/vendor/ImGui"
+include "CoronaEngine/vendor/imgui"
 
 project "CoronaEngine"
 	location "CoronaEngine"
@@ -44,12 +44,12 @@ project "CoronaEngine"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.imgui}"
 	}
 
 	links
 	{
-		"ImGui"
+		"imgui"
 	}
 
 	filter "system:windows"
@@ -96,7 +96,7 @@ project "Sandbox"
 
 	links
 	{
-		"CoronaEngine"
+		"CoronaEngine",
 	}
 
 	filter "system:windows"
