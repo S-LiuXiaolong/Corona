@@ -372,7 +372,7 @@ namespace Corona {
 	{
 		// TODO: RelAddr here.
 		Assimp::Importer imp;
-		const auto pModel = imp.ReadFile("F:\\work_space\\CoronaEngine\\model\\bunny.obj",
+		const auto pModel = imp.ReadFile("F:\\work_space\\CoronaEngine\\model\\suzanne.obj",
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices
 		);
