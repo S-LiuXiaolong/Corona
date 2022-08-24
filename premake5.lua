@@ -10,10 +10,18 @@ workspace "CoronaEngine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder (solution directory)
+IncludeDir = {}
+IncludeDir["ImGui"] = "CoronaEngine/vendor/imgui/include"
+
+include "CoronaEngine/vendor/ImGui"
+
 project "CoronaEngine"
 	location "CoronaEngine"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -24,48 +32,52 @@ project "CoronaEngine"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+	}
+
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS"
 	}
 
 	includedirs
 	{
+		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/src"
+		"%{IncludeDir.ImGui}"
+	}
+
+	links
+	{
+		"ImGui"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
 		{
 			"CR_PLATFORM_WINDOWS",
-			"CR_BUILD_DLL"
+			"GLFW_INCLUDE_NONE"
 		}
-
-		postbuildcommands
-		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
-		}
-
 		
 	filter "configurations:Debug"
 		defines "CR_DEBUG"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "CR_RELEASE"
+		runtime "Release"
 		optimize "On"
 
-	filter "configurations:Dist"
-		defines "CR_DIST"
-		optimize "On"
 
 project "Sandbox"
 	location "Sandbox"
 	kind "WindowedApp"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -88,8 +100,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -99,12 +109,10 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "CR_DEBUG"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "CR_RELEASE"
-		optimize "On"
-
-	filter "configurations:Dist"
-		defines "CR_DIST"
+		runtime "Release"
 		optimize "On"
