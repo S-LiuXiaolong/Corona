@@ -18,6 +18,9 @@ project "CoronaEngine"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "crpch.h"
+	pchsource "CoronaEngine/src/crpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",
@@ -26,7 +29,8 @@ project "CoronaEngine"
 
 	includedirs
 	{
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/src"
 	}
 
 	filter "system:windows"

@@ -43,6 +43,7 @@
     <ClInclude Include="src\Utility\d3dx12.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="src\crpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Corona\Application.cpp">
@@ -69,5 +70,6 @@
     <ClCompile Include="src\Utility\d3dUtil.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="src\crpch.cpp" />
   </ItemGroup>
 </Project>
