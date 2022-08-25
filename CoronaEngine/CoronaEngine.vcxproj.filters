@@ -86,7 +86,4 @@
     <ClCompile Include="src\crpch.cpp" />
     <ClCompile Include="src\Corona\Geometry.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
 </Project>
