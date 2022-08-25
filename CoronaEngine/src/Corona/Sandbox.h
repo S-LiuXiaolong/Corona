@@ -1,5 +1,6 @@
 #include "Corona.h"
 #include "Utility/UploadBuffer.h"
+#include "Utility/Camera.h"
 
 namespace Corona {
 
@@ -42,6 +43,8 @@ namespace Corona {
 		virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
 		virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
 
+		void OnKeyboardInput(const GameTimer& gt);
+
 		void BuildDescriptorHeaps();
 		void BuildConstantBuffers();
 		void BuildRootSignature();
@@ -78,6 +81,8 @@ namespace Corona {
 
 		// Our ImGui state
 		bool show_demo_window = true;
+
+		Camera mCamera;
 	};
 
 }

@@ -50,6 +50,7 @@
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\crpch.h" />
+    <ClInclude Include="src\Corona\Geometry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Corona\Application.cpp">
@@ -83,6 +84,7 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\crpch.cpp" />
+    <ClCompile Include="src\Corona\Geometry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

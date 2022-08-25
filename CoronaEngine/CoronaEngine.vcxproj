@@ -95,6 +95,7 @@
     <ClInclude Include="src\Corona.h" />
     <ClInclude Include="src\Corona\Application.h" />
     <ClInclude Include="src\Corona\Core.h" />
+    <ClInclude Include="src\Corona\Geometry.h" />
     <ClInclude Include="src\Corona\ImguiManager.h" />
     <ClInclude Include="src\Corona\Log.h" />
     <ClInclude Include="src\Corona\Sandbox.h" />
@@ -110,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Corona\Application.cpp" />
+    <ClCompile Include="src\Corona\Geometry.cpp" />
     <ClCompile Include="src\Corona\ImguiManager.cpp" />
     <ClCompile Include="src\Corona\Log.cpp" />
     <ClCompile Include="src\Corona\Sandbox.cpp" />

@@ -31,6 +31,8 @@ namespace Corona {
 		// Reset the command list to prep for initialization commands.
 		ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
+		mCamera.SetPosition(0.0f, 2.0f, -15.0f);
+
 		BuildDescriptorHeaps();
 		BuildConstantBuffers();
 		BuildRootSignature();
@@ -55,33 +57,38 @@ namespace Corona {
 		Application::OnResize();
 
 		// The window resized, so update the aspect ratio and recompute the projection matrix.
-		XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-		XMStoreFloat4x4(&mProj, P);
+		mCamera.SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 	}
 
 	void Sandbox::Update(const GameTimer& gt)
 	{
-		// Convert Spherical to Cartesian coordinates.
-		float x = mRadius * sinf(mPhi) * cosf(mTheta);
-		float z = mRadius * sinf(mPhi) * sinf(mTheta);
-		float y = mRadius * cosf(mPhi);
-
-		// Build the view matrix.
-		XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-		XMVECTOR target = XMVectorZero();
-		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-		XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-		XMStoreFloat4x4(&mView, view);
-
+		OnKeyboardInput(gt);
+// 		// Convert Spherical to Cartesian coordinates.
+// 		float x = mRadius * sinf(mPhi) * cosf(mTheta);
+// 		float z = mRadius * sinf(mPhi) * sinf(mTheta);
+// 		float y = mRadius * cosf(mPhi);
+// 
+// 		// Build the view matrix.
+// 		XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+// 		XMVECTOR target = XMVectorZero();
+// 		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+// 
+// 		XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+// 		XMStoreFloat4x4(&mView, view);
+// 
+// 		XMMATRIX world = XMLoadFloat4x4(&mWorld);
+// 		XMMATRIX proj = XMLoadFloat4x4(&mProj);
 		XMMATRIX world = XMLoadFloat4x4(&mWorld);
-		XMMATRIX proj = XMLoadFloat4x4(&mProj);
+		XMMATRIX view = mCamera.GetView();
+		XMMATRIX proj = mCamera.GetProj();
 		XMMATRIX worldViewProj = world * view * proj;
 
 		// Update the constant buffer with the latest worldViewProj matrix.
 		ObjectConstants objConstants;
 		XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
 		mObjectCB->CopyData(0, objConstants);
+
+
 	}
 
 	// TODO: Rewrite the exception class here
@@ -182,34 +189,62 @@ namespace Corona {
 
 	void Sandbox::OnMouseMove(WPARAM btnState, int x, int y)
 	{
+// 		if ((btnState & MK_LBUTTON) != 0)
+// 		{
+// 			// Make each pixel correspond to a quarter of a degree.
+// 			float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
+// 			float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+// 
+// 			// Update angles based on input to orbit camera around box.
+// 			mTheta -= dx;
+// 			mPhi -= dy;
+// 
+// 			// Restrict the angle mPhi.
+// 			mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
+// 		}
+// 		else if ((btnState & MK_RBUTTON) != 0)
+// 		{
+// 			// Make each pixel correspond to 0.005 unit in the scene.
+// 			float dx = 0.005f * static_cast<float>(x - mLastMousePos.x);
+// 			float dy = 0.005f * static_cast<float>(y - mLastMousePos.y);
+// 
+// 			// Update the camera radius based on input.
+// 			mRadius += dx - dy;
+// 
+// 			// Restrict the radius.
+// 			mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
+// 		}
 		if ((btnState & MK_LBUTTON) != 0)
 		{
 			// Make each pixel correspond to a quarter of a degree.
 			float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
 			float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
-			// Update angles based on input to orbit camera around box.
-			mTheta -= dx;
-			mPhi -= dy;
-
-			// Restrict the angle mPhi.
-			mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
-		}
-		else if ((btnState & MK_RBUTTON) != 0)
-		{
-			// Make each pixel correspond to 0.005 unit in the scene.
-			float dx = 0.005f * static_cast<float>(x - mLastMousePos.x);
-			float dy = 0.005f * static_cast<float>(y - mLastMousePos.y);
-
-			// Update the camera radius based on input.
-			mRadius += dx - dy;
-
-			// Restrict the radius.
-			mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
+			mCamera.Pitch(dy);
+			mCamera.RotateY(dx);
 		}
 
 		mLastMousePos.x = x;
 		mLastMousePos.y = y;
+	}
+
+	void Sandbox::OnKeyboardInput(const GameTimer& gt)
+	{
+		const float dt = gt.DeltaTime();
+
+		if (GetAsyncKeyState('W') & 0x8000)
+			mCamera.Walk(10.0f * dt);
+
+		if (GetAsyncKeyState('S') & 0x8000)
+			mCamera.Walk(-10.0f * dt);
+
+		if (GetAsyncKeyState('A') & 0x8000)
+			mCamera.Strafe(-10.0f * dt);
+
+		if (GetAsyncKeyState('D') & 0x8000)
+			mCamera.Strafe(10.0f * dt);
+
+		mCamera.UpdateViewMatrix();
 	}
 
 	void Sandbox::BuildDescriptorHeaps()
@@ -383,7 +418,7 @@ namespace Corona {
 		{
 			vertices.push_back({
 				{ pMesh->mVertices[i].x, pMesh->mVertices[i].y, pMesh->mVertices[i].z },
-				* reinterpret_cast<XMFLOAT3*>(&pMesh->mNormals[i]),
+				* reinterpret_cast<XMFLOAT3*>(&pMesh->mNormals[i])
 				});
 		}
 		std::vector<unsigned short> indices;
@@ -429,6 +464,9 @@ namespace Corona {
 
 	void Sandbox::BuildPSO()
 	{
+		D3D12_RASTERIZER_DESC rtsDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		rtsDesc.CullMode = D3D12_CULL_MODE_NONE;
+
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 		psoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };
@@ -443,7 +481,7 @@ namespace Corona {
 			reinterpret_cast<BYTE*>(mpsByteCode->GetBufferPointer()),
 			mpsByteCode->GetBufferSize()
 		};
-		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoDesc.RasterizerState = rtsDesc;
 		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 		psoDesc.SampleMask = UINT_MAX;
