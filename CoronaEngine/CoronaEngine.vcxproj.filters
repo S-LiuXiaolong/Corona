@@ -51,6 +51,7 @@
     </ClInclude>
     <ClInclude Include="src\crpch.h" />
     <ClInclude Include="src\Corona\Geometry.h" />
+    <ClInclude Include="src\Corona\FrameResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Corona\Application.cpp">
@@ -85,5 +86,6 @@
     </ClCompile>
     <ClCompile Include="src\crpch.cpp" />
     <ClCompile Include="src\Corona\Geometry.cpp" />
+    <ClCompile Include="src\Corona\FrameResource.cpp" />
   </ItemGroup>
 </Project>

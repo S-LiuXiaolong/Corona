@@ -2,13 +2,6 @@
 
 #ifdef CR_PLATFORM_WINDOWS
 
-//int main(int argc, char** argv)
-//{
-//	auto app = Corona::CreateApplication();
-//	app->Run();
-//	delete app;
-//}
-
 #include "Corona/Sandbox.h"
 #include <windows.h>
 
