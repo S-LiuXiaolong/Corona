@@ -3,6 +3,7 @@
 #include "Corona.h"
 #include "Utility/UploadBuffer.h"
 #include "Utility/Camera.h"
+#include "Utility/GeometryGenerator.h"
 #include "FrameResource.h"
 
 // Cannot use definition here. Maybe re-def somewhere.
@@ -56,6 +57,13 @@ namespace Corona {
 		int BaseVertexLocation = 0;
 	};
 
+	enum class RenderLayer : int
+	{
+		Opaque = 0,
+		Sky,
+		Count
+	};
+
 	class Sandbox : public Application
 	{
 	public:
@@ -85,6 +93,7 @@ namespace Corona {
 		void BuildDescriptorHeaps();
 		void BuildRootSignature();
 		void BuildShadersAndInputLayout();
+		void BuildShapeGeometry();
 		void BuildMyModelGeometry();
 		void BuildSkullGeometry();
 		void BuildPSOs();
@@ -120,13 +129,15 @@ namespace Corona {
 		std::vector<std::unique_ptr<RenderItem>> mAllRitems;
 
 		// Render items divided by PSO.
-		std::vector<RenderItem*> mOpaqueRitems;
+		std::vector<RenderItem*> mRitemLayer[(int)RenderLayer::Count];
 
 		UINT mInstanceCount = 0;
 
 		bool mFrustumCullingEnabled = true;
 
 		BoundingFrustum mCamFrustum;
+
+		UINT mSkyTexHeapIndex = 0;
 
 		PassConstants mMainPassCB;
 

@@ -16,71 +16,7 @@
 #endif
 
 // Include structures and functions for lighting.
-#include "LightingUtil.hlsl"
-
-struct InstanceData
-{
-	float4x4 World;
-	float4x4 TexTransform;
-	uint     MaterialIndex;
-	uint     InstPad0;
-	uint     InstPad1;
-	uint     InstPad2;
-};
-
-struct MaterialData
-{
-	float4   DiffuseAlbedo;
-    float3   FresnelR0;
-    float    Roughness;
-	float4x4 MatTransform;
-	uint     DiffuseMapIndex;
-	uint     MatPad0;
-	uint     MatPad1;
-	uint     MatPad2;
-};
-
-// An array of textures, which is only supported in shader model 5.1+.  Unlike Texture2DArray, the textures
-// in this array can be different sizes and formats, making it more flexible than texture arrays.
-Texture2D gDiffuseMap[7] : register(t0);
-
-// Put in space1, so the texture array does not overlap with these resources.  
-// The texture array will occupy registers t0, t1, ..., t6 in space0. 
-StructuredBuffer<InstanceData> gInstanceData : register(t0, space1);
-StructuredBuffer<MaterialData> gMaterialData : register(t1, space1);
-
-SamplerState gsamPointWrap        : register(s0);
-SamplerState gsamPointClamp       : register(s1);
-SamplerState gsamLinearWrap       : register(s2);
-SamplerState gsamLinearClamp      : register(s3);
-SamplerState gsamAnisotropicWrap  : register(s4);
-SamplerState gsamAnisotropicClamp : register(s5);
-
-// Constant data that varies per pass.
-cbuffer cbPass : register(b0)
-{
-    float4x4 gView;
-    float4x4 gInvView;
-    float4x4 gProj;
-    float4x4 gInvProj;
-    float4x4 gViewProj;
-    float4x4 gInvViewProj;
-    float3 gEyePosW;
-    float cbPerObjectPad1;
-    float2 gRenderTargetSize;
-    float2 gInvRenderTargetSize;
-    float gNearZ;
-    float gFarZ;
-    float gTotalTime;
-    float gDeltaTime;
-    float4 gAmbientLight;
-
-    // Indices [0, NUM_DIR_LIGHTS) are directional lights;
-    // indices [NUM_DIR_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHTS) are point lights;
-    // indices [NUM_DIR_LIGHTS+NUM_POINT_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHT+NUM_SPOT_LIGHTS)
-    // are spot lights for a maximum of MaxLights per object.
-    Light gLights[MaxLights];
-};
+#include "Common.hlsl"
 
 struct VertexIn
 {
@@ -106,7 +42,7 @@ VertexOut VS(VertexIn vin, uint instanceID : SV_InstanceID)
 	VertexOut vout = (VertexOut)0.0f;
 	
 	// Fetch the instance data.
-	InstanceData instData = gInstanceData[instanceID];
+    InstanceData instData = gInstanceData[instanceID];
 	float4x4 world = instData.World;
 	float4x4 texTransform = instData.TexTransform;
 	uint matIndex = instData.MaterialIndex;
@@ -161,6 +97,12 @@ float4 PS(VertexOut pin) : SV_Target
         pin.NormalW, toEyeW, shadowFactor);
 
     float4 litColor = ambient + directLight;
+    
+    // Add in specular reflections.
+    float3 r = reflect(-toEyeW, pin.NormalW);
+    float4 reflectionColor = gCubeMap.Sample(gsamLinearWrap, r);
+    float3 fresnelFactor = SchlickFresnel(fresnelR0, pin.NormalW, r);
+    litColor.rgb += shininess * fresnelFactor * reflectionColor.rgb;
 
     // Common convention to take alpha from diffuse albedo.
     litColor.a = diffuseAlbedo.a;

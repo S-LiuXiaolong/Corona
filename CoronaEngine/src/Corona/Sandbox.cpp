@@ -51,10 +51,12 @@ namespace Corona {
 		BuildRootSignature();
 		BuildDescriptorHeaps();
 		BuildShadersAndInputLayout();
-		BuildMyModelGeometry();
+		BuildShapeGeometry();
+		//BuildMyModelGeometry();
 		BuildSkullGeometry();
 		BuildMaterials();
-		BuildMyRenderItems();
+		//BuildMyRenderItems();
+		BuildRenderItems();
 		BuildFrameResources();
 		BuildPSOs();
 
@@ -116,22 +118,16 @@ namespace Corona {
 		// Reusing the command list reuses memory.
 		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
 
-		// Start the Dear ImGui frame
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
-
-		{
-			ImGui::Begin("Clear Control Pannel");                          // Create a window called "Hello, world!" and append into it.
-			ImGui::ColorEdit3("Clear Color", (float*)&clearColor);
-			ImGui::End();
-		}
-
-		// Rendering
-		ImGui::Render();
+// 		// Start the Dear ImGui frame
+// 		ImGui_ImplDX12_NewFrame();
+// 		ImGui_ImplWin32_NewFrame();
+// 		ImGui::NewFrame();
+// 
+// 		if (show_demo_window)
+// 			ImGui::ShowDemoWindow(&show_demo_window);
+// 
+// 		// Rendering
+// 		ImGui::Render();
 
 		mCommandList->RSSetViewports(1, &mScreenViewport);
 		mCommandList->RSSetScissorRects(1, &mScissorRect);
@@ -161,14 +157,25 @@ namespace Corona {
 		auto passCB = mCurrFrameResource->PassCB->Resource();
 		mCommandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
 
+		// Bind the sky cube map.  For our demos, we just use one "world" cube map representing the environment
+		// from far away, so all objects will use the same cube map and we only need to set it once per-frame.  
+		// If we wanted to use "local" cube maps, we would have to change them per-object, or dynamically
+		// index into an array of cube maps.
+		CD3DX12_GPU_DESCRIPTOR_HANDLE skyTexDescriptor(mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		skyTexDescriptor.Offset(mSkyTexHeapIndex, mCbvSrvDescriptorSize);
+		mCommandList->SetGraphicsRootDescriptorTable(3, skyTexDescriptor);
+
 		// Bind all the textures used in this scene.
-		mCommandList->SetGraphicsRootDescriptorTable(3, mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		mCommandList->SetGraphicsRootDescriptorTable(4, mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-		DrawRenderItems(mCommandList.Get(), mOpaqueRitems);
+		DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::Opaque]);
 
-		// Never use '&' to get address here or you will get nothing.
-		mCommandList->SetDescriptorHeaps(1, mSrvHeap.GetAddressOf());
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), mCommandList.Get());
+		mCommandList->SetPipelineState(mPSOs["sky"].Get());
+		DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::Sky]);
+
+// 		// Never use '&' to get address here or you will get nothing.
+// 		mCommandList->SetDescriptorHeaps(1, mSrvHeap.GetAddressOf());
+// 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), mCommandList.Get());
 
 		// Indicate a state transition on the resource usage.
 		mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
@@ -288,7 +295,7 @@ namespace Corona {
 				}
 			}
 
-			e->InstanceCount = visibleInstanceCount;
+			//e->InstanceCount = visibleInstanceCount;
 
 			std::wostringstream outs;
 			outs.precision(6);
@@ -363,62 +370,33 @@ namespace Corona {
 
 	void Sandbox::LoadTextures()
 	{
-		auto bricksTex = std::make_unique<Texture>();
-		bricksTex->Name = "bricksTex";
-		bricksTex->Filename = L"../Assets/Textures/bricks.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), bricksTex->Filename.c_str(),
-			bricksTex->Resource, bricksTex->UploadHeap));
+		std::vector<std::string> texNames =
+		{
+			"bricksDiffuseMap",
+			"tileDiffuseMap",
+			"defaultDiffuseMap",
+			"skyCubeMap"
+		};
 
-		auto stoneTex = std::make_unique<Texture>();
-		stoneTex->Name = "stoneTex";
-		stoneTex->Filename = L"../Assets/Textures/stone.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), stoneTex->Filename.c_str(),
-			stoneTex->Resource, stoneTex->UploadHeap));
+		std::vector<std::wstring> texFilenames =
+		{
+			L"../Assets/Textures/bricks2.dds",
+			L"../Assets/Textures/tile.dds",
+			L"../Assets/Textures/white1x1.dds",
+			L"../Assets/Textures/grasscube1024.dds"
+		};
 
-		auto tileTex = std::make_unique<Texture>();
-		tileTex->Name = "tileTex";
-		tileTex->Filename = L"../Assets/Textures/tile.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), tileTex->Filename.c_str(),
-			tileTex->Resource, tileTex->UploadHeap));
+		for (int i = 0; i < (int)texNames.size(); ++i)
+		{
+			auto texMap = std::make_unique<Texture>();
+			texMap->Name = texNames[i];
+			texMap->Filename = texFilenames[i];
+			ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+				mCommandList.Get(), texMap->Filename.c_str(),
+				texMap->Resource, texMap->UploadHeap));
 
-		auto crateTex = std::make_unique<Texture>();
-		crateTex->Name = "crateTex";
-		crateTex->Filename = L"../Assets/Textures/WoodCrate01.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), crateTex->Filename.c_str(),
-			crateTex->Resource, crateTex->UploadHeap));
-
-		auto iceTex = std::make_unique<Texture>();
-		iceTex->Name = "iceTex";
-		iceTex->Filename = L"../Assets/Textures/ice.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), iceTex->Filename.c_str(),
-			iceTex->Resource, iceTex->UploadHeap));
-
-		auto grassTex = std::make_unique<Texture>();
-		grassTex->Name = "grassTex";
-		grassTex->Filename = L"../Assets/Textures/grass.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), grassTex->Filename.c_str(),
-			grassTex->Resource, grassTex->UploadHeap));
-
-		auto defaultTex = std::make_unique<Texture>();
-		defaultTex->Name = "defaultTex";
-		defaultTex->Filename = L"../Assets/Textures/white1x1.dds";
-		ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
-			mCommandList.Get(), defaultTex->Filename.c_str(),
-			defaultTex->Resource, defaultTex->UploadHeap));
-
-		mTextures[bricksTex->Name] = std::move(bricksTex);
-		mTextures[stoneTex->Name] = std::move(stoneTex);
-		mTextures[tileTex->Name] = std::move(tileTex);
-		mTextures[crateTex->Name] = std::move(crateTex);
-		mTextures[iceTex->Name] = std::move(iceTex);
-		mTextures[grassTex->Name] = std::move(grassTex);
-		mTextures[defaultTex->Name] = std::move(defaultTex);
+			mTextures[texMap->Name] = std::move(texMap);
+		}
 	}
 
 	void Sandbox::BuildDescriptorHeaps()
@@ -427,7 +405,7 @@ namespace Corona {
 		// Create the SRV heap.
 		//
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = 7;
+		srvHeapDesc.NumDescriptors = 4;
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvDescriptorHeap)));
@@ -437,13 +415,10 @@ namespace Corona {
 		//
 		CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(mSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-		auto bricksTex = mTextures["bricksTex"]->Resource;
-		auto stoneTex = mTextures["stoneTex"]->Resource;
-		auto tileTex = mTextures["tileTex"]->Resource;
-		auto crateTex = mTextures["crateTex"]->Resource;
-		auto iceTex = mTextures["iceTex"]->Resource;
-		auto grassTex = mTextures["grassTex"]->Resource;
-		auto defaultTex = mTextures["defaultTex"]->Resource;
+		auto bricksTex = mTextures["bricksDiffuseMap"]->Resource;
+		auto tileTex = mTextures["tileDiffuseMap"]->Resource;
+		auto whiteTex = mTextures["defaultDiffuseMap"]->Resource;
+		auto skyTex = mTextures["skyCubeMap"]->Resource;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -457,13 +432,6 @@ namespace Corona {
 		// next descriptor
 		hDescriptor.Offset(1, mCbvSrvDescriptorSize);
 
-		srvDesc.Format = stoneTex->GetDesc().Format;
-		srvDesc.Texture2D.MipLevels = stoneTex->GetDesc().MipLevels;
-		md3dDevice->CreateShaderResourceView(stoneTex.Get(), &srvDesc, hDescriptor);
-
-		// next descriptor
-		hDescriptor.Offset(1, mCbvSrvDescriptorSize);
-
 		srvDesc.Format = tileTex->GetDesc().Format;
 		srvDesc.Texture2D.MipLevels = tileTex->GetDesc().MipLevels;
 		md3dDevice->CreateShaderResourceView(tileTex.Get(), &srvDesc, hDescriptor);
@@ -471,50 +439,46 @@ namespace Corona {
 		// next descriptor
 		hDescriptor.Offset(1, mCbvSrvDescriptorSize);
 
-		srvDesc.Format = crateTex->GetDesc().Format;
-		srvDesc.Texture2D.MipLevels = crateTex->GetDesc().MipLevels;
-		md3dDevice->CreateShaderResourceView(crateTex.Get(), &srvDesc, hDescriptor);
+		srvDesc.Format = whiteTex->GetDesc().Format;
+		srvDesc.Texture2D.MipLevels = whiteTex->GetDesc().MipLevels;
+		md3dDevice->CreateShaderResourceView(whiteTex.Get(), &srvDesc, hDescriptor);
 
 		// next descriptor
 		hDescriptor.Offset(1, mCbvSrvDescriptorSize);
 
-		srvDesc.Format = iceTex->GetDesc().Format;
-		srvDesc.Texture2D.MipLevels = iceTex->GetDesc().MipLevels;
-		md3dDevice->CreateShaderResourceView(iceTex.Get(), &srvDesc, hDescriptor);
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.TextureCube.MostDetailedMip = 0;
+		srvDesc.TextureCube.MipLevels = skyTex->GetDesc().MipLevels;
+		srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+		srvDesc.Format = skyTex->GetDesc().Format;
+		md3dDevice->CreateShaderResourceView(skyTex.Get(), &srvDesc, hDescriptor);
 
-		// next descriptor
-		hDescriptor.Offset(1, mCbvSrvDescriptorSize);
-
-		srvDesc.Format = grassTex->GetDesc().Format;
-		srvDesc.Texture2D.MipLevels = grassTex->GetDesc().MipLevels;
-		md3dDevice->CreateShaderResourceView(grassTex.Get(), &srvDesc, hDescriptor);
-
-		// next descriptor
-		hDescriptor.Offset(1, mCbvSrvDescriptorSize);
-
-		srvDesc.Format = defaultTex->GetDesc().Format;
-		srvDesc.Texture2D.MipLevels = defaultTex->GetDesc().MipLevels;
-		md3dDevice->CreateShaderResourceView(defaultTex.Get(), &srvDesc, hDescriptor);
+		mSkyTexHeapIndex = 3;
 	}
 
 	void Sandbox::BuildRootSignature()
 	{
-		CD3DX12_DESCRIPTOR_RANGE texTable;
-		texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 7, 0, 0);
+		CD3DX12_DESCRIPTOR_RANGE texTable0;
+		texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+		CD3DX12_DESCRIPTOR_RANGE texTable1;
+		texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0);
 
 		// Root parameter can be a table, root descriptor or root constants.
-		CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+		CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
 		// Perfomance TIP: Order from most frequent to least frequent.
 		slotRootParameter[0].InitAsShaderResourceView(0, 1);
 		slotRootParameter[1].InitAsShaderResourceView(1, 1);
 		slotRootParameter[2].InitAsConstantBufferView(0);
-		slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
-
+		slotRootParameter[3].InitAsDescriptorTable(1, &texTable0, D3D12_SHADER_VISIBILITY_PIXEL);
+		slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_PIXEL);
+		slotRootParameter[5].InitAsConstantBufferView(1);
+		
 		auto staticSamplers = GetStaticSamplers();
 
 		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter,
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(6, slotRootParameter,
 			(UINT)staticSamplers.size(), staticSamplers.data(),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -548,12 +512,139 @@ namespace Corona {
 		mShaders["standardVS"] = d3dUtil::CompileShader(L"F:\\work_space\\CoronaEngine\\CoronaEngine\\src\\Shaders\\Default.hlsl", nullptr, "VS", "vs_5_1");
 		mShaders["opaquePS"] = d3dUtil::CompileShader(L"F:\\work_space\\CoronaEngine\\CoronaEngine\\src\\Shaders\\Default.hlsl", nullptr, "PS", "ps_5_1");
 
+		mShaders["skyVS"] = d3dUtil::CompileShader(L"F:\\work_space\\CoronaEngine\\CoronaEngine\\src\\Shaders\\Sky.hlsl", nullptr, "VS", "vs_5_1");
+		mShaders["skyPS"] = d3dUtil::CompileShader(L"F:\\work_space\\CoronaEngine\\CoronaEngine\\src\\Shaders\\Sky.hlsl", nullptr, "PS", "ps_5_1");
+
 		mInputLayout =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		};
+	}
+
+	void Sandbox::BuildShapeGeometry()
+	{
+		GeometryGenerator geoGen;
+		GeometryGenerator::MeshData box = geoGen.CreateBox(1.0f, 1.0f, 1.0f, 3);
+		GeometryGenerator::MeshData grid = geoGen.CreateGrid(20.0f, 30.0f, 60, 40);
+		GeometryGenerator::MeshData sphere = geoGen.CreateSphere(0.5f, 20, 20);
+		GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20);
+
+		//
+		// We are concatenating all the geometry into one big vertex/index buffer.  So
+		// define the regions in the buffer each submesh covers.
+		//
+
+		// Cache the vertex offsets to each object in the concatenated vertex buffer.
+		UINT boxVertexOffset = 0;
+		UINT gridVertexOffset = (UINT)box.Vertices.size();
+		UINT sphereVertexOffset = gridVertexOffset + (UINT)grid.Vertices.size();
+		UINT cylinderVertexOffset = sphereVertexOffset + (UINT)sphere.Vertices.size();
+
+		// Cache the starting index for each object in the concatenated index buffer.
+		UINT boxIndexOffset = 0;
+		UINT gridIndexOffset = (UINT)box.Indices32.size();
+		UINT sphereIndexOffset = gridIndexOffset + (UINT)grid.Indices32.size();
+		UINT cylinderIndexOffset = sphereIndexOffset + (UINT)sphere.Indices32.size();
+
+		SubmeshGeometry boxSubmesh;
+		boxSubmesh.IndexCount = (UINT)box.Indices32.size();
+		boxSubmesh.StartIndexLocation = boxIndexOffset;
+		boxSubmesh.BaseVertexLocation = boxVertexOffset;
+
+		SubmeshGeometry gridSubmesh;
+		gridSubmesh.IndexCount = (UINT)grid.Indices32.size();
+		gridSubmesh.StartIndexLocation = gridIndexOffset;
+		gridSubmesh.BaseVertexLocation = gridVertexOffset;
+
+		SubmeshGeometry sphereSubmesh;
+		sphereSubmesh.IndexCount = (UINT)sphere.Indices32.size();
+		sphereSubmesh.StartIndexLocation = sphereIndexOffset;
+		sphereSubmesh.BaseVertexLocation = sphereVertexOffset;
+
+		SubmeshGeometry cylinderSubmesh;
+		cylinderSubmesh.IndexCount = (UINT)cylinder.Indices32.size();
+		cylinderSubmesh.StartIndexLocation = cylinderIndexOffset;
+		cylinderSubmesh.BaseVertexLocation = cylinderVertexOffset;
+
+		//
+		// Extract the vertex elements we are interested in and pack the
+		// vertices of all the meshes into one vertex buffer.
+		//
+
+		auto totalVertexCount =
+			box.Vertices.size() +
+			grid.Vertices.size() +
+			sphere.Vertices.size() +
+			cylinder.Vertices.size();
+
+		std::vector<Vertex> vertices(totalVertexCount);
+
+		UINT k = 0;
+		for (size_t i = 0; i < box.Vertices.size(); ++i, ++k)
+		{
+			vertices[k].Pos = box.Vertices[i].Position;
+			vertices[k].Normal = box.Vertices[i].Normal;
+			vertices[k].TexC = box.Vertices[i].TexC;
+		}
+
+		for (size_t i = 0; i < grid.Vertices.size(); ++i, ++k)
+		{
+			vertices[k].Pos = grid.Vertices[i].Position;
+			vertices[k].Normal = grid.Vertices[i].Normal;
+			vertices[k].TexC = grid.Vertices[i].TexC;
+		}
+
+		for (size_t i = 0; i < sphere.Vertices.size(); ++i, ++k)
+		{
+			vertices[k].Pos = sphere.Vertices[i].Position;
+			vertices[k].Normal = sphere.Vertices[i].Normal;
+			vertices[k].TexC = sphere.Vertices[i].TexC;
+		}
+
+		for (size_t i = 0; i < cylinder.Vertices.size(); ++i, ++k)
+		{
+			vertices[k].Pos = cylinder.Vertices[i].Position;
+			vertices[k].Normal = cylinder.Vertices[i].Normal;
+			vertices[k].TexC = cylinder.Vertices[i].TexC;
+		}
+
+		std::vector<std::uint16_t> indices;
+		indices.insert(indices.end(), std::begin(box.GetIndices16()), std::end(box.GetIndices16()));
+		indices.insert(indices.end(), std::begin(grid.GetIndices16()), std::end(grid.GetIndices16()));
+		indices.insert(indices.end(), std::begin(sphere.GetIndices16()), std::end(sphere.GetIndices16()));
+		indices.insert(indices.end(), std::begin(cylinder.GetIndices16()), std::end(cylinder.GetIndices16()));
+
+		const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+		const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+
+		auto geo = std::make_unique<MeshGeometry>();
+		geo->Name = "shapeGeo";
+
+		ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+		CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+
+		ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+		CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+
+		geo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
+
+		geo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
+			mCommandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
+
+		geo->VertexByteStride = sizeof(Vertex);
+		geo->VertexBufferByteSize = vbByteSize;
+		geo->IndexFormat = DXGI_FORMAT_R16_UINT;
+		geo->IndexBufferByteSize = ibByteSize;
+
+		geo->DrawArgs["box"] = boxSubmesh;
+		geo->DrawArgs["grid"] = gridSubmesh;
+		geo->DrawArgs["sphere"] = sphereSubmesh;
+		geo->DrawArgs["cylinder"] = cylinderSubmesh;
+
+		mGeometries[geo->Name] = std::move(geo);
 	}
 
 	void Sandbox::BuildMyModelGeometry()
@@ -756,6 +847,32 @@ namespace Corona {
 		opaquePsoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 		opaquePsoDesc.DSVFormat = mDepthStencilFormat;
 		ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
+
+		//
+		// PSO for sky.
+		//
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC skyPsoDesc = opaquePsoDesc;
+
+		// The camera is inside the sky sphere, so just turn off culling.
+		skyPsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+
+		// Make sure the depth function is LESS_EQUAL and not just LESS.  
+		// Otherwise, the normalized depth values at z = 1 (NDC) will 
+		// fail the depth test if the depth buffer was cleared to 1.
+		skyPsoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		skyPsoDesc.pRootSignature = mRootSignature.Get();
+		skyPsoDesc.VS =
+		{
+			reinterpret_cast<BYTE*>(mShaders["skyVS"]->GetBufferPointer()),
+			mShaders["skyVS"]->GetBufferSize()
+		};
+		skyPsoDesc.PS =
+		{
+			reinterpret_cast<BYTE*>(mShaders["skyPS"]->GetBufferPointer()),
+			mShaders["skyPS"]->GetBufferSize()
+		};
+		ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&skyPsoDesc, IID_PPV_ARGS(&mPSOs["sky"])));
+
 	}
 
 	void Sandbox::BuildFrameResources()
@@ -774,64 +891,46 @@ namespace Corona {
 		bricks0->MatCBIndex = 0;
 		bricks0->DiffuseSrvHeapIndex = 0;
 		bricks0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		bricks0->FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
-		bricks0->Roughness = 0.1f;
-
-		auto stone0 = std::make_unique<Material>();
-		stone0->Name = "stone0";
-		stone0->MatCBIndex = 1;
-		stone0->DiffuseSrvHeapIndex = 1;
-		stone0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		stone0->FresnelR0 = XMFLOAT3(0.05f, 0.05f, 0.05f);
-		stone0->Roughness = 0.3f;
+		bricks0->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+		bricks0->Roughness = 0.3f;
 
 		auto tile0 = std::make_unique<Material>();
 		tile0->Name = "tile0";
-		tile0->MatCBIndex = 2;
-		tile0->DiffuseSrvHeapIndex = 2;
-		tile0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		tile0->FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
-		tile0->Roughness = 0.3f;
+		tile0->MatCBIndex = 1;
+		tile0->DiffuseSrvHeapIndex = 1;
+		tile0->DiffuseAlbedo = XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f);
+		tile0->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+		tile0->Roughness = 0.1f;
 
-		auto crate0 = std::make_unique<Material>();
-		crate0->Name = "checkboard0";
-		crate0->MatCBIndex = 3;
-		crate0->DiffuseSrvHeapIndex = 3;
-		crate0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		crate0->FresnelR0 = XMFLOAT3(0.05f, 0.05f, 0.05f);
-		crate0->Roughness = 0.2f;
-
-		auto ice0 = std::make_unique<Material>();
-		ice0->Name = "ice0";
-		ice0->MatCBIndex = 4;
-		ice0->DiffuseSrvHeapIndex = 4;
-		ice0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		ice0->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
-		ice0->Roughness = 0.0f;
-
-		auto grass0 = std::make_unique<Material>();
-		grass0->Name = "grass0";
-		grass0->MatCBIndex = 5;
-		grass0->DiffuseSrvHeapIndex = 5;
-		grass0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		grass0->FresnelR0 = XMFLOAT3(0.05f, 0.05f, 0.05f);
-		grass0->Roughness = 0.2f;
+		auto mirror0 = std::make_unique<Material>();
+		mirror0->Name = "mirror0";
+		mirror0->MatCBIndex = 2;
+		mirror0->DiffuseSrvHeapIndex = 2;
+		mirror0->DiffuseAlbedo = XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f);
+		mirror0->FresnelR0 = XMFLOAT3(0.98f, 0.97f, 0.95f);
+		mirror0->Roughness = 0.1f;
 
 		auto skullMat = std::make_unique<Material>();
 		skullMat->Name = "skullMat";
-		skullMat->MatCBIndex = 6;
-		skullMat->DiffuseSrvHeapIndex = 6;
-		skullMat->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		skullMat->FresnelR0 = XMFLOAT3(0.05f, 0.05f, 0.05f);
-		skullMat->Roughness = 0.5f;
+		skullMat->MatCBIndex = 3;
+		skullMat->DiffuseSrvHeapIndex = 2;
+		skullMat->DiffuseAlbedo = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+		skullMat->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+		skullMat->Roughness = 0.2f;
+
+		auto sky = std::make_unique<Material>();
+		sky->Name = "sky";
+		sky->MatCBIndex = 4;
+		sky->DiffuseSrvHeapIndex = 3;
+		sky->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		sky->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+		sky->Roughness = 1.0f;
 
 		mMaterials["bricks0"] = std::move(bricks0);
-		mMaterials["stone0"] = std::move(stone0);
 		mMaterials["tile0"] = std::move(tile0);
-		mMaterials["crate0"] = std::move(crate0);
-		mMaterials["ice0"] = std::move(ice0);
-		mMaterials["grass0"] = std::move(grass0);
+		mMaterials["mirror0"] = std::move(mirror0);
 		mMaterials["skullMat"] = std::move(skullMat);
+		mMaterials["sky"] = std::move(sky);
 	}
 
 	void Sandbox::BuildMyRenderItems()
@@ -855,9 +954,9 @@ namespace Corona {
 		myRitem->Instances.resize(mInstanceCount);
 
 
-		float width = 200.0f;
-		float height = 200.0f;
-		float depth = 200.0f;
+		float width = 50.0f;
+		float height = 50.0f;
+		float depth = 50.0f;
 
 		float x = -0.5f * width;
 		float y = -0.5f * height;
@@ -890,11 +989,27 @@ namespace Corona {
 
 		// All the render items are opaque.
 		for (auto& e : mAllRitems)
-			mOpaqueRitems.push_back(e.get());
+			mRitemLayer[(int)RenderLayer::Opaque].push_back(e.get());
 	}
 
 	void Sandbox::BuildRenderItems()
 	{
+		auto skyRitem = std::make_unique<RenderItem>();
+		XMStoreFloat4x4(&skyRitem->World, XMMatrixScaling(5000.0f, 5000.0f, 5000.0f));
+		skyRitem->TexTransform = MathHelper::Identity4x4();
+		skyRitem->ObjCBIndex = 0;
+		skyRitem->Mat = mMaterials["sky"].get();
+		skyRitem->Geo = mGeometries["shapeGeo"].get();
+		skyRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		skyRitem->InstanceCount = 1;
+		skyRitem->IndexCount = skyRitem->Geo->DrawArgs["sphere"].IndexCount;
+		skyRitem->StartIndexLocation = skyRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
+		skyRitem->BaseVertexLocation = skyRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
+		skyRitem->Instances.resize(1);
+
+		mRitemLayer[(int)RenderLayer::Sky].push_back(skyRitem.get());
+		mAllRitems.push_back(std::move(skyRitem));
+
 		auto skullRitem = std::make_unique<RenderItem>();
 		skullRitem->World = MathHelper::Identity4x4();
 		skullRitem->TexTransform = MathHelper::Identity4x4();
@@ -944,18 +1059,29 @@ namespace Corona {
 			}
 		}
 
-
+		mRitemLayer[(int)RenderLayer::Opaque].push_back(skullRitem.get());
 		mAllRitems.push_back(std::move(skullRitem));
 
-		// All the render items are opaque.
-		for (auto& e : mAllRitems)
-			mOpaqueRitems.push_back(e.get());
 	}
 
 	void Sandbox::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems)
 	{
-		// For each render item...
-		for (size_t i = 0; i < ritems.size(); ++i)
+
+		auto ri = ritems[0];
+
+		cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
+		cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
+		cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+
+		// Set the instance buffer to use for this render-item.  For structured buffers, we can bypass 
+		// the heap and set as a root descriptor.
+		auto instanceBuffer = mCurrFrameResource->InstanceBuffer->Resource();
+		mCommandList->SetGraphicsRootShaderResourceView(5, instanceBuffer->GetGPUVirtualAddress());
+
+		cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+
+		// For each opaque render item...
+		for (size_t i = 1; i < ritems.size(); ++i)
 		{
 			auto ri = ritems[i];
 
