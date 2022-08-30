@@ -91,6 +91,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\BufferManager.h" />
+    <ClInclude Include="src\CommandAllocatorPool.h" />
+    <ClInclude Include="src\CommandListManager.h" />
+    <ClInclude Include="src\DescriptorHeap.h" />
     <ClInclude Include="src\GameCore.h" />
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\GraphicsCore.h" />
@@ -111,9 +115,14 @@
     <ClInclude Include="src\GeometryGenerator.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\crpch.h" />
+    <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\VectorMath.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BufferManager.cpp" />
+    <ClCompile Include="src\CommandAllocatorPool.cpp" />
+    <ClCompile Include="src\CommandListManager.cpp" />
+    <ClCompile Include="src\DescriptorHeap.cpp" />
     <ClCompile Include="src\GameCore.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\GraphicsCore.cpp" />
@@ -126,6 +135,7 @@
     <ClCompile Include="src\crpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\imgui\imgui.vcxproj">
