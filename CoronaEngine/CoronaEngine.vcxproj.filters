@@ -10,82 +10,82 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Corona.h" />
-    <ClInclude Include="src\Corona\Application.h">
+    <ClInclude Include="src\Application.h">
       <Filter>Corona</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corona\Core.h">
+    <ClInclude Include="src\Core.h">
       <Filter>Corona</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corona\ImguiManager.h">
+    <ClInclude Include="src\ImguiManager.h">
       <Filter>Corona</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corona\Log.h">
+    <ClInclude Include="src\Log.h">
       <Filter>Corona</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corona\Sandbox.h">
+    <ClInclude Include="src\Sandbox.h">
       <Filter>Corona</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\Camera.h">
+    <ClInclude Include="src\Camera.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\DDSTextureLoader.h">
+    <ClInclude Include="src\DDSTextureLoader.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\GameTimer.h">
+    <ClInclude Include="src\GameTimer.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\GeometryGenerator.h">
+    <ClInclude Include="src\GeometryGenerator.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\MathHelper.h">
+    <ClInclude Include="src\MathHelper.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\UploadBuffer.h">
+    <ClInclude Include="src\UploadBuffer.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\d3dUtil.h">
+    <ClInclude Include="src\d3dUtil.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\d3dx12.h">
+    <ClInclude Include="src\d3dx12.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\crpch.h" />
-    <ClInclude Include="src\Corona\Geometry.h" />
-    <ClInclude Include="src\Corona\FrameResource.h" />
+    <ClInclude Include="src\Geometry.h" />
+    <ClInclude Include="src\FrameResource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Corona\Application.cpp">
+    <ClCompile Include="src\Application.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
-    <ClCompile Include="src\Corona\ImguiManager.cpp">
+    <ClCompile Include="src\ImguiManager.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
-    <ClCompile Include="src\Corona\Log.cpp">
+    <ClCompile Include="src\Log.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
-    <ClCompile Include="src\Corona\Sandbox.cpp">
+    <ClCompile Include="src\Sandbox.cpp">
       <Filter>Corona</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility\Camera.cpp">
+    <ClCompile Include="src\Camera.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility\DDSTextureLoader.cpp">
+    <ClCompile Include="src\DDSTextureLoader.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility\GameTimer.cpp">
+    <ClCompile Include="src\GameTimer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility\GeometryGenerator.cpp">
+    <ClCompile Include="src\GeometryGenerator.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility\MathHelper.cpp">
+    <ClCompile Include="src\MathHelper.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility\d3dUtil.cpp">
+    <ClCompile Include="src\d3dUtil.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\crpch.cpp" />
-    <ClCompile Include="src\Corona\Geometry.cpp" />
-    <ClCompile Include="src\Corona\FrameResource.cpp" />
+    <ClCompile Include="src\Geometry.cpp" />
+    <ClCompile Include="src\FrameResource.cpp" />
   </ItemGroup>
 </Project>

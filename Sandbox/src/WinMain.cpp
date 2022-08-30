@@ -2,8 +2,7 @@
 
 #ifdef CR_PLATFORM_WINDOWS
 
-#include "Corona/Sandbox.h"
-#include <windows.h>
+#include "GameApp.h"
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -16,25 +15,10 @@ int WINAPI WinMain(
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	//try
-	//{
-	//	Sandbox theApp(hInstance);
-	//	if (!theApp.Initialize())
-	//		return 0;
-
-	//	return theApp.Run();
-	//}
-	//catch (DxException& e)
-	//{
-	//	MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
-	//	return 0;
-	//}
-	Corona::Log::Init();
-	Corona::Sandbox theApp(hInstance);
-	if (!theApp.Initialize())
-		return 0;
-
-	return theApp.Run();
+	GameApp* app = new GameApp();
+	GameCore::RunApplication(*app, L"CrossGate", hInstance, nCmdShow);
+	delete app;
+	return 0;
 }
 
 #endif

@@ -2,13 +2,13 @@
 
 #include "crpch.h"
 
-#include "Core.h"
+#include "GameCore.h"
 #include "spdlog/spdlog.h"
 
 // TODO: Log system will be integrated into imgui console
 namespace Corona {
 
-	class CORONA_API Log
+	class Log
 	{
 	public:
 		static void Init();
