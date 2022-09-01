@@ -403,17 +403,17 @@ void Graphics::Initialize(bool RequireDXRSupport)
 	g_CommandManager.Create(g_Device);
 
 	// Common state was moved to GraphicsCommon.*
-	InitializeCommonState();
+//	InitializeCommonState();
 
 	Display::Initialize();
 
-	GpuTimeManager::Initialize(4096);
-	TemporalEffects::Initialize();
-	PostEffects::Initialize();
-	SSAO::Initialize();
-	TextRenderer::Initialize();
-	GraphRenderer::Initialize();
-	ParticleEffectManager::Initialize(3840, 2160);
+// 	GpuTimeManager::Initialize(4096);
+// 	TemporalEffects::Initialize();
+// 	PostEffects::Initialize();
+// 	SSAO::Initialize();
+// 	TextRenderer::Initialize();
+//	GraphRenderer::Initialize();
+//	ParticleEffectManager::Initialize(3840, 2160);
 }
 
 void Graphics::Shutdown(void)

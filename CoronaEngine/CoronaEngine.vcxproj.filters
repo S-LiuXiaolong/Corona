@@ -1,92 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{1653CE33-0220-293F-2B39-17E717655ECD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Command">
+      <UniqueIdentifier>{2482950D-107B-B45F-39AD-99E42505946B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DescriptorHeap">
+      <UniqueIdentifier>{42D5D30A-AE0C-1CA2-B716-80C523CD429B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Pipeline">
+      <UniqueIdentifier>{FBD334F8-67EA-328E-B061-BEAF1CB70316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Resource">
+      <UniqueIdentifier>{ED0D89A4-5924-873A-A29B-125C0EF157C2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{AFF4887C-9B2B-8A0D-4418-7010302E060F}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BufferManager.h" />
-    <ClInclude Include="src\Color.h" />
-    <ClInclude Include="src\Colorbuffer.h" />
-    <ClInclude Include="src\CommandAllocatorPool.h" />
-    <ClInclude Include="src\CommandListManager.h" />
-    <ClInclude Include="src\DepthBuffer.h" />
-    <ClInclude Include="src\DescriptorHeap.h" />
-    <ClInclude Include="src\EsramAllocator.h" />
-    <ClInclude Include="src\GameCore.h" />
-    <ClInclude Include="src\GameTimer.h" />
-    <ClInclude Include="src\Geometry.h" />
-    <ClInclude Include="src\GeometryGenerator.h" />
-    <ClInclude Include="src\GpuResource.h" />
-    <ClInclude Include="src\GraphicsCore.h" />
-    <ClInclude Include="src\ImguiManager.h" />
-    <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\Math\BoundingPlane.h">
+    <ClInclude Include="Core\BufferManager.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Color.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Colorbuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandAllocatorPool.h">
+      <Filter>Graphics\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandContext.h">
+      <Filter>Graphics\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandListManager.h">
+      <Filter>Graphics\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DepthBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DescriptorHeap.h">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Display.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DynamicDescriptorHeap.h">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\EsramAllocator.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameCore.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameTimer.h" />
+    <ClInclude Include="Core\Geometry.h" />
+    <ClInclude Include="Core\GeometryGenerator.h" />
+    <ClInclude Include="Core\GpuBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GpuResource.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GraphicsCore.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Hash.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ImguiManager.h" />
+    <ClInclude Include="Core\LinearAllocator.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Log.h" />
+    <ClInclude Include="Core\Math\BoundingPlane.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\BoundingSphere.h">
+    <ClInclude Include="Core\Math\BoundingSphere.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Common.h">
+    <ClInclude Include="Core\Math\Common.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Frustum.h">
+    <ClInclude Include="Core\Math\Frustum.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Functions.inl">
+    <ClInclude Include="Core\Math\Functions.inl">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Matrix3.h">
+    <ClInclude Include="Core\Math\Matrix3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Matrix4.h">
+    <ClInclude Include="Core\Math\Matrix4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Quaternion.h">
+    <ClInclude Include="Core\Math\Quaternion.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Random.h">
+    <ClInclude Include="Core\Math\Random.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Scalar.h">
+    <ClInclude Include="Core\Math\Scalar.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Transform.h">
+    <ClInclude Include="Core\Math\Transform.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Vector.h">
+    <ClInclude Include="Core\Math\Vector.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\PixelBuffer.h" />
-    <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\VectorMath.h" />
-    <ClInclude Include="src\crpch.h" />
-    <ClInclude Include="src\d3dx12.h" />
+    <ClInclude Include="Core\PipelineState.h">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PixelBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RootSignature.h">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\SystemTime.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UploadBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utility.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VectorMath.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\crpch.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\d3dx12.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BufferManager.cpp" />
-    <ClCompile Include="src\Color.cpp" />
-    <ClCompile Include="src\ColorBuffer.cpp" />
-    <ClCompile Include="src\CommandAllocatorPool.cpp" />
-    <ClCompile Include="src\CommandListManager.cpp" />
-    <ClCompile Include="src\DepthBuffer.cpp" />
-    <ClCompile Include="src\DescriptorHeap.cpp" />
-    <ClCompile Include="src\GameCore.cpp" />
-    <ClCompile Include="src\GameTimer.cpp" />
-    <ClCompile Include="src\Geometry.cpp" />
-    <ClCompile Include="src\GeometryGenerator.cpp" />
-    <ClCompile Include="src\GraphicsCore.cpp" />
-    <ClCompile Include="src\ImguiManager.cpp" />
-    <ClCompile Include="src\Log.cpp" />
-    <ClCompile Include="src\Math\Frustum.cpp">
+    <ClCompile Include="Core\BufferManager.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Color.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ColorBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandAllocatorPool.cpp">
+      <Filter>Graphics\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandContext.cpp">
+      <Filter>Graphics\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandListManager.cpp">
+      <Filter>Graphics\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DepthBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DescriptorHeap.cpp">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Display.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DynamicDecriptorHeap.cpp">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GameCore.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GameTimer.cpp" />
+    <ClCompile Include="Core\Geometry.cpp" />
+    <ClCompile Include="Core\GeometryGenerator.cpp" />
+    <ClCompile Include="Core\GpuBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GraphicsCore.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ImguiManager.cpp" />
+    <ClCompile Include="Core\LinearAllocator.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Log.cpp" />
+    <ClCompile Include="Core\Math\Frustum.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Math\Random.cpp">
+    <ClCompile Include="Core\Math\Random.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\PixelBuffer.cpp" />
-    <ClCompile Include="src\Utility.cpp" />
-    <ClCompile Include="src\crpch.cpp" />
+    <ClCompile Include="Core\PipelineState.cpp">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PixelBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RootSignature.cpp">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\SystemTime.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\UploadBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Utility.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\crpch.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -59,7 +59,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,7 +75,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -91,11 +91,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\GameApp.h" />
+    <ClInclude Include="Core\GameApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GameApp.cpp" />
-    <ClCompile Include="src\WinMain.cpp" />
+    <ClCompile Include="Core\GameApp.cpp" />
+    <ClCompile Include="Core\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CoronaEngine\CoronaEngine.vcxproj">

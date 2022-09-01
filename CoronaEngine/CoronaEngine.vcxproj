@@ -58,7 +58,7 @@
       <PrecompiledHeaderFile>crpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CR_PLATFORM_WINDOWS;CR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Core;vendor\spdlog\include;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,7 +75,7 @@
       <PrecompiledHeaderFile>crpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CR_PLATFORM_WINDOWS;CR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Core;vendor\spdlog\include;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -91,64 +91,81 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\BufferManager.h" />
-    <ClInclude Include="src\Color.h" />
-    <ClInclude Include="src\Colorbuffer.h" />
-    <ClInclude Include="src\CommandAllocatorPool.h" />
-    <ClInclude Include="src\CommandListManager.h" />
-    <ClInclude Include="src\DepthBuffer.h" />
-    <ClInclude Include="src\DescriptorHeap.h" />
-    <ClInclude Include="src\EsramAllocator.h" />
-    <ClInclude Include="src\GameCore.h" />
-    <ClInclude Include="src\GameTimer.h" />
-    <ClInclude Include="src\Geometry.h" />
-    <ClInclude Include="src\GeometryGenerator.h" />
-    <ClInclude Include="src\GpuResource.h" />
-    <ClInclude Include="src\GraphicsCore.h" />
-    <ClInclude Include="src\ImguiManager.h" />
-    <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\Math\BoundingPlane.h" />
-    <ClInclude Include="src\Math\BoundingSphere.h" />
-    <ClInclude Include="src\Math\Common.h" />
-    <ClInclude Include="src\Math\Frustum.h" />
-    <ClInclude Include="src\Math\Functions.inl" />
-    <ClInclude Include="src\Math\Matrix3.h" />
-    <ClInclude Include="src\Math\Matrix4.h" />
-    <ClInclude Include="src\Math\Quaternion.h" />
-    <ClInclude Include="src\Math\Random.h" />
-    <ClInclude Include="src\Math\Scalar.h" />
-    <ClInclude Include="src\Math\Transform.h" />
-    <ClInclude Include="src\Math\Vector.h" />
-    <ClInclude Include="src\PixelBuffer.h" />
-    <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\VectorMath.h" />
-    <ClInclude Include="src\crpch.h" />
-    <ClInclude Include="src\d3dx12.h" />
-    <ClInclude Include="src\SystemTime.h" />
+    <ClInclude Include="Core\BufferManager.h" />
+    <ClInclude Include="Core\Color.h" />
+    <ClInclude Include="Core\Colorbuffer.h" />
+    <ClInclude Include="Core\CommandAllocatorPool.h" />
+    <ClInclude Include="Core\CommandContext.h" />
+    <ClInclude Include="Core\CommandListManager.h" />
+    <ClInclude Include="Core\DepthBuffer.h" />
+    <ClInclude Include="Core\DescriptorHeap.h" />
+    <ClInclude Include="Core\Display.h" />
+    <ClInclude Include="Core\DynamicDescriptorHeap.h" />
+    <ClInclude Include="Core\EsramAllocator.h" />
+    <ClInclude Include="Core\GameCore.h" />
+    <ClInclude Include="Core\GameTimer.h" />
+    <ClInclude Include="Core\Geometry.h" />
+    <ClInclude Include="Core\GeometryGenerator.h" />
+    <ClInclude Include="Core\GpuBuffer.h" />
+    <ClInclude Include="Core\GpuResource.h" />
+    <ClInclude Include="Core\GraphicsCore.h" />
+    <ClInclude Include="Core\Hash.h" />
+    <ClInclude Include="Core\ImguiManager.h" />
+    <ClInclude Include="Core\LinearAllocator.h" />
+    <ClInclude Include="Core\Log.h" />
+    <ClInclude Include="Core\Math\BoundingPlane.h" />
+    <ClInclude Include="Core\Math\BoundingSphere.h" />
+    <ClInclude Include="Core\Math\Common.h" />
+    <ClInclude Include="Core\Math\Frustum.h" />
+    <ClInclude Include="Core\Math\Functions.inl" />
+    <ClInclude Include="Core\Math\Matrix3.h" />
+    <ClInclude Include="Core\Math\Matrix4.h" />
+    <ClInclude Include="Core\Math\Quaternion.h" />
+    <ClInclude Include="Core\Math\Random.h" />
+    <ClInclude Include="Core\Math\Scalar.h" />
+    <ClInclude Include="Core\Math\Transform.h" />
+    <ClInclude Include="Core\Math\Vector.h" />
+    <ClInclude Include="Core\PipelineState.h" />
+    <ClInclude Include="Core\PixelBuffer.h" />
+    <ClInclude Include="Core\RootSignature.h" />
+    <ClInclude Include="Core\SystemTime.h" />
+    <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Core\Utility.h" />
+    <ClInclude Include="Core\VectorMath.h" />
+    <ClInclude Include="Core\crpch.h" />
+    <ClInclude Include="Core\d3dx12.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BufferManager.cpp" />
-    <ClCompile Include="src\Color.cpp" />
-    <ClCompile Include="src\ColorBuffer.cpp" />
-    <ClCompile Include="src\CommandAllocatorPool.cpp" />
-    <ClCompile Include="src\CommandListManager.cpp" />
-    <ClCompile Include="src\DepthBuffer.cpp" />
-    <ClCompile Include="src\DescriptorHeap.cpp" />
-    <ClCompile Include="src\GameCore.cpp" />
-    <ClCompile Include="src\GameTimer.cpp" />
-    <ClCompile Include="src\Geometry.cpp" />
-    <ClCompile Include="src\GeometryGenerator.cpp" />
-    <ClCompile Include="src\GraphicsCore.cpp" />
-    <ClCompile Include="src\ImguiManager.cpp" />
-    <ClCompile Include="src\Log.cpp" />
-    <ClCompile Include="src\Math\Frustum.cpp" />
-    <ClCompile Include="src\Math\Random.cpp" />
-    <ClCompile Include="src\PixelBuffer.cpp" />
-    <ClCompile Include="src\Utility.cpp" />
-    <ClCompile Include="src\crpch.cpp">
+    <ClCompile Include="Core\BufferManager.cpp" />
+    <ClCompile Include="Core\Color.cpp" />
+    <ClCompile Include="Core\ColorBuffer.cpp" />
+    <ClCompile Include="Core\CommandAllocatorPool.cpp" />
+    <ClCompile Include="Core\CommandContext.cpp" />
+    <ClCompile Include="Core\CommandListManager.cpp" />
+    <ClCompile Include="Core\DepthBuffer.cpp" />
+    <ClCompile Include="Core\DescriptorHeap.cpp" />
+    <ClCompile Include="Core\Display.cpp" />
+    <ClCompile Include="Core\DynamicDecriptorHeap.cpp" />
+    <ClCompile Include="Core\GameCore.cpp" />
+    <ClCompile Include="Core\GameTimer.cpp" />
+    <ClCompile Include="Core\Geometry.cpp" />
+    <ClCompile Include="Core\GeometryGenerator.cpp" />
+    <ClCompile Include="Core\GpuBuffer.cpp" />
+    <ClCompile Include="Core\GraphicsCore.cpp" />
+    <ClCompile Include="Core\ImguiManager.cpp" />
+    <ClCompile Include="Core\LinearAllocator.cpp" />
+    <ClCompile Include="Core\Log.cpp" />
+    <ClCompile Include="Core\Math\Frustum.cpp" />
+    <ClCompile Include="Core\Math\Random.cpp" />
+    <ClCompile Include="Core\PipelineState.cpp" />
+    <ClCompile Include="Core\PixelBuffer.cpp" />
+    <ClCompile Include="Core\RootSignature.cpp" />
+    <ClCompile Include="Core\SystemTime.cpp" />
+    <ClCompile Include="Core\UploadBuffer.cpp" />
+    <ClCompile Include="Core\Utility.cpp" />
+    <ClCompile Include="Core\crpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\SystemTime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\imgui\imgui.vcxproj">

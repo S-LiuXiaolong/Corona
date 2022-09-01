@@ -16,7 +16,7 @@
 // #include "ColorBuffer.h"
 #include "DepthBuffer.h"
 // #include "ShadowBuffer.h"
-// #include "GpuBuffer.h"
+#include "GpuBuffer.h"
 #include "GraphicsCore.h"
 
 namespace Graphics
