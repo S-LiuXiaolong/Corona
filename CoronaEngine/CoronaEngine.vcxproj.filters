@@ -6,13 +6,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BufferManager.h" />
+    <ClInclude Include="src\Color.h" />
+    <ClInclude Include="src\Colorbuffer.h" />
     <ClInclude Include="src\CommandAllocatorPool.h" />
     <ClInclude Include="src\CommandListManager.h" />
+    <ClInclude Include="src\DepthBuffer.h" />
     <ClInclude Include="src\DescriptorHeap.h" />
+    <ClInclude Include="src\EsramAllocator.h" />
     <ClInclude Include="src\GameCore.h" />
     <ClInclude Include="src\GameTimer.h" />
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\GeometryGenerator.h" />
+    <ClInclude Include="src\GpuResource.h" />
     <ClInclude Include="src\GraphicsCore.h" />
     <ClInclude Include="src\ImguiManager.h" />
     <ClInclude Include="src\Log.h" />
@@ -26,6 +32,9 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Math\Frustum.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\Functions.inl">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Math\Matrix3.h">
@@ -49,14 +58,19 @@
     <ClInclude Include="src\Math\Vector.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\PixelBuffer.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\VectorMath.h" />
     <ClInclude Include="src\crpch.h" />
     <ClInclude Include="src\d3dx12.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BufferManager.cpp" />
+    <ClCompile Include="src\Color.cpp" />
+    <ClCompile Include="src\ColorBuffer.cpp" />
     <ClCompile Include="src\CommandAllocatorPool.cpp" />
     <ClCompile Include="src\CommandListManager.cpp" />
+    <ClCompile Include="src\DepthBuffer.cpp" />
     <ClCompile Include="src\DescriptorHeap.cpp" />
     <ClCompile Include="src\GameCore.cpp" />
     <ClCompile Include="src\GameTimer.cpp" />
@@ -71,6 +85,7 @@
     <ClCompile Include="src\Math\Random.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\PixelBuffer.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\crpch.cpp" />
   </ItemGroup>

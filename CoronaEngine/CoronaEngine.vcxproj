@@ -92,11 +92,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\BufferManager.h" />
+    <ClInclude Include="src\Color.h" />
+    <ClInclude Include="src\Colorbuffer.h" />
     <ClInclude Include="src\CommandAllocatorPool.h" />
     <ClInclude Include="src\CommandListManager.h" />
+    <ClInclude Include="src\DepthBuffer.h" />
     <ClInclude Include="src\DescriptorHeap.h" />
+    <ClInclude Include="src\EsramAllocator.h" />
     <ClInclude Include="src\GameCore.h" />
+    <ClInclude Include="src\GameTimer.h" />
     <ClInclude Include="src\Geometry.h" />
+    <ClInclude Include="src\GeometryGenerator.h" />
+    <ClInclude Include="src\GpuResource.h" />
     <ClInclude Include="src\GraphicsCore.h" />
     <ClInclude Include="src\ImguiManager.h" />
     <ClInclude Include="src\Log.h" />
@@ -104,6 +111,7 @@
     <ClInclude Include="src\Math\BoundingSphere.h" />
     <ClInclude Include="src\Math\Common.h" />
     <ClInclude Include="src\Math\Frustum.h" />
+    <ClInclude Include="src\Math\Functions.inl" />
     <ClInclude Include="src\Math\Matrix3.h" />
     <ClInclude Include="src\Math\Matrix4.h" />
     <ClInclude Include="src\Math\Quaternion.h" />
@@ -111,31 +119,36 @@
     <ClInclude Include="src\Math\Scalar.h" />
     <ClInclude Include="src\Math\Transform.h" />
     <ClInclude Include="src\Math\Vector.h" />
-    <ClInclude Include="src\GameTimer.h" />
-    <ClInclude Include="src\GeometryGenerator.h" />
-    <ClInclude Include="src\d3dx12.h" />
-    <ClInclude Include="src\crpch.h" />
+    <ClInclude Include="src\PixelBuffer.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\VectorMath.h" />
+    <ClInclude Include="src\crpch.h" />
+    <ClInclude Include="src\d3dx12.h" />
+    <ClInclude Include="src\SystemTime.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BufferManager.cpp" />
+    <ClCompile Include="src\Color.cpp" />
+    <ClCompile Include="src\ColorBuffer.cpp" />
     <ClCompile Include="src\CommandAllocatorPool.cpp" />
     <ClCompile Include="src\CommandListManager.cpp" />
+    <ClCompile Include="src\DepthBuffer.cpp" />
     <ClCompile Include="src\DescriptorHeap.cpp" />
     <ClCompile Include="src\GameCore.cpp" />
+    <ClCompile Include="src\GameTimer.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
+    <ClCompile Include="src\GeometryGenerator.cpp" />
     <ClCompile Include="src\GraphicsCore.cpp" />
     <ClCompile Include="src\ImguiManager.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Math\Frustum.cpp" />
     <ClCompile Include="src\Math\Random.cpp" />
-    <ClCompile Include="src\GameTimer.cpp" />
-    <ClCompile Include="src\GeometryGenerator.cpp" />
+    <ClCompile Include="src\PixelBuffer.cpp" />
+    <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\crpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Utility.cpp" />
+    <ClCompile Include="src\SystemTime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\imgui\imgui.vcxproj">
@@ -145,8 +158,7 @@
       <Project>{724885F2-5EEA-AFC8-47A5-C31C33E63619}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Math\Functions.inl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>
