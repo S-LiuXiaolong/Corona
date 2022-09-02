@@ -15,8 +15,11 @@
 
 #include "DescriptorHeap.h"
 #include "RootSignature.h"
+// #include "CommandContext.h"
 #include <vector>
 #include <queue>
+
+class CommandContext;
 
 namespace Graphics
 {

@@ -91,7 +91,7 @@ project "CoronaEngine"
 			"CoronaEngine/Core/BufferManager.cpp",
 			"CoronaEngine/Core/BufferManager.h",
 			"CoronaEngine/Core/ColorBuffer.cpp",
-			"CoronaEngine/Core/Colorbuffer.h",
+			"CoronaEngine/Core/ColorBuffer.h",
 			"CoronaEngine/Core/DepthBuffer.cpp",
 			"CoronaEngine/Core/DepthBuffer.h",
 			"CoronaEngine/Core/EsramAllocator.h",
@@ -151,6 +151,8 @@ project "CoronaEngine"
 			"CoronaEngine/Core/Hash.h",
 			"CoronaEngine/Core/GraphicsCore.cpp",
 			"CoronaEngine/Core/GraphicsCore.h",
+			"CoronaEngine/Core/ImageScaling.cpp",
+			"CoronaEngine/Core/ImageScaling.h",
 		}
 	}
 
@@ -174,6 +176,7 @@ project "CoronaEngine"
 
 
 project "Sandbox"
+	nuget { "WinPixEventRuntime:1.0.220810001" }	
 	location "Sandbox"
 	kind "WindowedApp"
 	language "C++"

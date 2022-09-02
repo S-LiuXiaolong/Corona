@@ -165,6 +165,7 @@ void Graphics::Initialize(bool RequireDXRSupport)
 {
 	Microsoft::WRL::ComPtr<ID3D12Device> pDevice;
 
+	// 创建了一大堆用来debug的东西、以及device和factory
 	uint32_t useDebugLayers = 0;
 	CommandLineArgs::GetInteger(L"debug", useDebugLayers);
 #if _DEBUG
@@ -295,7 +296,7 @@ void Graphics::Initialize(bool RequireDXRSupport)
 		g_Device = pDevice.Detach();
 	}
 
-	// 这后面一堆玩意儿能都丢了吗
+	// 这后面一堆玩意儿能都丢了吗（恼）
 	// ------------------------------------------------------------------
 #ifndef RELEASE
 	else
@@ -400,6 +401,8 @@ void Graphics::Initialize(bool RequireDXRSupport)
 	}
 	// ------------------------------------------------------------------
 
+	// 创建GraphicsQueue、ComputeQueue、CopyQueue以及分别对应的fence和allocator
+	// 似乎commandlist是通过在GameApp中使用 GraphicsContext::Begin(const std::wstring&) 来创建
 	g_CommandManager.Create(g_Device);
 
 	// Common state was moved to GraphicsCommon.*

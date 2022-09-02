@@ -8,13 +8,18 @@
 //
 // Developed by Minigraph
 //
-// Author:  James Stanard 
-//
 
-#include "crpch.h"
-#include "Random.h"
+#pragma once
 
-namespace Math
+class GraphicsContext;
+class ColorBuffer;
+enum DXGI_FORMAT;
+
+namespace ImageScaling
 {
-    RandomNumberGenerator g_RNG;
+	void Initialize(DXGI_FORMAT DestFormat);
+
+	enum eScalingFilter { kBilinear, kSharpening, kBicubic, kLanczos, kFilterCount };
+
+	void Upscale(GraphicsContext& Context, ColorBuffer& dest, ColorBuffer& source, eScalingFilter tech = kLanczos);
 }

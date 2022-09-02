@@ -99,7 +99,7 @@
   <ItemGroup>
     <ClInclude Include="Core\BufferManager.h" />
     <ClInclude Include="Core\Color.h" />
-    <ClInclude Include="Core\Colorbuffer.h" />
+    <ClInclude Include="Core\ColorBuffer.h" />
     <ClInclude Include="Core\CommandAllocatorPool.h" />
     <ClInclude Include="Core\CommandContext.h" />
     <ClInclude Include="Core\CommandListManager.h" />
@@ -118,6 +118,7 @@
     <ClInclude Include="Core\GraphicsCommon.h" />
     <ClInclude Include="Core\GraphicsCore.h" />
     <ClInclude Include="Core\Hash.h" />
+    <ClInclude Include="Core\ImageScaling.h" />
     <ClInclude Include="Core\ImguiManager.h" />
     <ClInclude Include="Core\LinearAllocator.h" />
     <ClInclude Include="Core\Log.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Core\GpuTimeManager.cpp" />
     <ClCompile Include="Core\GraphicsCommon.cpp" />
     <ClCompile Include="Core\GraphicsCore.cpp" />
+    <ClCompile Include="Core\ImageScaling.cpp" />
     <ClCompile Include="Core\ImguiManager.cpp" />
     <ClCompile Include="Core\LinearAllocator.cpp" />
     <ClCompile Include="Core\Log.cpp" />

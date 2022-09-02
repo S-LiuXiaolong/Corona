@@ -108,8 +108,8 @@ namespace Graphics
 
 namespace BitonicSort
 {
-	void Initialize(void);
-	void Shutdown(void);
+// 	void Initialize(void);
+// 	void Shutdown(void);
 }
 
 void Graphics::InitializeCommonState(void)
@@ -260,7 +260,7 @@ void Graphics::InitializeCommonState(void)
 // 	DrawIndirectCommandSignature[0].Draw();
 // 	DrawIndirectCommandSignature.Finalize();
 
-	BitonicSort::Initialize();
+//	BitonicSort::Initialize();
 
 	g_CommonRS.Reset(4, 3);
 	g_CommonRS[0].InitAsConstants(0, 4);
@@ -307,5 +307,5 @@ void Graphics::DestroyCommonState(void)
 // 	DispatchIndirectCommandSignature.Destroy();
 // 	DrawIndirectCommandSignature.Destroy();
 
-	BitonicSort::Shutdown();
+//	BitonicSort::Shutdown();
 }

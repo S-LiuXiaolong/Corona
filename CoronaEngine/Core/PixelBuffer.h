@@ -55,7 +55,7 @@ protected:
     // 生成一个纹理资源
     void CreateTextureResource(ID3D12Device* Device, const std::wstring& Name, const D3D12_RESOURCE_DESC& ResourceDesc,
         D3D12_CLEAR_VALUE ClearValue, D3D12_GPU_VIRTUAL_ADDRESS VidMemPtr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN);
-    // 生成一个纹理资源
+    // 生成一个纹理资源（因为没有实现EsramAllocator所以这个方法没啥用，用上面那个就行）
     void CreateTextureResource(ID3D12Device* Device, const std::wstring& Name, const D3D12_RESOURCE_DESC& ResourceDesc,
         D3D12_CLEAR_VALUE ClearValue, EsramAllocator& Allocator);
 

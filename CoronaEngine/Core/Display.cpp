@@ -19,7 +19,7 @@
 #include "SystemTime.h"
 #include "CommandContext.h"
 #include "RootSignature.h"
-// #include "ImageScaling.h"
+#include "ImageScaling.h"
 // #include "TemporalEffects.h"
 
 #pragma comment(lib, "dxgi.lib") 
@@ -52,7 +52,7 @@ namespace GameCore { extern HWND g_hWnd; }
 DXGI_FORMAT SwapChainFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
 
 using namespace Math;
-// using namespace ImageScaling;
+using namespace ImageScaling;
 using namespace Graphics;
 
 namespace
@@ -229,6 +229,7 @@ void Display::Initialize(void)
 	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
 	ASSERT_SUCCEEDED(CreateDXGIFactory2(0, MY_IID_PPV_ARGS(&dxgiFactory)));
 
+	// ´´½¨½»»»Á´
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = g_DisplayWidth;
 	swapChainDesc.Height = g_DisplayHeight;

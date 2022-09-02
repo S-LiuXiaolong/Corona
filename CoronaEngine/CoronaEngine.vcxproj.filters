@@ -36,7 +36,7 @@
     <ClInclude Include="Core\Color.h">
       <Filter>Core\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Colorbuffer.h">
+    <ClInclude Include="Core\ColorBuffer.h">
       <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\CommandAllocatorPool.h">
@@ -91,6 +91,9 @@
       <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\Hash.h">
+      <Filter>Core\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ImageScaling.h">
       <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\ImguiManager.h">
@@ -228,6 +231,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\GraphicsCore.cpp">
+      <Filter>Core\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ImageScaling.cpp">
       <Filter>Core\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Core\ImguiManager.cpp">
