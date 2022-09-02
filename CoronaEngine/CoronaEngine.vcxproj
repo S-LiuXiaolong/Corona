@@ -58,12 +58,15 @@
       <PrecompiledHeaderFile>crpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CR_PLATFORM_WINDOWS;CR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>Core;vendor\spdlog\include;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Core;vendor\spdlog\include;..\bin\Debug-windows-x86_64\CoronaEngine;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
+    <FxCompile>
+      <ShaderModel>6.2</ShaderModel>
+    </FxCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -75,7 +78,7 @@
       <PrecompiledHeaderFile>crpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CR_PLATFORM_WINDOWS;CR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>Core;vendor\spdlog\include;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Core;vendor\spdlog\include;..\bin\Release-windows-x86_64\CoronaEngine;vendor\imgui;vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -84,6 +87,9 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
+    <FxCompile>
+      <ShaderModel>6.2</ShaderModel>
+    </FxCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -101,13 +107,15 @@
     <ClInclude Include="Core\DescriptorHeap.h" />
     <ClInclude Include="Core\Display.h" />
     <ClInclude Include="Core\DynamicDescriptorHeap.h" />
+    <ClInclude Include="Core\EngineTuning.h" />
     <ClInclude Include="Core\EsramAllocator.h" />
     <ClInclude Include="Core\GameCore.h" />
-    <ClInclude Include="Core\GameTimer.h" />
-    <ClInclude Include="Core\Geometry.h" />
-    <ClInclude Include="Core\GeometryGenerator.h" />
+    <ClInclude Include="Core\GameInput.h" />
+    <ClInclude Include="Core\GeometryGeneratorOld.h" />
     <ClInclude Include="Core\GpuBuffer.h" />
     <ClInclude Include="Core\GpuResource.h" />
+    <ClInclude Include="Core\GpuTimeManager.h" />
+    <ClInclude Include="Core\GraphicsCommon.h" />
     <ClInclude Include="Core\GraphicsCore.h" />
     <ClInclude Include="Core\Hash.h" />
     <ClInclude Include="Core\ImguiManager.h" />
@@ -127,9 +135,12 @@
     <ClInclude Include="Core\Math\Vector.h" />
     <ClInclude Include="Core\PipelineState.h" />
     <ClInclude Include="Core\PixelBuffer.h" />
+    <ClInclude Include="Core\ReadBackBuffer.h" />
     <ClInclude Include="Core\RootSignature.h" />
+    <ClInclude Include="Core\SamplerManager.h" />
     <ClInclude Include="Core\SystemTime.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Core\Util\CommandLineArg.h" />
     <ClInclude Include="Core\Utility.h" />
     <ClInclude Include="Core\VectorMath.h" />
     <ClInclude Include="Core\crpch.h" />
@@ -146,11 +157,13 @@
     <ClCompile Include="Core\DescriptorHeap.cpp" />
     <ClCompile Include="Core\Display.cpp" />
     <ClCompile Include="Core\DynamicDecriptorHeap.cpp" />
+    <ClCompile Include="Core\EngineTuning.cpp" />
     <ClCompile Include="Core\GameCore.cpp" />
-    <ClCompile Include="Core\GameTimer.cpp" />
-    <ClCompile Include="Core\Geometry.cpp" />
-    <ClCompile Include="Core\GeometryGenerator.cpp" />
+    <ClCompile Include="Core\GameInput.cpp" />
+    <ClCompile Include="Core\GeometryGeneratorOld.cpp" />
     <ClCompile Include="Core\GpuBuffer.cpp" />
+    <ClCompile Include="Core\GpuTimeManager.cpp" />
+    <ClCompile Include="Core\GraphicsCommon.cpp" />
     <ClCompile Include="Core\GraphicsCore.cpp" />
     <ClCompile Include="Core\ImguiManager.cpp" />
     <ClCompile Include="Core\LinearAllocator.cpp" />
@@ -159,13 +172,1399 @@
     <ClCompile Include="Core\Math\Random.cpp" />
     <ClCompile Include="Core\PipelineState.cpp" />
     <ClCompile Include="Core\PixelBuffer.cpp" />
+    <ClCompile Include="Core\ReadBackBuffer.cpp" />
     <ClCompile Include="Core\RootSignature.cpp" />
+    <ClCompile Include="Core\SamplerManager.cpp" />
     <ClCompile Include="Core\SystemTime.cpp" />
     <ClCompile Include="Core\UploadBuffer.cpp" />
+    <ClCompile Include="Core\Util\CommandLineArg.cpp" />
     <ClCompile Include="Core\Utility.cpp" />
     <ClCompile Include="Core\crpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Core\Shaders\AdaptExposureCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAdaptExposureCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AdaptExposureCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AdaptExposureCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoBlurUpsampleBlendOutCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoBlurUpsampleBlendOutCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsampleBlendOutCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsampleBlendOutCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoBlurUpsampleCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoBlurUpsampleCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsampleCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsampleCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoBlurUpsamplePreMinBlendOutCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoBlurUpsamplePreMinBlendOutCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsamplePreMinBlendOutCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsamplePreMinBlendOutCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoBlurUpsamplePreMinCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoBlurUpsamplePreMinCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsamplePreMinCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoBlurUpsamplePreMinCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoPrepareDepthBuffers1CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoPrepareDepthBuffers1CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoPrepareDepthBuffers1CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoPrepareDepthBuffers1CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoPrepareDepthBuffers2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoPrepareDepthBuffers2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoPrepareDepthBuffers2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoPrepareDepthBuffers2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoRender1CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoRender1CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoRender1CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoRender1CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AoRender2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAoRender2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AoRender2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AoRender2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ApplyBloom2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pApplyBloom2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ApplyBloom2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ApplyBloom2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ApplyBloomCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pApplyBloomCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ApplyBloomCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ApplyBloomCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\AverageLumaCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pAverageLumaCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/AverageLumaCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/AverageLumaCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicHorizontalUpsamplePS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBicubicHorizontalUpsamplePS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicHorizontalUpsamplePS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicHorizontalUpsamplePS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicUpsampleCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBicubicUpsampleCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicUpsampleFast16CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBicubicUpsampleFast16CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleFast16CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleFast16CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicUpsampleFast24CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBicubicUpsampleFast24CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleFast24CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleFast24CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicUpsampleFast32CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBicubicUpsampleFast32CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleFast32CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleFast32CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicUpsampleGammaPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBicubicUpsampleGammaPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleGammaPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsampleGammaPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicUpsamplePS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBicubicUpsamplePS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsamplePS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicUpsamplePS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BicubicVerticalUpsamplePS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBicubicVerticalUpsamplePS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BicubicVerticalUpsamplePS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BicubicVerticalUpsamplePS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BilinearUpsamplePS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBilinearUpsamplePS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BilinearUpsamplePS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BilinearUpsamplePS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\Bitonic32InnerSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonic32InnerSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic32InnerSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic32InnerSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\Bitonic32OuterSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonic32OuterSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic32OuterSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic32OuterSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\Bitonic32PreSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonic32PreSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic32PreSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic32PreSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\Bitonic64InnerSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonic64InnerSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic64InnerSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic64InnerSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\Bitonic64OuterSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonic64OuterSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic64OuterSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic64OuterSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\Bitonic64PreSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonic64PreSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic64PreSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/Bitonic64PreSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BitonicIndirectArgsCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBitonicIndirectArgsCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BitonicIndirectArgsCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BitonicIndirectArgsCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BlendUIHDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBlendUIHDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BlendUIHDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BlendUIHDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BloomExtractAndDownsampleHdrCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBloomExtractAndDownsampleHdrCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BloomExtractAndDownsampleHdrCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BloomExtractAndDownsampleHdrCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BloomExtractAndDownsampleLdrCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBloomExtractAndDownsampleLdrCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BloomExtractAndDownsampleLdrCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BloomExtractAndDownsampleLdrCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BlurCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBlurCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BlurCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BlurCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BoundNeighborhoodCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pBoundNeighborhoodCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BoundNeighborhoodCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BoundNeighborhoodCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\BufferCopyPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pBufferCopyPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/BufferCopyPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/BufferCopyPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\CameraMotionBlurPrePassCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pCameraMotionBlurPrePassCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/CameraMotionBlurPrePassCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/CameraMotionBlurPrePassCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\CameraMotionBlurPrePassLinearZCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pCameraMotionBlurPrePassLinearZCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/CameraMotionBlurPrePassLinearZCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/CameraMotionBlurPrePassLinearZCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\CameraVelocityCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pCameraVelocityCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/CameraVelocityCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/CameraVelocityCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\CompositeHDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pCompositeHDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/CompositeHDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/CompositeHDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\CompositeSDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pCompositeSDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/CompositeSDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/CompositeSDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\CopyBackPostBufferCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pCopyBackPostBufferCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/CopyBackPostBufferCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/CopyBackPostBufferCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DebugDrawHistogramCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDebugDrawHistogramCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DebugDrawHistogramCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DebugDrawHistogramCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DebugLuminanceHdr2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDebugLuminanceHdr2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceHdr2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceHdr2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DebugLuminanceHdrCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDebugLuminanceHdrCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceHdrCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceHdrCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DebugLuminanceLdr2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDebugLuminanceLdr2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceLdr2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceLdr2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DebugLuminanceLdrCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDebugLuminanceLdrCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceLdrCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DebugLuminanceLdrCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DebugSSAOCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDebugSSAOCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DebugSSAOCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DebugSSAOCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFCombine2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFCombine2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombine2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombine2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFCombineCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFCombineCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombineCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombineCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFCombineFast2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFCombineFast2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombineFast2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombineFast2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFCombineFastCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFCombineFastCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombineFastCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFCombineFastCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFDebugBlueCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFDebugBlueCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFDebugBlueCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFDebugBlueCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFDebugGreenCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFDebugGreenCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFDebugGreenCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFDebugGreenCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFDebugRedCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFDebugRedCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFDebugRedCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFDebugRedCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFMedianFilterCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFMedianFilterCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFMedianFilterCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFMedianFilterCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFMedianFilterFixupCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFMedianFilterFixupCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFMedianFilterFixupCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFMedianFilterFixupCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFMedianFilterSepAlphaCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFMedianFilterSepAlphaCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFMedianFilterSepAlphaCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFMedianFilterSepAlphaCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPass1CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPass1CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass1CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass1CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPass2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPass2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPass2DebugCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPass2DebugCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2DebugCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2DebugCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPass2FastCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPass2FastCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2FastCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2FastCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPass2FixupCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPass2FixupCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2FixupCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPass2FixupCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPreFilterCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPreFilterCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPreFilterCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPreFilterCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPreFilterFastCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPreFilterFastCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPreFilterFastCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPreFilterFastCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFPreFilterFixupCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFPreFilterFixupCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFPreFilterFixupCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFPreFilterFixupCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFTilePassCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFTilePassCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFTilePassCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFTilePassCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DoFTilePassFixupCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDoFTilePassFixupCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DoFTilePassFixupCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DoFTilePassFixupCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DownsampleBloomAllCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDownsampleBloomAllCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DownsampleBloomAllCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DownsampleBloomAllCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DownsampleBloomCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pDownsampleBloomCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DownsampleBloomCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DownsampleBloomCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\DownsampleDepthPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pDownsampleDepthPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/DownsampleDepthPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/DownsampleDepthPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ExtractLumaCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pExtractLumaCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ExtractLumaCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ExtractLumaCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass1_Luma2_CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass1_Luma2_CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_Luma2_CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_Luma2_CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass1_Luma_CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass1_Luma_CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_Luma_CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_Luma_CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass1_RGB2_CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass1_RGB2_CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_RGB2_CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_RGB2_CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass1_RGB_CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass1_RGB_CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_RGB_CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass1_RGB_CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2H2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2H2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2H2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2H2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2HCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2HCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2HCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2HCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2HDebug2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2HDebug2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2HDebug2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2HDebug2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2HDebugCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2HDebugCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2HDebugCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2HDebugCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2V2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2V2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2V2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2V2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2VCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2VCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2VCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2VCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2VDebug2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2VDebug2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2VDebug2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2VDebug2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAPass2VDebugCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAPass2VDebugCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2VDebugCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAPass2VDebugCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\FXAAResolveWorkQueueCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pFXAAResolveWorkQueueCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/FXAAResolveWorkQueueCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/FXAAResolveWorkQueueCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateHistogramCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateHistogramCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateHistogramCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateHistogramCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsGammaCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsGammaCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsGammaOddCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsGammaOddCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaOddCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaOddCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsGammaOddXCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsGammaOddXCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaOddXCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaOddXCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsGammaOddYCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsGammaOddYCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaOddYCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsGammaOddYCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsLinearCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsLinearCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsLinearOddCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsLinearOddCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearOddCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearOddCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsLinearOddXCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsLinearOddXCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearOddXCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearOddXCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\GenerateMipsLinearOddYCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pGenerateMipsLinearOddYCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearOddYCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/GenerateMipsLinearOddYCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LanczosCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pLanczosCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LanczosCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LanczosCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LanczosFast16CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pLanczosFast16CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LanczosFast16CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LanczosFast16CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LanczosFast24CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pLanczosFast24CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LanczosFast24CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LanczosFast24CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LanczosFast32CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pLanczosFast32CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LanczosFast32CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LanczosFast32CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LanczosHorizontalPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pLanczosHorizontalPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LanczosHorizontalPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LanczosHorizontalPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LanczosVerticalPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pLanczosVerticalPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LanczosVerticalPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LanczosVerticalPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\LinearizeDepthCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pLinearizeDepthCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/LinearizeDepthCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/LinearizeDepthCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\MagnifyPixelsPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pMagnifyPixelsPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/MagnifyPixelsPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/MagnifyPixelsPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\MotionBlurFinalPassCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pMotionBlurFinalPassCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/MotionBlurFinalPassCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/MotionBlurFinalPassCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\MotionBlurFinalPassPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pMotionBlurFinalPassPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/MotionBlurFinalPassPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/MotionBlurFinalPassPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\MotionBlurPrePassCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pMotionBlurPrePassCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/MotionBlurPrePassCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/MotionBlurPrePassCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleBinCullingCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleBinCullingCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleBinCullingCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleBinCullingCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleDepthBoundsCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleDepthBoundsCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleDepthBoundsCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleDepthBoundsCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleDispatchIndirectArgsCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleDispatchIndirectArgsCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleDispatchIndirectArgsCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleDispatchIndirectArgsCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleFinalDispatchIndirectArgsCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleFinalDispatchIndirectArgsCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleFinalDispatchIndirectArgsCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleFinalDispatchIndirectArgsCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleLargeBinCullingCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleLargeBinCullingCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleLargeBinCullingCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleLargeBinCullingCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleNoSortVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pParticleNoSortVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleNoSortVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleNoSortVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticlePS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pParticlePS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticlePS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticlePS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticlePreSortCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticlePreSortCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticlePreSortCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticlePreSortCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleSortIndirectArgsCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleSortIndirectArgsCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleSortIndirectArgsCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleSortIndirectArgsCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleSpawnCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleSpawnCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleSpawnCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleSpawnCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileCullingCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileCullingCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileCullingCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileCullingCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRender2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRender2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRender2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRender2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderFast2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderFast2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFast2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFast2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderFastCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderFastCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderFastDynamic2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderFastDynamic2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastDynamic2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastDynamic2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderFastDynamicCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderFastDynamicCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastDynamicCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastDynamicCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderFastLowRes2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderFastLowRes2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastLowRes2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastLowRes2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderFastLowResCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderFastLowResCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastLowResCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderFastLowResCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderSlowDynamic2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderSlowDynamic2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowDynamic2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowDynamic2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderSlowDynamicCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderSlowDynamicCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowDynamicCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowDynamicCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderSlowLowRes2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderSlowLowRes2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowLowRes2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowLowRes2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleTileRenderSlowLowResCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleTileRenderSlowLowResCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowLowResCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleTileRenderSlowLowResCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleUpdateCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pParticleUpdateCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleUpdateCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleUpdateCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ParticleVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pParticleVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ParticleVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ParticleVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\PerfGraphBackgroundVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pPerfGraphBackgroundVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/PerfGraphBackgroundVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/PerfGraphBackgroundVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\PerfGraphPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pPerfGraphPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/PerfGraphPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/PerfGraphPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\PerfGraphVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pPerfGraphVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/PerfGraphVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/PerfGraphVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\PresentHDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pPresentHDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/PresentHDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/PresentHDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\PresentSDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pPresentSDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/PresentSDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/PresentSDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ResolveTAACS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pResolveTAACS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ResolveTAACS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ResolveTAACS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ScaleAndCompositeHDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pScaleAndCompositeHDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ScaleAndCompositeHDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ScaleAndCompositeHDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ScaleAndCompositeSDRPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pScaleAndCompositeSDRPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ScaleAndCompositeSDRPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ScaleAndCompositeSDRPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ScreenQuadCommonVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pScreenQuadCommonVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ScreenQuadCommonVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ScreenQuadCommonVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ScreenQuadPresentVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pScreenQuadPresentVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ScreenQuadPresentVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ScreenQuadPresentVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\SharpenTAACS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pSharpenTAACS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/SharpenTAACS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/SharpenTAACS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\SharpeningUpsampleGammaPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pSharpeningUpsampleGammaPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/SharpeningUpsampleGammaPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/SharpeningUpsampleGammaPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\SharpeningUpsamplePS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pSharpeningUpsamplePS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/SharpeningUpsamplePS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/SharpeningUpsamplePS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\TemporalBlendCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pTemporalBlendCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/TemporalBlendCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/TemporalBlendCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\TextAntialiasPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pTextAntialiasPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/TextAntialiasPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/TextAntialiasPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\TextShadowPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pTextShadowPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/TextShadowPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/TextShadowPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\TextVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pTextVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/TextVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/TextVS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ToneMap2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pToneMap2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ToneMap2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ToneMap2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ToneMapCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pToneMapCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ToneMapCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ToneMapCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ToneMapHDR2CS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pToneMapHDR2CS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ToneMapHDR2CS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ToneMapHDR2CS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\ToneMapHDRCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pToneMapHDRCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/ToneMapHDRCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/ToneMapHDRCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\UpsampleAndBlurCS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Compute</ShaderType>
+      <VariableName>g_pUpsampleAndBlurCS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/UpsampleAndBlurCS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/UpsampleAndBlurCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Core\Shaders\AoBlurAndUpsampleCS.hlsli" />
+    <None Include="Core\Shaders\AoRenderCS.hlsli" />
+    <None Include="Core\Shaders\BicubicFilterFunctions.hlsli" />
+    <None Include="Core\Shaders\BitonicSortCommon.hlsli" />
+    <None Include="Core\Shaders\ColorSpaceUtility.hlsli" />
+    <None Include="Core\Shaders\CommonRS.hlsli" />
+    <None Include="Core\Shaders\DoFCommon.hlsli" />
+    <None Include="Core\Shaders\DoFRS.hlsli" />
+    <None Include="Core\Shaders\FXAAPass1CS.hlsli" />
+    <None Include="Core\Shaders\FXAAPass2CS.hlsli" />
+    <None Include="Core\Shaders\FXAARootSignature.hlsli" />
+    <None Include="Core\Shaders\GenerateMipsCS.hlsli" />
+    <None Include="Core\Shaders\LanczosFunctions.hlsli" />
+    <None Include="Core\Shaders\MotionBlurRS.hlsli" />
+    <None Include="Core\Shaders\ParticleRS.hlsli" />
+    <None Include="Core\Shaders\ParticleUpdateCommon.hlsli" />
+    <None Include="Core\Shaders\ParticleUtility.hlsli" />
+    <None Include="Core\Shaders\PerfGraphRS.hlsli" />
+    <None Include="Core\Shaders\PixelPacking.hlsli" />
+    <None Include="Core\Shaders\PixelPacking_R11G11B10.hlsli" />
+    <None Include="Core\Shaders\PixelPacking_RGBE.hlsli" />
+    <None Include="Core\Shaders\PixelPacking_RGBM.hlsli" />
+    <None Include="Core\Shaders\PixelPacking_Velocity.hlsli" />
+    <None Include="Core\Shaders\PostEffectsRS.hlsli" />
+    <None Include="Core\Shaders\PresentRS.hlsli" />
+    <None Include="Core\Shaders\SSAORS.hlsli" />
+    <None Include="Core\Shaders\ShaderUtility.hlsli" />
+    <None Include="Core\Shaders\TextRS.hlsli" />
+    <None Include="Core\Shaders\ToneMappingUtility.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\imgui\imgui.vcxproj">

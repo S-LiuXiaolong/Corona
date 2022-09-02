@@ -15,17 +15,17 @@
 #include "GraphicsCore.h"
 #include "GameCore.h"
 #include "BufferManager.h"
-// #include "GpuTimeManager.h"
+#include "GpuTimeManager.h"
 // #include "PostEffects.h"
 // #include "SSAO.h"
 // #include "TextRenderer.h"
 #include "ColorBuffer.h"
 #include "SystemTime.h"
-// #include "SamplerManager.h"
+#include "SamplerManager.h"
 #include "DescriptorHeap.h"
 #include "CommandContext.h"
 #include "CommandListManager.h"
-// #include "RootSignature.h"
+#include "RootSignature.h"
 // #include "CommandSignature.h"
 // #include "ParticleEffectManager.h"
 // #include "GraphRenderer.h"
@@ -429,12 +429,12 @@ void Graphics::Shutdown(void)
 
 	DestroyCommonState();
 	DestroyRenderingBuffers();
-	TemporalEffects::Shutdown();
-	PostEffects::Shutdown();
-	SSAO::Shutdown();
-	TextRenderer::Shutdown();
-	GraphRenderer::Shutdown();
-	ParticleEffectManager::Shutdown();
+// 	TemporalEffects::Shutdown();
+// 	PostEffects::Shutdown();
+// 	SSAO::Shutdown();
+// 	TextRenderer::Shutdown();
+// 	GraphRenderer::Shutdown();
+// 	ParticleEffectManager::Shutdown();
 	Display::Shutdown();
 
 #if defined(_GAMING_DESKTOP) && defined(_DEBUG)

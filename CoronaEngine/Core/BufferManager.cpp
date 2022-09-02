@@ -16,17 +16,17 @@
 #include "Display.h"
 #include "CommandContext.h"
 #include "EsramAllocator.h"
-#include "TemporalEffects.h"
+// #include "TemporalEffects.h"
 
 namespace Graphics
 {
 	DepthBuffer g_SceneDepthBuffer;
-// 	ColorBuffer g_SceneColorBuffer;
+ 	ColorBuffer g_SceneColorBuffer;
 // 	ColorBuffer g_SceneNormalBuffer;
 // 	ColorBuffer g_PostEffectsBuffer;
 // 	ColorBuffer g_VelocityBuffer;
-// 	ColorBuffer g_OverlayBuffer;
-// 	ColorBuffer g_HorizontalBuffer;
+	ColorBuffer g_OverlayBuffer;
+	ColorBuffer g_HorizontalBuffer;
 // 
 // 	ShadowBuffer g_ShadowBuffer;
 // 
@@ -82,7 +82,7 @@ namespace Graphics
 // 	// For testing GenerateMipMaps()
 // 	ColorBuffer g_GenMipsBuffer;
 // 
-// 	DXGI_FORMAT DefaultHdrColorFormat = DXGI_FORMAT_R11G11B10_FLOAT;
+ 	DXGI_FORMAT DefaultHdrColorFormat = DXGI_FORMAT_R11G11B10_FLOAT;
 }
 
 #define T2X_COLOR_FORMAT DXGI_FORMAT_R10G10B10A2_UNORM

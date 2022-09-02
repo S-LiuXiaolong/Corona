@@ -15,7 +15,7 @@
 #include "GameCore.h"
 #include "GraphicsCore.h"
 #include "SystemTime.h"
-// #include "GameInput.h"
+#include "GameInput.h"
 #include "BufferManager.h"
 #include "CommandContext.h"
 // #include "PostEffects.h"
@@ -56,7 +56,7 @@ namespace GameCore
 
 	bool UpdateApplication(IGameApp& game)
 	{
-		EngineProfiling::Update();
+//		EngineProfiling::Update();
 
 		float DeltaTime = Graphics::GetFrameTime();
 
@@ -66,7 +66,7 @@ namespace GameCore
 		game.Update(DeltaTime);
 		game.RenderScene();
 
-		PostEffects::Render();
+//		PostEffects::Render();
 
 		GraphicsContext& UiContext = GraphicsContext::Begin(L"Render UI");
 		UiContext.TransitionResource(g_OverlayBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, true);

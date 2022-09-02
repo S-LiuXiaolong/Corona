@@ -79,20 +79,20 @@ CommandContext& CommandContext::Begin(const std::wstring ID)
 {
 	CommandContext* NewContext = g_ContextManager.AllocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
 	NewContext->SetID(ID);
-	if (ID.length() > 0)
-		EngineProfiling::BeginBlock(ID, NewContext);
+// 	if (ID.length() > 0)
+// 		EngineProfiling::BeginBlock(ID, NewContext);
 	return *NewContext;
 }
 
-ComputeContext& ComputeContext::Begin(const std::wstring& ID, bool Async)
-{
-	ComputeContext& NewContext = g_ContextManager.AllocateContext(
-		Async ? D3D12_COMMAND_LIST_TYPE_COMPUTE : D3D12_COMMAND_LIST_TYPE_DIRECT)->GetComputeContext();
-	NewContext.SetID(ID);
-	if (ID.length() > 0)
-		EngineProfiling::BeginBlock(ID, &NewContext);
-	return NewContext;
-}
+// ComputeContext& ComputeContext::Begin(const std::wstring& ID, bool Async)
+// {
+// 	ComputeContext& NewContext = g_ContextManager.AllocateContext(
+// 		Async ? D3D12_COMMAND_LIST_TYPE_COMPUTE : D3D12_COMMAND_LIST_TYPE_DIRECT)->GetComputeContext();
+// 	NewContext.SetID(ID);
+// 	if (ID.length() > 0)
+// 		EngineProfiling::BeginBlock(ID, &NewContext);
+// 	return NewContext;
+// }
 
 uint64_t CommandContext::Flush(bool WaitForCompletion)
 {
@@ -135,8 +135,8 @@ uint64_t CommandContext::Finish(bool WaitForCompletion)
 
 	FlushResourceBarriers();
 
-	if (m_ID.length() > 0)
-		EngineProfiling::EndBlock(this);
+// 	if (m_ID.length() > 0)
+// 		EngineProfiling::EndBlock(this);
 
 	ASSERT(m_CurrentAllocator != nullptr);
 
@@ -255,17 +255,17 @@ void GraphicsContext::ClearUAV(GpuBuffer& Target)
 	m_CommandList->ClearUnorderedAccessViewUint(GpuVisibleHandle, Target.GetUAV(), Target.GetResource(), ClearColor, 0, nullptr);
 }
 
-void ComputeContext::ClearUAV(GpuBuffer& Target)
-{
-	FlushResourceBarriers();
-
-	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
-	// a shader to set all of the values).
-	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = m_DynamicViewDescriptorHeap.UploadDirect(Target.GetUAV());
-	const UINT ClearColor[4] = {};
-	m_CommandList->ClearUnorderedAccessViewUint(GpuVisibleHandle, Target.GetUAV(), Target.GetResource(), ClearColor, 0, nullptr);
-}
-
+// void ComputeContext::ClearUAV(GpuBuffer& Target)
+// {
+// 	FlushResourceBarriers();
+// 
+// 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
+// 	// a shader to set all of the values).
+// 	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = m_DynamicViewDescriptorHeap.UploadDirect(Target.GetUAV());
+// 	const UINT ClearColor[4] = {};
+// 	m_CommandList->ClearUnorderedAccessViewUint(GpuVisibleHandle, Target.GetUAV(), Target.GetResource(), ClearColor, 0, nullptr);
+// }
+// 
 void GraphicsContext::ClearUAV(ColorBuffer& Target)
 {
 	FlushResourceBarriers();
@@ -280,20 +280,20 @@ void GraphicsContext::ClearUAV(ColorBuffer& Target)
 	m_CommandList->ClearUnorderedAccessViewFloat(GpuVisibleHandle, Target.GetUAV(), Target.GetResource(), ClearColor, 1, &ClearRect);
 }
 
-void ComputeContext::ClearUAV(ColorBuffer& Target)
-{
-	FlushResourceBarriers();
-
-	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
-	// a shader to set all of the values).
-	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = m_DynamicViewDescriptorHeap.UploadDirect(Target.GetUAV());
-	CD3DX12_RECT ClearRect(0, 0, (LONG)Target.GetWidth(), (LONG)Target.GetHeight());
-
-	//TODO: My Nvidia card is not clearing UAVs with either Float or Uint variants.
-	const float* ClearColor = Target.GetClearColor().GetPtr();
-	m_CommandList->ClearUnorderedAccessViewFloat(GpuVisibleHandle, Target.GetUAV(), Target.GetResource(), ClearColor, 1, &ClearRect);
-}
-
+// void ComputeContext::ClearUAV(ColorBuffer& Target)
+// {
+// 	FlushResourceBarriers();
+// 
+// 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
+// 	// a shader to set all of the values).
+// 	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = m_DynamicViewDescriptorHeap.UploadDirect(Target.GetUAV());
+// 	CD3DX12_RECT ClearRect(0, 0, (LONG)Target.GetWidth(), (LONG)Target.GetHeight());
+// 
+// 	//TODO: My Nvidia card is not clearing UAVs with either Float or Uint variants.
+// 	const float* ClearColor = Target.GetClearColor().GetPtr();
+// 	m_CommandList->ClearUnorderedAccessViewFloat(GpuVisibleHandle, Target.GetUAV(), Target.GetResource(), ClearColor, 1, &ClearRect);
+// }
+// 
 void GraphicsContext::ClearColor(ColorBuffer& Target, D3D12_RECT* Rect)
 {
 	FlushResourceBarriers();

@@ -35,8 +35,50 @@ project "CoronaEngine"
 	{
 		"%{prj.name}/Core/**.h",
 		"%{prj.name}/Core/**.cpp",
-		"%{prj.name}/Core/**.inl"
+		"%{prj.name}/Core/**.inl",
+		"%{prj.name}/Core/**.hlsl",
+		"%{prj.name}/Core/**.hlsli",
 	}
+
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS"
+	}
+
+	includedirs
+	{
+		"%{prj.name}/Core",
+		"%{prj.name}/vendor/spdlog/include",
+		"bin/" .. outputdir .."/%{prj.name}",
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.assimp}"
+	}
+
+	links
+	{
+		"imgui",
+		"assimp"
+	}
+
+	shadermodel("6.2")
+
+	local shader_dir = "../bin/" .. outputdir .."/%{prj.name}".. "/CompiledShaders"
+	
+	filter("files:**.hlsl")
+		shadervariablename ("g_p" .. "%{file.basename}")
+		shaderheaderfileoutput (shader_dir.."/%{file.basename}"..".h")
+		shaderobjectfileoutput ("")
+		shaderoptions ("-Qembed_debug")
+		shaderdefines ("_GAMING_DESKTOP=1")
+
+ 	filter("files:**PS.hlsl")
+		shadertype("Pixel")
+
+ 	filter("files:**VS.hlsl")
+		shadertype("Vertex")
+
+	filter("files:**CS.hlsl")
+		shadertype("Compute")
 
 	vpaths
 	{
@@ -58,6 +100,8 @@ project "CoronaEngine"
 			"CoronaEngine/Core/PixelBuffer.h",
 			"CoronaEngine/Core/UploadBuffer.cpp",
 			"CoronaEngine/Core/UploadBuffer.h",
+			"CoronaEngine/Core/ReadBackBuffer.cpp",
+			"CoronaEngine/Core/ReadBackBuffer.h",
 		},
 		["Core/Graphics/Command"] = 
 		{
@@ -81,6 +125,8 @@ project "CoronaEngine"
 			"CoronaEngine/Core/PipelineState.h",
 			"CoronaEngine/Core/RootSignature.cpp",
 			"CoronaEngine/Core/RootSignature.h",
+			"CoronaEngine/Core/SamplerManager.cpp",
+			"CoronaEngine/Core/SamplerManager.h",
 		},
 		["Core/Graphics"] = 
 		{
@@ -104,31 +150,12 @@ project "CoronaEngine"
 		}
 	}
 
-	defines
-	{
-		"_CRT_SECURE_NO_WARNINGS"
-	}
-
-	includedirs
-	{
-		"%{prj.name}/Core",
-		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.imgui}",
-		"%{IncludeDir.assimp}"
-	}
-
-	links
-	{
-		"imgui",
-		"assimp"
-	}
-
 	filter "system:windows"
 		systemversion "latest"
 
 		defines
 		{
-			"CR_PLATFORM_WINDOWS"
+			"CR_PLATFORM_WINDOWS",
 		}
 		
 	filter "configurations:Debug"
