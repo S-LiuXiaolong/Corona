@@ -403,11 +403,11 @@ void Graphics::Initialize(bool RequireDXRSupport)
 	g_CommandManager.Create(g_Device);
 
 	// Common state was moved to GraphicsCommon.*
-//	InitializeCommonState();
+	InitializeCommonState();
 
 	Display::Initialize();
 
-// 	GpuTimeManager::Initialize(4096);
+ 	GpuTimeManager::Initialize(4096);
 // 	TemporalEffects::Initialize();
 // 	PostEffects::Initialize();
 // 	SSAO::Initialize();

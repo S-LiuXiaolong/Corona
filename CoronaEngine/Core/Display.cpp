@@ -30,26 +30,24 @@
 
 namespace GameCore { extern HWND g_hWnd; }
 
-// #include "CompiledShaders/ScreenQuadPresentVS.h"
-// #include "CompiledShaders/BufferCopyPS.h"
-// #include "CompiledShaders/PresentSDRPS.h"
-// #include "CompiledShaders/PresentHDRPS.h"
-// #include "CompiledShaders/CompositeSDRPS.h"
-// #include "CompiledShaders/ScaleAndCompositeSDRPS.h"
-// #include "CompiledShaders/CompositeHDRPS.h"
-// #include "CompiledShaders/BlendUIHDRPS.h"
-// #include "CompiledShaders/ScaleAndCompositeHDRPS.h"
-// #include "CompiledShaders/MagnifyPixelsPS.h"
-// #include "CompiledShaders/GenerateMipsLinearCS.h"
-// #include "CompiledShaders/GenerateMipsLinearOddCS.h"
-// #include "CompiledShaders/GenerateMipsLinearOddXCS.h"
-// #include "CompiledShaders/GenerateMipsLinearOddYCS.h"
-// #include "CompiledShaders/GenerateMipsGammaCS.h"
-// #include "CompiledShaders/GenerateMipsGammaOddCS.h"
-// #include "CompiledShaders/GenerateMipsGammaOddXCS.h"
-// #include "CompiledShaders/GenerateMipsGammaOddYCS.h"
-
-#define SWAP_CHAIN_BUFFER_COUNT 3
+#include "CompiledShaders/ScreenQuadPresentVS.h"
+#include "CompiledShaders/BufferCopyPS.h"
+#include "CompiledShaders/PresentSDRPS.h"
+#include "CompiledShaders/PresentHDRPS.h"
+#include "CompiledShaders/CompositeSDRPS.h"
+#include "CompiledShaders/ScaleAndCompositeSDRPS.h"
+#include "CompiledShaders/CompositeHDRPS.h"
+#include "CompiledShaders/BlendUIHDRPS.h"
+#include "CompiledShaders/ScaleAndCompositeHDRPS.h"
+#include "CompiledShaders/MagnifyPixelsPS.h"
+#include "CompiledShaders/GenerateMipsLinearCS.h"
+#include "CompiledShaders/GenerateMipsLinearOddCS.h"
+#include "CompiledShaders/GenerateMipsLinearOddXCS.h"
+#include "CompiledShaders/GenerateMipsLinearOddYCS.h"
+#include "CompiledShaders/GenerateMipsGammaCS.h"
+#include "CompiledShaders/GenerateMipsGammaOddCS.h"
+#include "CompiledShaders/GenerateMipsGammaOddXCS.h"
+#include "CompiledShaders/GenerateMipsGammaOddYCS.h"
 
 DXGI_FORMAT SwapChainFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
 
@@ -71,7 +69,7 @@ namespace
 namespace Graphics
 {
 	void PreparePresentSDR();
-	void PreparePresentHDR();
+//	void PreparePresentHDR();
 	void CompositeOverlays(GraphicsContext& Context);
 
 	enum eResolution { k720p, k900p, k1080p, k1440p, k1800p, k2160p };
@@ -332,7 +330,7 @@ void Display::Initialize(void)
 	SetNativeResolution();
 
 	g_PreDisplayBuffer.Create(L"PreDisplay Buffer", g_DisplayWidth, g_DisplayHeight, 1, SwapChainFormat);
-	ImageScaling::Initialize(g_PreDisplayBuffer.GetFormat());
+//	ImageScaling::Initialize(g_PreDisplayBuffer.GetFormat());
 }
 
 void Display::Shutdown(void)
@@ -348,10 +346,11 @@ void Display::Shutdown(void)
 
 void Display::Present(void)
 {
-	if (g_bEnableHDROutput)
-		PreparePresentHDR();
-	else
-		PreparePresentSDR();
+// 	if (g_bEnableHDROutput)
+// 		PreparePresentHDR();
+// 	else
+// 		PreparePresentSDR();
+	PreparePresentSDR();
 
 	UINT PresentInterval = s_EnableVSync ? std::min(4, (int)Round(s_FrameTime * 60.0f)) : 0;
 
@@ -392,66 +391,66 @@ void Display::Present(void)
 
 	++s_FrameIndex;
 
-	TemporalEffects::Update((uint32_t)s_FrameIndex);
+//	TemporalEffects::Update((uint32_t)s_FrameIndex);
 
 	SetNativeResolution();
 	SetDisplayResolution();
 }
 
-void Graphics::PreparePresentHDR(void)
-{
-	GraphicsContext& Context = GraphicsContext::Begin(L"Present");
-
-	bool NeedsScaling = g_NativeWidth != g_DisplayWidth || g_NativeHeight != g_DisplayHeight;
-
-	Context.SetRootSignature(s_PresentRS);
-	Context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	Context.TransitionResource(g_SceneColorBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	Context.SetDynamicDescriptor(0, 0, g_SceneColorBuffer.GetSRV());
-
-	ColorBuffer& Dest = DebugZoom == kDebugZoomOff ? g_DisplayPlane[g_CurrentBuffer] : g_PreDisplayBuffer;
-
-	// On Windows, prefer scaling and compositing in one step via pixel shader
-	Context.SetRootSignature(s_PresentRS);
-	Context.TransitionResource(g_OverlayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	if (DebugZoom == kDebugZoomOff)
-	{
-		Context.SetDynamicDescriptor(0, 1, g_OverlayBuffer.GetSRV());
-		Context.SetPipelineState(NeedsScaling ? ScaleAndCompositeHDRPS : CompositeHDRPS);
-	}
-	else
-	{
-		Context.SetDynamicDescriptor(0, 1, GetDefaultTexture(kBlackTransparent2D));
-		Context.SetPipelineState(NeedsScaling ? ScaleAndCompositeHDRPS : PresentHDRPS);
-	}
-	Context.SetConstants(1, (float)g_HDRPaperWhite / 10000.0f, (float)g_MaxDisplayLuminance,
-		0.7071f / g_NativeWidth, 0.7071f / g_NativeHeight);
-	Context.TransitionResource(Dest, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	Context.SetRenderTarget(Dest.GetRTV());
-	Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
-	Context.Draw(3);
-
-	// Magnify without stretching
-	if (DebugZoom != kDebugZoomOff)
-	{
-		Context.SetPipelineState(MagnifyPixelsPS);
-		Context.TransitionResource(g_PreDisplayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_RENDER_TARGET);
-		Context.SetRenderTarget(g_DisplayPlane[g_CurrentBuffer].GetRTV());
-		Context.SetDynamicDescriptor(0, 0, g_PreDisplayBuffer.GetSRV());
-		Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
-		Context.SetConstants(1, 1.0f / ((int)DebugZoom + 1.0f));
-		Context.Draw(3);
-
-		CompositeOverlays(Context);
-	}
-
-	Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_PRESENT);
-
-	// Close the final context to be executed before frame present.
-	Context.Finish();
-}
-
+// void Graphics::PreparePresentHDR(void)
+// {
+// 	GraphicsContext& Context = GraphicsContext::Begin(L"Present");
+// 
+// 	bool NeedsScaling = g_NativeWidth != g_DisplayWidth || g_NativeHeight != g_DisplayHeight;
+// 
+// 	Context.SetRootSignature(s_PresentRS);
+// 	Context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+// 	Context.TransitionResource(g_SceneColorBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+// 	Context.SetDynamicDescriptor(0, 0, g_SceneColorBuffer.GetSRV());
+// 
+// 	ColorBuffer& Dest = DebugZoom == kDebugZoomOff ? g_DisplayPlane[g_CurrentBuffer] : g_PreDisplayBuffer;
+// 
+// 	// On Windows, prefer scaling and compositing in one step via pixel shader
+// 	Context.SetRootSignature(s_PresentRS);
+// 	Context.TransitionResource(g_OverlayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+// 	if (DebugZoom == kDebugZoomOff)
+// 	{
+// 		Context.SetDynamicDescriptor(0, 1, g_OverlayBuffer.GetSRV());
+// 		Context.SetPipelineState(NeedsScaling ? ScaleAndCompositeHDRPS : CompositeHDRPS);
+// 	}
+// 	else
+// 	{
+// 		Context.SetDynamicDescriptor(0, 1, GetDefaultTexture(kBlackTransparent2D));
+// 		Context.SetPipelineState(NeedsScaling ? ScaleAndCompositeHDRPS : PresentHDRPS);
+// 	}
+// 	Context.SetConstants(1, (float)g_HDRPaperWhite / 10000.0f, (float)g_MaxDisplayLuminance,
+// 		0.7071f / g_NativeWidth, 0.7071f / g_NativeHeight);
+// 	Context.TransitionResource(Dest, D3D12_RESOURCE_STATE_RENDER_TARGET);
+// 	Context.SetRenderTarget(Dest.GetRTV());
+// 	Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
+// 	Context.Draw(3);
+// 
+// 	// Magnify without stretching
+// 	if (DebugZoom != kDebugZoomOff)
+// 	{
+// 		Context.SetPipelineState(MagnifyPixelsPS);
+// 		Context.TransitionResource(g_PreDisplayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+// 		Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_RENDER_TARGET);
+// 		Context.SetRenderTarget(g_DisplayPlane[g_CurrentBuffer].GetRTV());
+// 		Context.SetDynamicDescriptor(0, 0, g_PreDisplayBuffer.GetSRV());
+// 		Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
+// 		Context.SetConstants(1, 1.0f / ((int)DebugZoom + 1.0f));
+// 		Context.Draw(3);
+// 
+// 		CompositeOverlays(Context);
+// 	}
+// 
+// 	Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_PRESENT);
+// 
+// 	// Close the final context to be executed before frame present.
+// 	Context.Finish();
+// }
+// 
 void Graphics::CompositeOverlays(GraphicsContext& Context)
 {
 	// Now blend (or write) the UI overlay
@@ -496,7 +495,7 @@ void Graphics::PreparePresentSDR(void)
 		// Scale or Copy
 		if (NeedsScaling)
 		{
-			ImageScaling::Upscale(Context, Dest, g_SceneColorBuffer, eScalingFilter((int)UpsampleFilter));
+//			ImageScaling::Upscale(Context, Dest, g_SceneColorBuffer, eScalingFilter((int)UpsampleFilter));
 		}
 		else
 		{

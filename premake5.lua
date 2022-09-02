@@ -19,6 +19,7 @@ include "CoronaEngine/vendor/imgui"
 include "CoronaEngine/vendor/assimp"
 
 project "CoronaEngine"
+	nuget { "WinPixEventRuntime:1.0.220810001" }
 	location "CoronaEngine"
 	kind "StaticLib"
 	language "C++"
@@ -42,7 +43,8 @@ project "CoronaEngine"
 
 	defines
 	{
-		"_CRT_SECURE_NO_WARNINGS"
+		"_CRT_SECURE_NO_WARNINGS",
+		"_GAMING_DESKTOP"
 	}
 
 	includedirs
@@ -81,7 +83,7 @@ project "CoronaEngine"
 		shadertype("Compute")
 
 	filter {}
-	
+
 	vpaths
 	{
 		["Core/Graphics/Resource"] = 

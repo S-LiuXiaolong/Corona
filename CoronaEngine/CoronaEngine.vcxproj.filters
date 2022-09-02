@@ -1,789 +1,821 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Graphics">
-      <UniqueIdentifier>{1653CE33-0220-293F-2B39-17E717655ECD}</UniqueIdentifier>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\Command">
-      <UniqueIdentifier>{2482950D-107B-B45F-39AD-99E42505946B}</UniqueIdentifier>
+    <Filter Include="Core\Graphics">
+      <UniqueIdentifier>{2E10C882-9AD0-43B9-630B-8D36CF8A8895}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\DescriptorHeap">
-      <UniqueIdentifier>{42D5D30A-AE0C-1CA2-B716-80C523CD429B}</UniqueIdentifier>
+    <Filter Include="Core\Graphics\Command">
+      <UniqueIdentifier>{3CD7A610-A843-620B-7137-FA68DD628473}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\Pipeline">
-      <UniqueIdentifier>{FBD334F8-67EA-328E-B061-BEAF1CB70316}</UniqueIdentifier>
+    <Filter Include="Core\Graphics\DescriptorHeap">
+      <UniqueIdentifier>{5A7F9FD2-463A-8F7E-EFF1-07C9DB8BD90E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\Resource">
-      <UniqueIdentifier>{ED0D89A4-5924-873A-A29B-125C0EF157C2}</UniqueIdentifier>
+    <Filter Include="Core\Graphics\Pipeline">
+      <UniqueIdentifier>{13CC705D-FFC5-99AF-E832-30C0D4CBFF1B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math">
-      <UniqueIdentifier>{AFF4887C-9B2B-8A0D-4418-7010302E060F}</UniqueIdentifier>
+    <Filter Include="Core\Graphics\Resource">
+      <UniqueIdentifier>{0506C509-F1FF-ED5B-DA6C-846CC60554C8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{EFAC8DF2-5B8C-0C8E-64A4-9764D00273EF}</UniqueIdentifier>
+    <Filter Include="Core\Math">
+      <UniqueIdentifier>{C7E5BF15-3350-748C-7C8E-2532E83752E1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Util">
-      <UniqueIdentifier>{23A78D7C-0FDE-8E0D-B8CA-7410A4E00A0F}</UniqueIdentifier>
+    <Filter Include="Core\Shaders">
+      <UniqueIdentifier>{0727380C-F389-C7B0-9C0F-006788519333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Util">
+      <UniqueIdentifier>{3B98C415-A702-798C-F040-2A325CEA56E1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BufferManager.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\Color.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\Colorbuffer.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\CommandAllocatorPool.h">
-      <Filter>Graphics\Command</Filter>
+      <Filter>Core\Graphics\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\CommandContext.h">
-      <Filter>Graphics\Command</Filter>
+      <Filter>Core\Graphics\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\CommandListManager.h">
-      <Filter>Graphics\Command</Filter>
+      <Filter>Core\Graphics\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\DepthBuffer.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\DescriptorHeap.h">
-      <Filter>Graphics\DescriptorHeap</Filter>
+      <Filter>Core\Graphics\DescriptorHeap</Filter>
     </ClInclude>
     <ClInclude Include="Core\Display.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\DynamicDescriptorHeap.h">
-      <Filter>Graphics\DescriptorHeap</Filter>
+      <Filter>Core\Graphics\DescriptorHeap</Filter>
     </ClInclude>
-    <ClInclude Include="Core\EngineTuning.h" />
+    <ClInclude Include="Core\EngineTuning.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\EsramAllocator.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\GameCore.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Core\GameInput.h" />
-    <ClInclude Include="Core\GeometryGeneratorOld.h" />
+    <ClInclude Include="Core\GameInput.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GeometryGeneratorOld.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\GpuBuffer.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\GpuResource.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Core\GpuTimeManager.h" />
-    <ClInclude Include="Core\GraphicsCommon.h" />
+    <ClInclude Include="Core\GpuTimeManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GraphicsCommon.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\GraphicsCore.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\Hash.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ImguiManager.h" />
+    <ClInclude Include="Core\ImguiManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\LinearAllocator.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Log.h" />
+    <ClInclude Include="Core\Log.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\Math\BoundingPlane.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\BoundingSphere.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Common.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Frustum.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Functions.inl">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Matrix3.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Matrix4.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Quaternion.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Random.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Scalar.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Transform.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Math\Vector.h">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\PipelineState.h">
-      <Filter>Graphics\Pipeline</Filter>
+      <Filter>Core\Graphics\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Core\PixelBuffer.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\ReadBackBuffer.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\RootSignature.h">
-      <Filter>Graphics\Pipeline</Filter>
+      <Filter>Core\Graphics\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Core\SamplerManager.h">
-      <Filter>Graphics\Pipeline</Filter>
+      <Filter>Core\Graphics\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Core\SystemTime.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\UploadBuffer.h">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Core\Util\CommandLineArg.h">
-      <Filter>Util</Filter>
+      <Filter>Core\Util</Filter>
     </ClInclude>
     <ClInclude Include="Core\Utility.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\VectorMath.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\crpch.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\d3dx12.h">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\BufferManager.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Core\Color.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Core\ColorBuffer.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Core\CommandAllocatorPool.cpp">
-      <Filter>Graphics\Command</Filter>
+      <Filter>Core\Graphics\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\CommandContext.cpp">
-      <Filter>Graphics\Command</Filter>
+      <Filter>Core\Graphics\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\CommandListManager.cpp">
-      <Filter>Graphics\Command</Filter>
+      <Filter>Core\Graphics\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\DepthBuffer.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Core\DescriptorHeap.cpp">
-      <Filter>Graphics\DescriptorHeap</Filter>
+      <Filter>Core\Graphics\DescriptorHeap</Filter>
     </ClCompile>
     <ClCompile Include="Core\Display.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Core\DynamicDecriptorHeap.cpp">
-      <Filter>Graphics\DescriptorHeap</Filter>
+      <Filter>Core\Graphics\DescriptorHeap</Filter>
     </ClCompile>
-    <ClCompile Include="Core\EngineTuning.cpp" />
+    <ClCompile Include="Core\EngineTuning.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\GameCore.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Core\GameInput.cpp" />
-    <ClCompile Include="Core\GeometryGeneratorOld.cpp" />
+    <ClCompile Include="Core\GameInput.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GeometryGeneratorOld.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\GpuBuffer.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Core\GpuTimeManager.cpp" />
-    <ClCompile Include="Core\GraphicsCommon.cpp" />
+    <ClCompile Include="Core\GpuTimeManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GraphicsCommon.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\GraphicsCore.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ImguiManager.cpp" />
+    <ClCompile Include="Core\ImguiManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\LinearAllocator.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Log.cpp" />
+    <ClCompile Include="Core\Log.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\Math\Frustum.cpp">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClCompile>
     <ClCompile Include="Core\Math\Random.cpp">
-      <Filter>Math</Filter>
+      <Filter>Core\Math</Filter>
     </ClCompile>
     <ClCompile Include="Core\PipelineState.cpp">
-      <Filter>Graphics\Pipeline</Filter>
+      <Filter>Core\Graphics\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="Core\PixelBuffer.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Core\ReadBackBuffer.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Core\RootSignature.cpp">
-      <Filter>Graphics\Pipeline</Filter>
+      <Filter>Core\Graphics\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="Core\SamplerManager.cpp">
-      <Filter>Graphics\Pipeline</Filter>
+      <Filter>Core\Graphics\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="Core\SystemTime.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Core\UploadBuffer.cpp">
-      <Filter>Graphics\Resource</Filter>
+      <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Core\Util\CommandLineArg.cpp">
-      <Filter>Util</Filter>
+      <Filter>Core\Util</Filter>
     </ClCompile>
     <ClCompile Include="Core\Utility.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Core\crpch.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Core\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Core\Shaders\AdaptExposureCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoBlurUpsampleBlendOutCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoBlurUpsampleCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoBlurUpsamplePreMinBlendOutCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoBlurUpsamplePreMinCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoPrepareDepthBuffers1CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoPrepareDepthBuffers2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoRender1CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AoRender2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ApplyBloom2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ApplyBloomCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\AverageLumaCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicHorizontalUpsamplePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicUpsampleCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicUpsampleFast16CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicUpsampleFast24CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicUpsampleFast32CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicUpsampleGammaPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicUpsamplePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BicubicVerticalUpsamplePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BilinearUpsamplePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\Bitonic32InnerSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\Bitonic32OuterSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\Bitonic32PreSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\Bitonic64InnerSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\Bitonic64OuterSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\Bitonic64PreSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BitonicIndirectArgsCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BlendUIHDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BloomExtractAndDownsampleHdrCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BloomExtractAndDownsampleLdrCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BlurCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BoundNeighborhoodCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\BufferCopyPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\CameraMotionBlurPrePassCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\CameraMotionBlurPrePassLinearZCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\CameraVelocityCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\CompositeHDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\CompositeSDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\CopyBackPostBufferCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DebugDrawHistogramCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DebugLuminanceHdr2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DebugLuminanceHdrCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DebugLuminanceLdr2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DebugLuminanceLdrCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DebugSSAOCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFCombine2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFCombineCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFCombineFast2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFCombineFastCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFDebugBlueCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFDebugGreenCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFDebugRedCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFMedianFilterCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFMedianFilterFixupCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFMedianFilterSepAlphaCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPass1CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPass2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPass2DebugCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPass2FastCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPass2FixupCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPreFilterCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPreFilterFastCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFPreFilterFixupCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFTilePassCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DoFTilePassFixupCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DownsampleBloomAllCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DownsampleBloomCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\DownsampleDepthPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ExtractLumaCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass1_Luma2_CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass1_Luma_CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass1_RGB2_CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass1_RGB_CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2H2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2HCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2HDebug2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2HDebugCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2V2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2VCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2VDebug2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAPass2VDebugCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\FXAAResolveWorkQueueCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateHistogramCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsGammaCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsGammaOddCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsGammaOddXCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsGammaOddYCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsLinearCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsLinearOddCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsLinearOddXCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\GenerateMipsLinearOddYCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LanczosCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LanczosFast16CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LanczosFast24CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LanczosFast32CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LanczosHorizontalPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LanczosVerticalPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\LinearizeDepthCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\MagnifyPixelsPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\MotionBlurFinalPassCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\MotionBlurFinalPassPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\MotionBlurPrePassCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleBinCullingCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleDepthBoundsCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleDispatchIndirectArgsCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleFinalDispatchIndirectArgsCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleLargeBinCullingCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleNoSortVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticlePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticlePreSortCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleSortIndirectArgsCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleSpawnCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileCullingCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRender2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderFast2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderFastCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderFastDynamic2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderFastDynamicCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderFastLowRes2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderFastLowResCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderSlowDynamic2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderSlowDynamicCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderSlowLowRes2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleTileRenderSlowLowResCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleUpdateCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ParticleVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\PerfGraphBackgroundVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\PerfGraphPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\PerfGraphVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\PresentHDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\PresentSDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ResolveTAACS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ScaleAndCompositeHDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ScaleAndCompositeSDRPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ScreenQuadCommonVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ScreenQuadPresentVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\SharpenTAACS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\SharpeningUpsampleGammaPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\SharpeningUpsamplePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\TemporalBlendCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\TextAntialiasPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\TextShadowPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\TextVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ToneMap2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ToneMapCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ToneMapHDR2CS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\ToneMapHDRCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\UpsampleAndBlurCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Core\Shaders\AoBlurAndUpsampleCS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\AoRenderCS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\BicubicFilterFunctions.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\BitonicSortCommon.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\ColorSpaceUtility.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\CommonRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\DoFCommon.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\DoFRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\FXAAPass1CS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\FXAAPass2CS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\FXAARootSignature.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\GenerateMipsCS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\LanczosFunctions.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\MotionBlurRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\ParticleRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\ParticleUpdateCommon.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\ParticleUtility.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PerfGraphRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PixelPacking.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PixelPacking_R11G11B10.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PixelPacking_RGBE.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PixelPacking_RGBM.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PixelPacking_Velocity.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PostEffectsRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\PresentRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\SSAORS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\ShaderUtility.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\TextRS.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
     <None Include="Core\Shaders\ToneMappingUtility.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Core\Shaders</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

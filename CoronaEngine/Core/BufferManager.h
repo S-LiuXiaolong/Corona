@@ -13,7 +13,7 @@
 
 #pragma once
 
-// #include "ColorBuffer.h"
+#include "ColorBuffer.h"
 #include "DepthBuffer.h"
 // #include "ShadowBuffer.h"
 #include "GpuBuffer.h"
