@@ -80,6 +80,8 @@ project "CoronaEngine"
 	filter("files:**CS.hlsl")
 		shadertype("Compute")
 
+	filter {}
+	
 	vpaths
 	{
 		["Core/Graphics/Resource"] = 

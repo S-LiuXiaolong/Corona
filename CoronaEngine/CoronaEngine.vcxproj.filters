@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{1653CE33-0220-293F-2B39-17E717655ECD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Command">
+      <UniqueIdentifier>{2482950D-107B-B45F-39AD-99E42505946B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DescriptorHeap">
+      <UniqueIdentifier>{42D5D30A-AE0C-1CA2-B716-80C523CD429B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Pipeline">
+      <UniqueIdentifier>{FBD334F8-67EA-328E-B061-BEAF1CB70316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Resource">
+      <UniqueIdentifier>{ED0D89A4-5924-873A-A29B-125C0EF157C2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{AFF4887C-9B2B-8A0D-4418-7010302E060F}</UniqueIdentifier>
     </Filter>
@@ -12,29 +27,63 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\BufferManager.h" />
-    <ClInclude Include="Core\Color.h" />
-    <ClInclude Include="Core\Colorbuffer.h" />
-    <ClInclude Include="Core\CommandAllocatorPool.h" />
-    <ClInclude Include="Core\CommandContext.h" />
-    <ClInclude Include="Core\CommandListManager.h" />
-    <ClInclude Include="Core\DepthBuffer.h" />
-    <ClInclude Include="Core\DescriptorHeap.h" />
-    <ClInclude Include="Core\Display.h" />
-    <ClInclude Include="Core\DynamicDescriptorHeap.h" />
+    <ClInclude Include="Core\BufferManager.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Color.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Colorbuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandAllocatorPool.h">
+      <Filter>Graphics\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandContext.h">
+      <Filter>Graphics\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandListManager.h">
+      <Filter>Graphics\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DepthBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DescriptorHeap.h">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Display.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DynamicDescriptorHeap.h">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClInclude>
     <ClInclude Include="Core\EngineTuning.h" />
-    <ClInclude Include="Core\EsramAllocator.h" />
-    <ClInclude Include="Core\GameCore.h" />
+    <ClInclude Include="Core\EsramAllocator.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameCore.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="Core\GameInput.h" />
     <ClInclude Include="Core\GeometryGeneratorOld.h" />
-    <ClInclude Include="Core\GpuBuffer.h" />
-    <ClInclude Include="Core\GpuResource.h" />
+    <ClInclude Include="Core\GpuBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GpuResource.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
     <ClInclude Include="Core\GpuTimeManager.h" />
     <ClInclude Include="Core\GraphicsCommon.h" />
-    <ClInclude Include="Core\GraphicsCore.h" />
-    <ClInclude Include="Core\Hash.h" />
+    <ClInclude Include="Core\GraphicsCore.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Hash.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="Core\ImguiManager.h" />
-    <ClInclude Include="Core\LinearAllocator.h" />
+    <ClInclude Include="Core\LinearAllocator.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
     <ClInclude Include="Core\Log.h" />
     <ClInclude Include="Core\Math\BoundingPlane.h">
       <Filter>Math</Filter>
@@ -72,42 +121,92 @@
     <ClInclude Include="Core\Math\Vector.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Core\PipelineState.h" />
-    <ClInclude Include="Core\PixelBuffer.h" />
-    <ClInclude Include="Core\ReadBackBuffer.h" />
-    <ClInclude Include="Core\RootSignature.h" />
-    <ClInclude Include="Core\SamplerManager.h" />
-    <ClInclude Include="Core\SystemTime.h" />
-    <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Core\PipelineState.h">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PixelBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ReadBackBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RootSignature.h">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\SamplerManager.h">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\SystemTime.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UploadBuffer.h">
+      <Filter>Graphics\Resource</Filter>
+    </ClInclude>
     <ClInclude Include="Core\Util\CommandLineArg.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Utility.h" />
-    <ClInclude Include="Core\VectorMath.h" />
-    <ClInclude Include="Core\crpch.h" />
-    <ClInclude Include="Core\d3dx12.h" />
+    <ClInclude Include="Core\Utility.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VectorMath.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\crpch.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\d3dx12.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\BufferManager.cpp" />
-    <ClCompile Include="Core\Color.cpp" />
-    <ClCompile Include="Core\ColorBuffer.cpp" />
-    <ClCompile Include="Core\CommandAllocatorPool.cpp" />
-    <ClCompile Include="Core\CommandContext.cpp" />
-    <ClCompile Include="Core\CommandListManager.cpp" />
-    <ClCompile Include="Core\DepthBuffer.cpp" />
-    <ClCompile Include="Core\DescriptorHeap.cpp" />
-    <ClCompile Include="Core\Display.cpp" />
-    <ClCompile Include="Core\DynamicDecriptorHeap.cpp" />
+    <ClCompile Include="Core\BufferManager.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Color.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ColorBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandAllocatorPool.cpp">
+      <Filter>Graphics\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandContext.cpp">
+      <Filter>Graphics\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandListManager.cpp">
+      <Filter>Graphics\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DepthBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DescriptorHeap.cpp">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Display.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DynamicDecriptorHeap.cpp">
+      <Filter>Graphics\DescriptorHeap</Filter>
+    </ClCompile>
     <ClCompile Include="Core\EngineTuning.cpp" />
-    <ClCompile Include="Core\GameCore.cpp" />
+    <ClCompile Include="Core\GameCore.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Core\GameInput.cpp" />
     <ClCompile Include="Core\GeometryGeneratorOld.cpp" />
-    <ClCompile Include="Core\GpuBuffer.cpp" />
+    <ClCompile Include="Core\GpuBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
     <ClCompile Include="Core\GpuTimeManager.cpp" />
     <ClCompile Include="Core\GraphicsCommon.cpp" />
-    <ClCompile Include="Core\GraphicsCore.cpp" />
+    <ClCompile Include="Core\GraphicsCore.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Core\ImguiManager.cpp" />
-    <ClCompile Include="Core\LinearAllocator.cpp" />
+    <ClCompile Include="Core\LinearAllocator.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Core\Math\Frustum.cpp">
       <Filter>Math</Filter>
@@ -115,18 +214,36 @@
     <ClCompile Include="Core\Math\Random.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Core\PipelineState.cpp" />
-    <ClCompile Include="Core\PixelBuffer.cpp" />
-    <ClCompile Include="Core\ReadBackBuffer.cpp" />
-    <ClCompile Include="Core\RootSignature.cpp" />
-    <ClCompile Include="Core\SamplerManager.cpp" />
-    <ClCompile Include="Core\SystemTime.cpp" />
-    <ClCompile Include="Core\UploadBuffer.cpp" />
+    <ClCompile Include="Core\PipelineState.cpp">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PixelBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ReadBackBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RootSignature.cpp">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\SamplerManager.cpp">
+      <Filter>Graphics\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\SystemTime.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\UploadBuffer.cpp">
+      <Filter>Graphics\Resource</Filter>
+    </ClCompile>
     <ClCompile Include="Core\Util\CommandLineArg.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Utility.cpp" />
-    <ClCompile Include="Core\crpch.cpp" />
+    <ClCompile Include="Core\Utility.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\crpch.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Core\Shaders\AdaptExposureCS.hlsl">
