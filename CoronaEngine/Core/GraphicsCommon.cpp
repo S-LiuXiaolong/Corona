@@ -162,6 +162,7 @@ void Graphics::InitializeCommonState(void)
 // 	DefaultTextures[kBlackCubeMap].CreateCube(4, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, BlackCubeTexels);
 
 	// Default rasterizer states
+	// 这玩意儿就是PSO创建的时候 D3D12_GRAPHICS_PIPELINE_STATE_DESC 结构体里面的一个显示设置
 	RasterizerDefault.FillMode = D3D12_FILL_MODE_SOLID;
 	RasterizerDefault.CullMode = D3D12_CULL_MODE_BACK;
 	RasterizerDefault.FrontCounterClockwise = TRUE;
@@ -227,6 +228,7 @@ void Graphics::InitializeCommonState(void)
 	DepthStateTestEqual = DepthStateReadOnly;
 	DepthStateTestEqual.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
 
+	// 这个 D3D12_BLEND_DESC 结构体也是PSO设置里头的
 	D3D12_BLEND_DESC alphaBlend = {};
 	alphaBlend.IndependentBlendEnable = FALSE;
 	alphaBlend.RenderTarget[0].BlendEnable = FALSE;
@@ -262,6 +264,7 @@ void Graphics::InitializeCommonState(void)
 
 //	BitonicSort::Initialize();
 
+	// 设置根签名（这上头的应该是纹理和采样器的rootsignature）
 	g_CommonRS.Reset(4, 3);
 	g_CommonRS[0].InitAsConstants(0, 4);
 	g_CommonRS[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 10);
@@ -272,6 +275,7 @@ void Graphics::InitializeCommonState(void)
 	g_CommonRS.InitStaticSampler(2, SamplerLinearBorderDesc);
 	g_CommonRS.Finalize(L"GraphicsCommonRS");
 
+	// 这一段是创建Compute PSO
 #define CreatePSO(ObjName, ShaderByteCode ) \
     ObjName.SetRootSignature(g_CommonRS); \
     ObjName.SetComputeShader(ShaderByteCode, sizeof(ShaderByteCode) ); \
@@ -286,6 +290,7 @@ void Graphics::InitializeCommonState(void)
 	CreatePSO(g_GenerateMipsGammaPSO[2], g_pGenerateMipsGammaOddYCS);
 	CreatePSO(g_GenerateMipsGammaPSO[3], g_pGenerateMipsGammaOddCS);
 
+	// 创建Graphics PSO（但是为什么只有一个（可能是因为在GameApp中可以自己创建））
 	g_DownsampleDepthPSO.SetRootSignature(g_CommonRS);
 	g_DownsampleDepthPSO.SetRasterizerState(RasterizerTwoSided);
 	g_DownsampleDepthPSO.SetBlendState(BlendDisable);

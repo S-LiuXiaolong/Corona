@@ -110,7 +110,7 @@ void Graphics::InitializeRenderingBuffers(uint32_t bufferWidth, uint32_t bufferH
 
 	esram.PushStack();
 
-// 	g_SceneColorBuffer.Create(L"Main Color Buffer", bufferWidth, bufferHeight, 1, DefaultHdrColorFormat, esram);
+ 	g_SceneColorBuffer.Create(L"Main Color Buffer", bufferWidth, bufferHeight, 1, DefaultHdrColorFormat, esram);
 // 	g_SceneNormalBuffer.Create(L"Normals Buffer", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, esram);
 // 	g_VelocityBuffer.Create(L"Motion Vectors", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT);
 // 	g_PostEffectsBuffer.Create(L"Post Effects Buffer", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT);
@@ -244,7 +244,7 @@ void Graphics::ResizeDisplayDependentBuffers(uint32_t NativeWidth, uint32_t Nati
 void Graphics::DestroyRenderingBuffers()
 {
 	g_SceneDepthBuffer.Destroy();
-// 	g_SceneColorBuffer.Destroy();
+ 	g_SceneColorBuffer.Destroy();
 // 	g_SceneNormalBuffer.Destroy();
 // 	g_VelocityBuffer.Destroy();
 // 	g_OverlayBuffer.Destroy();

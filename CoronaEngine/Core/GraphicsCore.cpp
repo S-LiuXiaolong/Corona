@@ -165,7 +165,7 @@ void Graphics::Initialize(bool RequireDXRSupport)
 {
 	Microsoft::WRL::ComPtr<ID3D12Device> pDevice;
 
-	// 创建了一大堆用来debug的东西、以及device和factory
+	// 创建了device和factory、以及一大堆用来debug的东西
 	uint32_t useDebugLayers = 0;
 	CommandLineArgs::GetInteger(L"debug", useDebugLayers);
 #if _DEBUG
@@ -241,6 +241,7 @@ void Graphics::Initialize(bool RequireDXRSupport)
 
 	if (!bUseWarpDriver)
 	{
+		// 这里貌似是选了最大显存的显卡来创建Device
 		SIZE_T MaxSize = 0;
 
 		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(Idx, &pAdapter); ++Idx)

@@ -281,6 +281,7 @@ void Display::Initialize(void)
 		g_DisplayPlane[i].CreateFromSwapChain(L"Primary SwapChain Buffer", DisplayPlane.Detach());
 	}
 
+	// TODO：这里的RootSignature给谁设置的哦
 	s_PresentRS.Reset(4, 2);
 	s_PresentRS[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
 	s_PresentRS[1].InitAsConstants(0, 6, D3D12_SHADER_VISIBILITY_ALL);
@@ -290,7 +291,7 @@ void Display::Initialize(void)
 	s_PresentRS.InitStaticSampler(1, SamplerPointClampDesc);
 	s_PresentRS.Finalize(L"Present");
 
-	// Initialize PSOs
+	// Initialize PSOs（这里是UI的PSO）
 	s_BlendUIPSO.SetRootSignature(s_PresentRS);
 	s_BlendUIPSO.SetRasterizerState(RasterizerTwoSided);
 	s_BlendUIPSO.SetBlendState(BlendPreMultiplied);

@@ -98,6 +98,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Core\BufferManager.h" />
+    <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\CameraController.h" />
     <ClInclude Include="Core\Color.h" />
     <ClInclude Include="Core\ColorBuffer.h" />
     <ClInclude Include="Core\CommandAllocatorPool.h" />
@@ -111,7 +113,6 @@
     <ClInclude Include="Core\EsramAllocator.h" />
     <ClInclude Include="Core\GameCore.h" />
     <ClInclude Include="Core\GameInput.h" />
-    <ClInclude Include="Core\GeometryGeneratorOld.h" />
     <ClInclude Include="Core\GpuBuffer.h" />
     <ClInclude Include="Core\GpuResource.h" />
     <ClInclude Include="Core\GpuTimeManager.h" />
@@ -149,6 +150,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\BufferManager.cpp" />
+    <ClCompile Include="Core\Camera.cpp" />
+    <ClCompile Include="Core\CameraController.cpp" />
     <ClCompile Include="Core\Color.cpp" />
     <ClCompile Include="Core\ColorBuffer.cpp" />
     <ClCompile Include="Core\CommandAllocatorPool.cpp" />
@@ -157,11 +160,10 @@
     <ClCompile Include="Core\DepthBuffer.cpp" />
     <ClCompile Include="Core\DescriptorHeap.cpp" />
     <ClCompile Include="Core\Display.cpp" />
-    <ClCompile Include="Core\DynamicDecriptorHeap.cpp" />
+    <ClCompile Include="Core\DynamicDescriptorHeap.cpp" />
     <ClCompile Include="Core\EngineTuning.cpp" />
     <ClCompile Include="Core\GameCore.cpp" />
     <ClCompile Include="Core\GameInput.cpp" />
-    <ClCompile Include="Core\GeometryGeneratorOld.cpp" />
     <ClCompile Include="Core\GpuBuffer.cpp" />
     <ClCompile Include="Core\GpuTimeManager.cpp" />
     <ClCompile Include="Core\GraphicsCommon.cpp" />
@@ -1533,6 +1535,24 @@
       <VariableName>g_pUpsampleAndBlurCS</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/UpsampleAndBlurCS.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/UpsampleAndBlurCS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\defaultPS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pdefaultPS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/defaultPS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/defaultPS.h</HeaderFileOutput>
+      <ObjectFileOutput></ObjectFileOutput>
+      <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\defaultVS.hlsl">
+      <PreprocessorDefinitions>_GAMING_DESKTOP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_pdefaultVS</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../bin/Debug-windows-x86_64/CoronaEngine/CompiledShaders/defaultVS.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../bin/Release-windows-x86_64/CoronaEngine/CompiledShaders/defaultVS.h</HeaderFileOutput>
       <ObjectFileOutput></ObjectFileOutput>
       <AdditionalOptions>-Qembed_debug %(AdditionalOptions)</AdditionalOptions>
     </FxCompile>

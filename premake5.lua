@@ -120,7 +120,7 @@ project "CoronaEngine"
 		{
 			"CoronaEngine/Core/DescriptorHeap.cpp",
 			"CoronaEngine/Core/DescriptorHeap.h",
-			"CoronaEngine/Core/DynamicDecriptorHeap.cpp",
+			"CoronaEngine/Core/DynamicDescriptorHeap.cpp",
 			"CoronaEngine/Core/DynamicDescriptorHeap.h",
 		},
 		["Core/Graphics/Pipeline"] = 
@@ -153,6 +153,8 @@ project "CoronaEngine"
 			"CoronaEngine/Core/GraphicsCore.h",
 			"CoronaEngine/Core/ImageScaling.cpp",
 			"CoronaEngine/Core/ImageScaling.h",
+			"CoronaEngine/Core/Camera.cpp",
+			"CoronaEngine/Core/Camera.h",
 		}
 	}
 
@@ -195,7 +197,9 @@ project "Sandbox"
 	includedirs
 	{
 		"CoronaEngine/vendor/spdlog/include",
-		"CoronaEngine/Core"
+		"CoronaEngine/Core",
+		"bin/" .. outputdir .."/CoronaEngine",
+
 	}
 
 	links

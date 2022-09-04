@@ -33,6 +33,7 @@ class GraphicsContext;
 class ComputeContext;
 class UploadBuffer;
 class ReadbackBuffer;
+// class DynamicDescriptorHeap;
 
 struct DWParam
 {

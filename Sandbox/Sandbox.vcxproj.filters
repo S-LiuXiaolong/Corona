@@ -9,9 +9,15 @@
     <ClInclude Include="Core\GameApp.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Core\GeometryGeneratorOld.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\GameApp.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GeometryGeneratorOld.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\WinMain.cpp">

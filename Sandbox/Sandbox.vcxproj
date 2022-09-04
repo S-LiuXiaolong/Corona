@@ -59,7 +59,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\Core;..\bin\Debug-windows-x86_64\CoronaEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,7 +75,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\CoronaEngine\vendor\spdlog\include;..\CoronaEngine\Core;..\bin\Release-windows-x86_64\CoronaEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -92,9 +92,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Core\GameApp.h" />
+    <ClInclude Include="Core\GeometryGeneratorOld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\GameApp.cpp" />
+    <ClCompile Include="Core\GeometryGeneratorOld.cpp" />
     <ClCompile Include="Core\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>

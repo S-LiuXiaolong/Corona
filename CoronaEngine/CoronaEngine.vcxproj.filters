@@ -33,6 +33,12 @@
     <ClInclude Include="Core\BufferManager.h">
       <Filter>Core\Graphics\Resource</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Camera.h">
+      <Filter>Core\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CameraController.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\Color.h">
       <Filter>Core\Graphics</Filter>
     </ClInclude>
@@ -70,9 +76,6 @@
       <Filter>Core\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Core\GameInput.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\GeometryGeneratorOld.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\GpuBuffer.h">
@@ -182,6 +185,12 @@
     <ClCompile Include="Core\BufferManager.cpp">
       <Filter>Core\Graphics\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Camera.cpp">
+      <Filter>Core\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CameraController.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\Color.cpp">
       <Filter>Core\Graphics</Filter>
     </ClCompile>
@@ -206,7 +215,7 @@
     <ClCompile Include="Core\Display.cpp">
       <Filter>Core\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Core\DynamicDecriptorHeap.cpp">
+    <ClCompile Include="Core\DynamicDescriptorHeap.cpp">
       <Filter>Core\Graphics\DescriptorHeap</Filter>
     </ClCompile>
     <ClCompile Include="Core\EngineTuning.cpp">
@@ -216,9 +225,6 @@
       <Filter>Core\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Core\GameInput.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\GeometryGeneratorOld.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\GpuBuffer.cpp">
@@ -731,6 +737,12 @@
       <Filter>Core\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Core\Shaders\UpsampleAndBlurCS.hlsl">
+      <Filter>Core\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\defaultPS.hlsl">
+      <Filter>Core\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Core\Shaders\defaultVS.hlsl">
       <Filter>Core\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
