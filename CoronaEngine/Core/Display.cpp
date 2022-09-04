@@ -479,59 +479,69 @@ void Graphics::PreparePresentSDR(void)
 		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 	Context.SetDynamicDescriptor(0, 0, g_SceneColorBuffer.GetSRV());
 
-	bool NeedsScaling = g_NativeWidth != g_DisplayWidth || g_NativeHeight != g_DisplayHeight;
+// 	bool NeedsScaling = g_NativeWidth != g_DisplayWidth || g_NativeHeight != g_DisplayHeight;
+// 
+// 	// On Windows, prefer scaling and compositing in one step via pixel shader
+// 	if (DebugZoom == kDebugZoomOff && (UpsampleFilter == kSharpening || !NeedsScaling))
+// 	{
+// 		Context.TransitionResource(g_OverlayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+// 		Context.SetDynamicDescriptor(0, 1, g_OverlayBuffer.GetSRV());
+// 		Context.SetPipelineState(NeedsScaling ? ScaleAndCompositeSDRPS : CompositeSDRPS);
+// 		Context.SetConstants(1, 0.7071f / g_NativeWidth, 0.7071f / g_NativeHeight);
+// 		Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_RENDER_TARGET);
+// 		Context.SetRenderTarget(g_DisplayPlane[g_CurrentBuffer].GetRTV());
+// 		Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
+// 		Context.Draw(3);
+// 	}
+// 	else
+// 	{
+// 		ColorBuffer& Dest = (DebugZoom == kDebugZoomOff ? g_DisplayPlane[g_CurrentBuffer] : g_PreDisplayBuffer);
+// 
+// 		// Scale or Copy
+// 		if (NeedsScaling)
+// 		{
+// //			ImageScaling::Upscale(Context, Dest, g_SceneColorBuffer, eScalingFilter((int)UpsampleFilter));
+// 		}
+// 		else
+// 		{
+// 			Context.SetPipelineState(PresentSDRPS);
+// 			Context.TransitionResource(Dest, D3D12_RESOURCE_STATE_RENDER_TARGET);
+// 			Context.SetRenderTarget(Dest.GetRTV());
+// 			Context.SetViewportAndScissor(0, 0, g_NativeWidth, g_NativeHeight);
+// 			Context.Draw(3);
+// 		}
+// 
+// 		// Magnify without stretching
+// 		if (DebugZoom != kDebugZoomOff)
+// 		{
+// 			Context.SetPipelineState(MagnifyPixelsPS);
+// 			Context.TransitionResource(g_PreDisplayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+// 			Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_RENDER_TARGET);
+// 			Context.SetRenderTarget(g_DisplayPlane[g_CurrentBuffer].GetRTV());
+// 			Context.SetDynamicDescriptor(0, 0, g_PreDisplayBuffer.GetSRV());
+// 			Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
+// 			Context.SetConstants(1, 1.0f / ((int)DebugZoom + 1.0f));
+// 			Context.Draw(3);
+// 		}
+// 
+// 		CompositeOverlays(Context);
+// 	}
 
-	// On Windows, prefer scaling and compositing in one step via pixel shader
-	if (DebugZoom == kDebugZoomOff && (UpsampleFilter == kSharpening || !NeedsScaling))
-	{
-		Context.TransitionResource(g_OverlayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		Context.SetDynamicDescriptor(0, 1, g_OverlayBuffer.GetSRV());
-		Context.SetPipelineState(NeedsScaling ? ScaleAndCompositeSDRPS : CompositeSDRPS);
-		Context.SetConstants(1, 0.7071f / g_NativeWidth, 0.7071f / g_NativeHeight);
-		Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_RENDER_TARGET);
-		Context.SetRenderTarget(g_DisplayPlane[g_CurrentBuffer].GetRTV());
-		Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
-		Context.Draw(3);
-	}
-	else
-	{
-		ColorBuffer& Dest = DebugZoom == kDebugZoomOff ? g_DisplayPlane[g_CurrentBuffer] : g_PreDisplayBuffer;
+	ColorBuffer& Dest = (DebugZoom == kDebugZoomOff ? g_DisplayPlane[g_CurrentBuffer] : g_PreDisplayBuffer);
 
-		// Scale or Copy
-		if (NeedsScaling)
-		{
-//			ImageScaling::Upscale(Context, Dest, g_SceneColorBuffer, eScalingFilter((int)UpsampleFilter));
-		}
-		else
-		{
-			Context.SetPipelineState(PresentSDRPS);
-			Context.TransitionResource(Dest, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			Context.SetRenderTarget(Dest.GetRTV());
-			Context.SetViewportAndScissor(0, 0, g_NativeWidth, g_NativeHeight);
-			Context.Draw(3);
-		}
+	Context.SetPipelineState(PresentSDRPS);
+	Context.TransitionResource(Dest, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	Context.SetRenderTarget(Dest.GetRTV());
+	Context.SetViewportAndScissor(0, 0, g_NativeWidth, g_NativeHeight);
+	Context.Draw(3);
 
-		// Magnify without stretching
-		if (DebugZoom != kDebugZoomOff)
-		{
-			Context.SetPipelineState(MagnifyPixelsPS);
-			Context.TransitionResource(g_PreDisplayBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-			Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_RENDER_TARGET);
-			Context.SetRenderTarget(g_DisplayPlane[g_CurrentBuffer].GetRTV());
-			Context.SetDynamicDescriptor(0, 0, g_PreDisplayBuffer.GetSRV());
-			Context.SetViewportAndScissor(0, 0, g_DisplayWidth, g_DisplayHeight);
-			Context.SetConstants(1, 1.0f / ((int)DebugZoom + 1.0f));
-			Context.Draw(3);
-		}
-
-		CompositeOverlays(Context);
-	}
-
+	CompositeOverlays(Context);
 
 	Context.TransitionResource(g_DisplayPlane[g_CurrentBuffer], D3D12_RESOURCE_STATE_PRESENT);
 
 	// Close the final context to be executed before frame present.
 	Context.Finish();
+
 }
 
 uint64_t Graphics::GetFrameCount(void)

@@ -80,7 +80,7 @@ void GameApp::Startup(void)
 	m_PSO.SetRootSignature(m_RootSignature);
 	m_PSO.SetRasterizerState(RasterizerDefault);
 	m_PSO.SetBlendState(BlendDisable);
-	m_PSO.SetDepthStencilState(DepthStateReadWrite);
+	m_PSO.SetDepthStencilState(DepthStateDisabled);
 	m_PSO.SetInputLayout(_countof(mInputLayout), mInputLayout);
 	m_PSO.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 	m_PSO.SetRenderTargetFormat(ColorFormat, DepthFormat);
@@ -181,8 +181,8 @@ void GameApp::RenderScene(void)
 	gfxContext.SetIndexBuffer(m_IndexBuffer.IndexBufferView());
 	// TODO：下面这俩不是你有问题就是他有问题
 	// 设置常量缓冲区数据
-	// gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &m_ViewProjMatrix);
-	gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &Matrix4());
+	gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &m_ViewProjMatrix);
+	// gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &Matrix4());
 	// 绘制
 	gfxContext.DrawIndexedInstanced(36, 1, 0, 0, 0);
 
