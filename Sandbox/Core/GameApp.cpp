@@ -7,6 +7,7 @@
 #include "GeometryGeneratorOld.h"
 
 #include <DirectXColors.h>
+#include "Math/Matrix4.h"
 #include "GameInput.h"
 #include "CompiledShaders/defaultVS.h"
 #include "CompiledShaders/defaultPS.h"
@@ -159,7 +160,7 @@ void GameApp::RenderScene(void)
 
 	// 已证明似乎除了ClearColor之外，其它的部分没有起到应当的作用
 	// 而且 g_DisplayPlane[g_CurrentBuffer] 和 g_SceneColorBuffer 起的作用并不一样
-	g_SceneColorBuffer.SetClearColor({ 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f });
+//	g_SceneColorBuffer.SetClearColor({ 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f });
 	gfxContext.ClearColor(g_SceneColorBuffer);
 
 	gfxContext.TransitionResource(g_SceneDepthBuffer, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
@@ -178,8 +179,10 @@ void GameApp::RenderScene(void)
 	gfxContext.SetVertexBuffer(0, m_VertexBuffer.VertexBufferView());
 	// 设置索引视图
 	gfxContext.SetIndexBuffer(m_IndexBuffer.IndexBufferView());
+	// TODO：下面这俩不是你有问题就是他有问题
 	// 设置常量缓冲区数据
-	gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &m_ViewProjMatrix);
+	// gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &m_ViewProjMatrix);
+	gfxContext.SetDynamicConstantBufferView(0, sizeof(m_ViewProjMatrix), &Matrix4());
 	// 绘制
 	gfxContext.DrawIndexedInstanced(36, 1, 0, 0, 0);
 

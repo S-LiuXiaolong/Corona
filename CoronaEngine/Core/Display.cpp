@@ -354,7 +354,8 @@ void Display::Present(void)
 // 		PreparePresentSDR();
 
 // TODO：这里似乎因为DynamicDescriptorHeap的某些原因，无法正常运行，所以注释掉了
-//	PreparePresentSDR();
+// 但是因为有一部分很重要的commandlist分配在里面，所以不得不修正
+	PreparePresentSDR();
 
 	UINT PresentInterval = s_EnableVSync ? std::min(4, (int)Round(s_FrameTime * 60.0f)) : 0;
 
