@@ -63,6 +63,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <array>
 #include <cwctype>
 #include <exception>
 
