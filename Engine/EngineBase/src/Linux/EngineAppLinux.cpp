@@ -21,7 +21,7 @@
 *  of the possibility of such damages.
 */
 
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #if VULKAN_SUPPORTED
 #    include "ImGuiImplLinuxXCB.hpp"
 #endif
@@ -30,15 +30,15 @@
 namespace Diligent
 {
 
-class SampleAppLinux final : public SampleApp
+class EngineAppLinux final : public EngineApp
 {
 public:
-    SampleAppLinux()
+    EngineAppLinux()
     {
         m_DeviceType = RENDER_DEVICE_TYPE_GL;
     }
 
-    ~SampleAppLinux()
+    ~EngineAppLinux()
     {
     }
     virtual bool OnGLContextCreated(Display* display, Window window) override final
@@ -51,7 +51,7 @@ public:
             InitializeDiligentEngine(&LinuxWindow);
             const auto& SCDesc = m_pSwapChain->GetDesc();
             m_pImGui.reset(new ImGuiImplLinuxX11(m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat, SCDesc.Width, SCDesc.Height));
-            InitializeSample();
+            InitializeEngine();
             return true;
         }
         catch (...)
@@ -66,7 +66,7 @@ public:
         // Always handle mouse move, button release and key release events
         if (!handled || xev->type == ButtonRelease || xev->type == MotionNotify || xev->type == KeyRelease)
         {
-            handled = m_TheSample->GetInputController().HandleXEvent(xev);
+            handled = m_TheEngine->GetInputController().HandleXEvent(xev);
         }
         return handled;
     }
@@ -83,8 +83,8 @@ public:
             InitializeDiligentEngine(&LinuxWindow);
             const auto& SCDesc = m_pSwapChain->GetDesc();
             m_pImGui.reset(new ImGuiImplLinuxXCB(connection, m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat, SCDesc.Width, SCDesc.Height));
-            m_TheSample->GetInputController().InitXCBKeysms(connection);
-            InitializeSample();
+            m_TheEngine->GetInputController().InitXCBKeysms(connection);
+            InitializeEngine();
             return true;
         }
         catch (...)
@@ -99,7 +99,7 @@ public:
         // Always handle mouse move, button release and key release events
         if (!handled || EventType == XCB_MOTION_NOTIFY || EventType == XCB_BUTTON_RELEASE || EventType == XCB_KEY_RELEASE)
         {
-            handled = m_TheSample->GetInputController().HandleXCBEvent(event);
+            handled = m_TheEngine->GetInputController().HandleXCBEvent(event);
         }
     }
 #endif
@@ -107,7 +107,7 @@ public:
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppLinux;
+    return new EngineAppLinux;
 }
 
 } // namespace Diligent

@@ -23,7 +23,7 @@
  */
 
 
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "RenderDeviceGLES.h"
 #include "ImGuiImplEmscripten.hpp"
 #include <emscripten.h>
@@ -32,10 +32,10 @@
 namespace Diligent
 {
 
-class SampleAppEmscripten : public SampleApp
+class EngineAppEmscripten : public EngineApp
 {
 public:
-    SampleAppEmscripten()
+    EngineAppEmscripten()
     {
         m_DeviceType = RENDER_DEVICE_TYPE_GLES;
     }
@@ -49,7 +49,7 @@ public:
 
             const auto& SCDesc = m_pSwapChain->GetDesc();
             m_pImGui.reset(new ImGuiImplEmscripten(m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
-            InitializeSample();
+            InitializeEngine();
         }
         catch (...)
         {
@@ -61,7 +61,7 @@ public:
     {
         if (!static_cast<ImGuiImplEmscripten*>(m_pImGui.get())->OnMouseEvent(EventType, Event))
         {
-            auto& InputController = m_TheSample->GetInputController();
+            auto& InputController = m_TheEngine->GetInputController();
 
             switch (EventType)
             {
@@ -87,7 +87,7 @@ public:
     {
         if (!static_cast<ImGuiImplEmscripten*>(m_pImGui.get())->OnWheelEvent(EventType, Event))
         {
-            auto& InputController = m_TheSample->GetInputController();
+            auto& InputController = m_TheEngine->GetInputController();
             InputController.OnMouseWheel(static_cast<float>(-Event->deltaY * 0.01));
         }
     }
@@ -96,7 +96,7 @@ public:
     {
         if (!static_cast<ImGuiImplEmscripten*>(m_pImGui.get())->OnKeyEvent(EventType, Event))
         {
-            auto& inputController = m_TheSample->GetInputController();
+            auto& inputController = m_TheEngine->GetInputController();
 
             switch (EventType)
             {
@@ -119,7 +119,7 @@ public:
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppEmscripten;
+    return new EngineAppEmscripten;
 }
 
 } // namespace Diligent

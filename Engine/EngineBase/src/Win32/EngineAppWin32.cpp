@@ -27,7 +27,7 @@
 
 #include <limits>
 
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "resources/Win32AppResource.h"
 #include "ImGuiImplWin32.hpp"
 
@@ -116,7 +116,7 @@ INT_PTR CALLBACK SelectDeviceTypeDialogProc(HWND   hwndDlg,
 namespace Diligent
 {
 
-class SampleAppWin32 final : public SampleApp
+class EngineAppWin32 final : public EngineApp
 {
 public:
     virtual LRESULT HandleWin32Message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override final
@@ -127,7 +127,7 @@ public:
                 // Handle ALT+ENTER:
                 if ((wParam == VK_RETURN) && (lParam & (1 << 29)))
                 {
-                    //if (pSample && pSample->GetTearingSupport())
+                    //if (pEngine && pEngine->GetTearingSupport())
                     {
                         ToggleFullscreenWindow();
                         return 0;
@@ -176,8 +176,8 @@ public:
             WPARAM wParam;
             LPARAM lParam;
         } MsgData = {hWnd, message, wParam, lParam};
-        m_TheSample->GetInputController().HandleNativeMessage(&MsgData);
-        return m_TheSample->HandleNativeMessage(&MsgData);
+        m_TheEngine->GetInputController().HandleNativeMessage(&MsgData);
+        return m_TheEngine->HandleNativeMessage(&MsgData);
     }
 
     virtual bool OnWindowCreated(HWND hWnd, LONG WindowWidth, LONG WindowHeight) override final
@@ -193,7 +193,7 @@ public:
             const auto& SCDesc = m_pSwapChain->GetDesc();
             m_pImGui.reset(new ImGuiImplWin32(m_hWnd, m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
 
-            InitializeSample();
+            InitializeEngine();
         }
         catch (...)
         {
@@ -266,7 +266,7 @@ protected:
             // We must exit full screen window first.
             ToggleFullscreenWindow();
         }
-        SampleApp::SetFullscreenMode(DisplayMode);
+        EngineApp::SetFullscreenMode(DisplayMode);
     }
 
     virtual void SetWindowedMode() override
@@ -276,7 +276,7 @@ protected:
             // Exit full screen window
             ToggleFullscreenWindow();
         }
-        SampleApp::SetWindowedMode();
+        EngineApp::SetWindowedMode();
     }
 
     virtual void SelectDeviceType() override final
@@ -295,7 +295,7 @@ private:
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppWin32;
+    return new EngineAppWin32;
 }
 
 } // namespace Diligent

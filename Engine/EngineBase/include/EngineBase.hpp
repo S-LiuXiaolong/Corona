@@ -43,7 +43,7 @@ namespace Diligent
 
 class ImGuiImplDiligent;
 
-struct SampleInitInfo
+struct EngineInitInfo
 {
     IEngineFactory*    pEngineFactory  = nullptr;
     IRenderDevice*     pDevice         = nullptr;
@@ -54,10 +54,10 @@ struct SampleInitInfo
     ImGuiImplDiligent* pImGui          = nullptr;
 };
 
-class SampleBase
+class EngineBase
 {
 public:
-    virtual ~SampleBase() {}
+    virtual ~EngineBase() {}
 
     struct ModifyEngineInitInfoAttribs
     {
@@ -69,7 +69,7 @@ public:
     };
     virtual void ModifyEngineInitInfo(const ModifyEngineInitInfoAttribs& Attribs);
 
-    virtual void Initialize(const SampleInitInfo& InitInfo) = 0;
+    virtual void Initialize(const EngineInitInfo& InitInfo) = 0;
 
     virtual void Render()                                    = 0;
     virtual void Update(double CurrTime, double ElapsedTime) = 0;
@@ -77,7 +77,7 @@ public:
     virtual void WindowResize(Uint32 Width, Uint32 Height) {}
     virtual bool HandleNativeMessage(const void* pNativeMsgData) { return false; }
 
-    virtual const Char* GetSampleName() const { return "Diligent Engine Sample"; }
+    virtual const Char* GetEngineName() const { return "Diligent Engine Engine"; }
 
     using CommandLineStatus = AppBase::CommandLineStatus;
     virtual CommandLineStatus ProcessCommandLine(int argc, const char* const* argv) { return CommandLineStatus::OK; }
@@ -114,7 +114,7 @@ protected:
     InputController m_InputController;
 };
 
-inline void SampleBase::Update(double CurrTime, double ElapsedTime)
+inline void EngineBase::Update(double CurrTime, double ElapsedTime)
 {
     ++m_NumFramesRendered;
     ++m_CurrentFrameNumber;
@@ -127,7 +127,7 @@ inline void SampleBase::Update(double CurrTime, double ElapsedTime)
     }
 }
 
-inline void SampleBase::Initialize(const SampleInitInfo& InitInfo)
+inline void EngineBase::Initialize(const EngineInitInfo& InitInfo)
 {
     m_pEngineFactory    = InitInfo.pEngineFactory;
     m_pDevice           = InitInfo.pDevice;
@@ -139,6 +139,6 @@ inline void SampleBase::Initialize(const SampleInitInfo& InitInfo)
     m_pImGui = InitInfo.pImGui;
 }
 
-extern SampleBase* CreateSample();
+extern EngineBase* CreateEngine();
 
 } // namespace Diligent

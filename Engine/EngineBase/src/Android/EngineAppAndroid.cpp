@@ -27,7 +27,7 @@
 #    include "EngineFactoryVk.h"
 #endif
 
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "RenderDeviceGLES.h"
 #include "ImGuiImplAndroid.hpp"
 
@@ -35,10 +35,10 @@
 namespace Diligent
 {
 
-class SampleAppAndroid final : public SampleApp
+class EngineAppAndroid final : public EngineApp
 {
 public:
-    SampleAppAndroid()
+    EngineAppAndroid()
     {
 #if VULKAN_SUPPORTED
         m_DeviceType = RENDER_DEVICE_TYPE_VULKAN;
@@ -67,10 +67,10 @@ public:
             m_WindowHeight = SCDesc.Height;
             m_PreTransform = SCDesc.PreTransform;
 
-            m_TheSample->WindowResize(static_cast<int>(m_WindowWidth), static_cast<int>(m_WindowHeight));
+            m_TheEngine->WindowResize(static_cast<int>(m_WindowWidth), static_cast<int>(m_WindowHeight));
         }
 
-        SampleApp::DrawFrame();
+        EngineApp::DrawFrame();
     }
 
     virtual void Initialize() override final
@@ -93,7 +93,7 @@ public:
 
         AndroidFileSystem::Init(app_->activity, native_activity_class_name_.c_str(), nullptr);
 
-        SampleApp::Initialize();
+        EngineApp::Initialize();
 
         AndroidNativeWindow Window;
         Window.pAWindow = app_->window;
@@ -120,7 +120,7 @@ public:
                 UNEXPECTED("Unexpected device type");
         }
 
-        InitializeSample();
+        InitializeEngine();
     }
 
     virtual int Resume(ANativeWindow* window) override final
@@ -132,7 +132,7 @@ public:
             {
                 // Create a new swap chain for the new window
                 m_pSwapChain.Release();
-                m_TheSample->ResetSwapChain(nullptr);
+                m_TheEngine->ResetSwapChain(nullptr);
                 m_pDevice->IdleGPU();
 
                 AndroidNativeWindow AndroidWindow;
@@ -140,7 +140,7 @@ public:
                 GetEngineFactoryVk()->CreateSwapChainVk(m_pDevice, GetImmediateContext(),
                                                         m_SwapChainInitDesc, AndroidWindow,
                                                         &m_pSwapChain);
-                m_TheSample->ResetSwapChain(m_pSwapChain);
+                m_TheEngine->ResetSwapChain(m_pSwapChain);
                 return m_pSwapChain ? EGL_SUCCESS : EGL_NOT_INITIALIZED;
             }
 #endif
@@ -163,7 +163,7 @@ public:
             case RENDER_DEVICE_TYPE_VULKAN:
                 // Destroy the swap chain as we will need to recreate it for the new window
                 m_pSwapChain.Release();
-                m_TheSample->ResetSwapChain(nullptr);
+                m_TheEngine->ResetSwapChain(nullptr);
                 break;
 #endif
 
@@ -230,7 +230,7 @@ public:
                     auto Handled = static_cast<ImGuiImplAndroid*>(m_pImGui.get())->BeginDrag(fX, fY);
                     if (!Handled)
                     {
-                        m_TheSample->GetInputController().BeginDrag(fX, fY);
+                        m_TheEngine->GetInputController().BeginDrag(fX, fY);
                     }
                 }
                 else if (dragState & ndk_helper::GESTURE_STATE_MOVE)
@@ -242,13 +242,13 @@ public:
                     auto Handled = static_cast<ImGuiImplAndroid*>(m_pImGui.get())->DragMove(fX, fY);
                     if (!Handled)
                     {
-                        m_TheSample->GetInputController().DragMove(fX, fY);
+                        m_TheEngine->GetInputController().DragMove(fX, fY);
                     }
                 }
                 else if (dragState & ndk_helper::GESTURE_STATE_END)
                 {
                     static_cast<ImGuiImplAndroid*>(m_pImGui.get())->EndDrag();
-                    m_TheSample->GetInputController().EndDrag();
+                    m_TheEngine->GetInputController().EndDrag();
                 }
 
                 //Handle pinch state
@@ -261,7 +261,7 @@ public:
                     float fX1 = 0, fY1 = 0, fX2 = 0, fY2 = 0;
                     v1.Value(fX1, fY1);
                     v2.Value(fX2, fY2);
-                    m_TheSample->GetInputController().StartPinch(fX1, fY1, fX2, fY2);
+                    m_TheEngine->GetInputController().StartPinch(fX1, fY1, fX2, fY2);
                     //tap_camera_.BeginPinch( v1, v2 );
                 }
                 else if (pinchState & ndk_helper::GESTURE_STATE_MOVE)
@@ -274,12 +274,12 @@ public:
                     float fX1 = 0, fY1 = 0, fX2 = 0, fY2 = 0;
                     v1.Value(fX1, fY1);
                     v2.Value(fX2, fY2);
-                    m_TheSample->GetInputController().PinchMove(fX1, fY1, fX2, fY2);
+                    m_TheEngine->GetInputController().PinchMove(fX1, fY1, fX2, fY2);
                     //tap_camera_.Pinch( v1, v2 );
                 }
                 else if (pinchState & ndk_helper::GESTURE_STATE_END)
                 {
-                    m_TheSample->GetInputController().EndPinch();
+                    m_TheEngine->GetInputController().EndPinch();
                 }
             }
             return 1;
@@ -297,7 +297,7 @@ private:
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppAndroid;
+    return new EngineAppAndroid;
 }
 
 } // namespace Diligent

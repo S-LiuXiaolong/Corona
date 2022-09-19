@@ -24,16 +24,16 @@
 #include <queue>
 #include <mutex>
 #import <Cocoa/Cocoa.h>
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "ImGuiImplMacOS.hpp"
 
 namespace Diligent
 {
 
-class SampleAppMacOS final : public SampleApp
+class EngineAppMacOS final : public EngineApp
 {
 public:
-    SampleAppMacOS()
+    EngineAppMacOS()
     {
         m_DeviceType = RENDER_DEVICE_TYPE_GL;
     }
@@ -64,7 +64,7 @@ public:
         InitializeDiligentEngine(&MacWindow);
         const auto& SCDesc = m_pSwapChain->GetDesc();
         m_pImGui.reset(new ImGuiImplMacOS(m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
-        InitializeSample();
+        InitializeEngine();
 
         if (m_DeviceType == RENDER_DEVICE_TYPE_METAL)
         {
@@ -84,25 +84,25 @@ public:
 
         GetImmediateContext()->SetRenderTargets(0, nullptr, nullptr, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
-        SampleApp::Render();
+        EngineApp::Render();
     }
 
     virtual void Update(double CurrTime, double ElapsedTime)override
     {
         std::lock_guard<std::mutex> lock(AppMutex);
-        SampleApp::Update(CurrTime, ElapsedTime);
+        EngineApp::Update(CurrTime, ElapsedTime);
     }
 
     virtual void WindowResize(int width, int height)override
     {
         std::lock_guard<std::mutex> lock(AppMutex);
-        SampleApp::WindowResize(width, height);
+        EngineApp::WindowResize(width, height);
     }
 
     virtual void Present()override
     {
         std::lock_guard<std::mutex> lock(AppMutex);
-        SampleApp::Present();
+        EngineApp::Present();
     }
 
     virtual void HandleOSXEvent(void* _event, void* _view)override final
@@ -131,7 +131,7 @@ public:
         }
 
         std::lock_guard<std::mutex> lock(AppMutex);
-        auto& inputController = m_TheSample->GetInputController();
+        auto& inputController = m_TheEngine->GetInputController();
 
         auto HandleKeyEvent = [](NSEvent* event, InputController& inputController)
         {
@@ -247,7 +247,7 @@ private:
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppMacOS;
+    return new EngineAppMacOS;
 }
 
 }

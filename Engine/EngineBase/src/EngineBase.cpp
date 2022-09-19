@@ -26,13 +26,13 @@
  */
 
 #include "PlatformDefinitions.h"
-#include "SampleBase.hpp"
+#include "EngineBase.hpp"
 #include "Errors.hpp"
 
 namespace Diligent
 {
 
-void SampleBase::ModifyEngineInitInfo(const ModifyEngineInitInfoAttribs& Attribs)
+void EngineBase::ModifyEngineInitInfo(const ModifyEngineInitInfoAttribs& Attribs)
 {
     Attribs.EngineCI.Features = DeviceFeatures{DEVICE_FEATURE_STATE_OPTIONAL};
 
@@ -56,7 +56,7 @@ void SampleBase::ModifyEngineInitInfo(const ModifyEngineInitInfoAttribs& Attribs
             EngineD3D12CI.GPUDescriptorHeapSize[1]                = 128;
             EngineD3D12CI.GPUDescriptorHeapDynamicSize[1]         = 2048 - 128;
             EngineD3D12CI.DynamicDescriptorAllocationChunkSize[0] = 32;
-            EngineD3D12CI.DynamicDescriptorAllocationChunkSize[1] = 8; // D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER
+            EngineD3D12CI.DynamicDescriptorAllocationChunkSize[1] = 8; // D3D12_DESCRIPTOR_HEAP_TYPE_EngineR
         }
         break;
 #endif
@@ -99,7 +99,7 @@ void SampleBase::ModifyEngineInitInfo(const ModifyEngineInitInfoAttribs& Attribs
     }
 }
 
-float4x4 SampleBase::GetAdjustedProjectionMatrix(float FOV, float NearPlane, float FarPlane) const
+float4x4 EngineBase::GetAdjustedProjectionMatrix(float FOV, float NearPlane, float FarPlane) const
 {
     const auto& SCDesc = m_pSwapChain->GetDesc();
 
@@ -128,7 +128,7 @@ float4x4 SampleBase::GetAdjustedProjectionMatrix(float FOV, float NearPlane, flo
     return Proj;
 }
 
-float4x4 SampleBase::GetSurfacePretransformMatrix(const float3& f3CameraViewAxis) const
+float4x4 EngineBase::GetSurfacePretransformMatrix(const float3& f3CameraViewAxis) const
 {
     const auto& SCDesc = m_pSwapChain->GetDesc();
     switch (SCDesc.PreTransform)

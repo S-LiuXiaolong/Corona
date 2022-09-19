@@ -24,13 +24,13 @@
  *  of the possibility of such damages.
  */
 
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "ImGuiImplTVOS.hpp"
 
 namespace Diligent
 {
 
-class SampleAppTVOS final : public SampleApp
+class EngineAppTVOS final : public EngineApp
 {
 public:
     virtual void Initialize(int deviceType, void* layer) override final
@@ -40,13 +40,13 @@ public:
         InitializeDiligentEngine(&IOSWindow);
         const auto& SCDesc = m_pSwapChain->GetDesc();
         m_pImGui.reset(new ImGuiImplTVOS{m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat});
-        InitializeSample();
+        InitializeEngine();
     }
 };
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppTVOS;
+    return new EngineAppTVOS;
 }
 
 } // namespace Diligent

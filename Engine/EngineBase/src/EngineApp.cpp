@@ -31,7 +31,7 @@
 #include <cmath>
 
 #include "PlatformDefinitions.h"
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "Errors.hpp"
 #include "StringTools.hpp"
 #include "MapHelper.hpp"
@@ -67,16 +67,16 @@
 namespace Diligent
 {
 
-SampleApp::SampleApp() :
-    m_TheSample{CreateSample()},
-    m_AppTitle{m_TheSample->GetSampleName()}
+EngineApp::EngineApp() :
+    m_TheEngine{CreateEngine()},
+    m_AppTitle{m_TheEngine->GetEngineName()}
 {
 }
 
-SampleApp::~SampleApp()
+EngineApp::~EngineApp()
 {
     m_pImGui.reset();
-    m_TheSample.reset();
+    m_TheEngine.reset();
 
     if (!m_pDeviceContexts.empty())
     {
@@ -90,7 +90,7 @@ SampleApp::~SampleApp()
 }
 
 
-void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
+void EngineApp::InitializeDiligentEngine(const NativeWindow* pWindow)
 {
     if (m_ScreenCaptureInfo.AllowCapture)
         m_SwapChainInitDesc.Usage |= SWAP_CHAIN_USAGE_COPY_SOURCE;
@@ -207,7 +207,7 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
                 EngineCI.SetValidationLevel(static_cast<VALIDATION_LEVEL>(m_ValidationLevel));
 
             EngineCI.AdapterId = FindAdapter(pFactoryD3D11, EngineCI.GraphicsAPIVersion, m_AdapterAttribs);
-            m_TheSample->ModifyEngineInitInfo({pFactoryD3D11, m_DeviceType, EngineCI, m_SwapChainInitDesc});
+            m_TheEngine->ModifyEngineInitInfo({pFactoryD3D11, m_DeviceType, EngineCI, m_SwapChainInitDesc});
 
             if (m_AdapterType != ADAPTER_TYPE_SOFTWARE && EngineCI.AdapterId != DEFAULT_ADAPTER_ID)
             {
@@ -268,7 +268,7 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
 #    endif
             }
 
-            m_TheSample->ModifyEngineInitInfo({pFactoryD3D12, m_DeviceType, EngineCI, m_SwapChainInitDesc});
+            m_TheEngine->ModifyEngineInitInfo({pFactoryD3D12, m_DeviceType, EngineCI, m_SwapChainInitDesc});
 
             if (m_AdapterType != ADAPTER_TYPE_SOFTWARE && EngineCI.AdapterId != DEFAULT_ADAPTER_ID)
             {
@@ -314,7 +314,7 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
             if (m_ValidationLevel >= 0)
                 EngineCI.SetValidationLevel(static_cast<VALIDATION_LEVEL>(m_ValidationLevel));
 
-            m_TheSample->ModifyEngineInitInfo({pFactoryOpenGL, m_DeviceType, EngineCI, m_SwapChainInitDesc});
+            m_TheEngine->ModifyEngineInitInfo({pFactoryOpenGL, m_DeviceType, EngineCI, m_SwapChainInitDesc});
 
             if (m_bForceNonSeprblProgs)
                 EngineCI.Features.SeparablePrograms = DEVICE_FEATURE_STATE_DISABLED;
@@ -360,7 +360,7 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
             m_pEngineFactory = pFactoryVk;
 
             EngineCI.AdapterId = FindAdapter(pFactoryVk, EngineCI.GraphicsAPIVersion, m_AdapterAttribs);
-            m_TheSample->ModifyEngineInitInfo({pFactoryVk, m_DeviceType, EngineCI, m_SwapChainInitDesc});
+            m_TheEngine->ModifyEngineInitInfo({pFactoryVk, m_DeviceType, EngineCI, m_SwapChainInitDesc});
 
             NumImmediateContexts = std::max(1u, EngineCI.NumImmediateContexts);
             ppContexts.resize(NumImmediateContexts + EngineCI.NumDeferredContexts);
@@ -388,7 +388,7 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
             auto* pFactoryMtl = GetEngineFactoryMtl();
             m_pEngineFactory  = pFactoryMtl;
 
-            m_TheSample->ModifyEngineInitInfo({pFactoryMtl, m_DeviceType, EngineCI, m_SwapChainInitDesc});
+            m_TheEngine->ModifyEngineInitInfo({pFactoryMtl, m_DeviceType, EngineCI, m_SwapChainInitDesc});
 
             NumImmediateContexts = std::max(1u, EngineCI.NumImmediateContexts);
             ppContexts.resize(NumImmediateContexts + EngineCI.NumDeferredContexts);
@@ -433,7 +433,7 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
     }
 }
 
-void SampleApp::InitializeSample()
+void EngineApp::InitializeEngine()
 {
 #if PLATFORM_WIN32
     if (!m_DisplayModes.empty())
@@ -463,7 +463,7 @@ void SampleApp::InitializeSample()
     for (size_t ctx = 0; ctx < m_pDeviceContexts.size(); ++ctx)
         ppContexts[ctx] = m_pDeviceContexts[ctx];
 
-    SampleInitInfo InitInfo;
+    EngineInitInfo InitInfo;
     InitInfo.pEngineFactory  = m_pEngineFactory;
     InitInfo.pDevice         = m_pDevice;
     InitInfo.ppContexts      = ppContexts.data();
@@ -472,12 +472,12 @@ void SampleApp::InitializeSample()
     InitInfo.NumDeferredCtx = static_cast<Uint32>(m_pDeviceContexts.size()) - m_NumImmediateContexts;
     InitInfo.pSwapChain     = m_pSwapChain;
     InitInfo.pImGui         = m_pImGui.get();
-    m_TheSample->Initialize(InitInfo);
+    m_TheEngine->Initialize(InitInfo);
 
-    m_TheSample->WindowResize(SCDesc.Width, SCDesc.Height);
+    m_TheEngine->WindowResize(SCDesc.Width, SCDesc.Height);
 }
 
-void SampleApp::UpdateAdaptersDialog()
+void EngineApp::UpdateAdaptersDialog()
 {
 #if PLATFORM_WIN32 || PLATFORM_LINUX
     const auto& SCDesc = m_pSwapChain->GetDesc();
@@ -586,7 +586,7 @@ void SampleApp::UpdateAdaptersDialog()
 //
 //     magick convert  -delay 6  -loop 0 -layers Optimize -compress LZW -strip -resize 240x180   frame*.png   Animation.gif
 //
-SampleApp::CommandLineStatus SampleApp::ProcessCommandLine(int argc, const char* const* argv)
+EngineApp::CommandLineStatus EngineApp::ProcessCommandLine(int argc, const char* const* argv)
 {
     if (argc == 0)
         return CommandLineStatus::OK;
@@ -751,22 +751,22 @@ SampleApp::CommandLineStatus SampleApp::ProcessCommandLine(int argc, const char*
         }
     }
 
-    return m_TheSample->ProcessCommandLine(ArgsParser.ArgC(), ArgsParser.ArgV());
+    return m_TheEngine->ProcessCommandLine(ArgsParser.ArgC(), ArgsParser.ArgV());
 }
 
-void SampleApp::WindowResize(int width, int height)
+void EngineApp::WindowResize(int width, int height)
 {
     if (m_pSwapChain)
     {
-        m_TheSample->PreWindowResize();
+        m_TheEngine->PreWindowResize();
         m_pSwapChain->Resize(width, height);
         auto SCWidth  = m_pSwapChain->GetDesc().Width;
         auto SCHeight = m_pSwapChain->GetDesc().Height;
-        m_TheSample->WindowResize(SCWidth, SCHeight);
+        m_TheEngine->WindowResize(SCWidth, SCHeight);
     }
 }
 
-void SampleApp::Update(double CurrTime, double ElapsedTime)
+void EngineApp::Update(double CurrTime, double ElapsedTime)
 {
     m_CurrentTime = CurrTime;
 
@@ -781,12 +781,12 @@ void SampleApp::Update(double CurrTime, double ElapsedTime)
     }
     if (m_pDevice)
     {
-        m_TheSample->Update(CurrTime, ElapsedTime);
-        m_TheSample->GetInputController().ClearState();
+        m_TheEngine->Update(CurrTime, ElapsedTime);
+        m_TheEngine->GetInputController().ClearState();
     }
 }
 
-void SampleApp::Render()
+void EngineApp::Render()
 {
     if (m_NumImmediateContexts == 0 || !m_pSwapChain)
         return;
@@ -796,9 +796,9 @@ void SampleApp::Render()
     auto* pDSV = m_pSwapChain->GetDepthBufferDSV();
     pCtx->SetRenderTargets(1, &pRTV, pDSV, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
-    m_TheSample->Render();
+    m_TheEngine->Render();
 
-    // Restore default render target in case the sample has changed it
+    // Restore default render target in case the Engine has changed it
     pCtx->SetRenderTargets(1, &pRTV, pDSV, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
     if (m_pImGui)
     {
@@ -814,7 +814,7 @@ void SampleApp::Render()
     }
 }
 
-void SampleApp::CompareGoldenImage(const std::string& FileName, ScreenCapture::CaptureInfo& Capture)
+void EngineApp::CompareGoldenImage(const std::string& FileName, ScreenCapture::CaptureInfo& Capture)
 {
     RefCntAutoPtr<Image> pGoldenImg;
     CreateImageFromFile(FileName.c_str(), &pGoldenImg, nullptr);
@@ -873,7 +873,7 @@ void SampleApp::CompareGoldenImage(const std::string& FileName, ScreenCapture::C
     m_ExitCode = NumBadPixels > 0 ? 10 : 0;
 }
 
-void SampleApp::SaveScreenCapture(const std::string& FileName, ScreenCapture::CaptureInfo& Capture)
+void EngineApp::SaveScreenCapture(const std::string& FileName, ScreenCapture::CaptureInfo& Capture)
 {
     auto* const pCtx = GetImmediateContext();
 
@@ -915,7 +915,7 @@ void SampleApp::SaveScreenCapture(const std::string& FileName, ScreenCapture::Ca
     // Do NOT set exit code to 0! We must not clear the previous error code.
 }
 
-void SampleApp::Present()
+void EngineApp::Present()
 {
     if (!m_pSwapChain)
         return;

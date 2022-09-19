@@ -37,7 +37,7 @@
 #include "RenderDevice.h"
 #include "DeviceContext.h"
 #include "SwapChain.h"
-#include "SampleBase.hpp"
+#include "EngineBase.hpp"
 #include "ScreenCapture.hpp"
 #include "Image.h"
 
@@ -46,11 +46,11 @@ namespace Diligent
 
 class ImGuiImplDiligent;
 
-class SampleApp : public NativeAppBase
+class EngineApp : public NativeAppBase
 {
 public:
-    SampleApp();
-    ~SampleApp();
+    EngineApp();
+    ~EngineApp();
     virtual CommandLineStatus ProcessCommandLine(int argc, const char* const* argv) override final;
 
     virtual const char* GetAppTitle() const override final { return m_AppTitle.c_str(); }
@@ -89,7 +89,7 @@ public:
 
 protected:
     void InitializeDiligentEngine(const NativeWindow* pWindow);
-    void InitializeSample();
+    void InitializeEngine();
     void UpdateAdaptersDialog();
 
     virtual void SetFullscreenMode(const DisplayModeAttribs& DisplayMode)
@@ -115,7 +115,7 @@ protected:
     GraphicsAdapterInfo                        m_AdapterAttribs;
     std::vector<DisplayModeAttribs>            m_DisplayModes;
 
-    std::unique_ptr<SampleBase> m_TheSample;
+    std::unique_ptr<EngineBase> m_TheEngine;
 
     int          m_InitialWindowWidth  = 0;
     int          m_InitialWindowHeight = 0;

@@ -21,7 +21,7 @@
 *  of the possibility of such damages.
 */
 
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "ImguiUWPEventHelper.h"
 #include "InputControllerEventHandlerUWP.h"
 #include "RenderDeviceD3D12.h"
@@ -35,10 +35,10 @@
 namespace Diligent
 {
 
-class SampleAppUWP final : public SampleApp
+class EngineAppUWP final : public EngineApp
 {
 public:
-    SampleAppUWP()
+    EngineAppUWP()
     {
         m_DeviceType = RENDER_DEVICE_TYPE_D3D12;
     }
@@ -46,22 +46,22 @@ public:
     virtual void OnSetWindow(Windows::UI::Core::CoreWindow^ window)override final
     {
         m_ImguiEventHandler = ImguiUWPEventHelper::Create(window);
-        m_InputControllerEventHandlerUWP = InputControllerEventHandlerUWP::Create(window, m_TheSample->GetInputController().GetSharedState());
+        m_InputControllerEventHandlerUWP = InputControllerEventHandlerUWP::Create(window, m_TheEngine->GetInputController().GetSharedState());
     }
 
     virtual void OnWindowSizeChanged()override final
     {
-        if (m_SampleInitialized)
+        if (m_EngineInitialized)
         {
-            m_TheSample->PreWindowResize();
+            m_TheEngine->PreWindowResize();
         }
 
         InitWindowSizeDependentResources();
 
-        if (m_SampleInitialized)
+        if (m_EngineInitialized)
         {
             const auto& SCDesc = m_pSwapChain->GetDesc();
-            m_TheSample->WindowResize(SCDesc.Width, SCDesc.Height);
+            m_TheEngine->WindowResize(SCDesc.Width, SCDesc.Height);
         }
     }
 
@@ -72,7 +72,7 @@ public:
         {
             return;
         }
-        SampleApp::Render();
+        EngineApp::Render();
         m_bFrameReady = true;
     }
 
@@ -102,7 +102,7 @@ public:
         // TODO: Save any necessary application or renderer state and release the renderer
         // and its resources which are no longer valid.
         //m_sceneRenderer->SaveState();
-        m_TheSample.reset();
+        m_TheEngine.reset();
     }
 
     virtual void Present()override
@@ -237,9 +237,9 @@ public:
         const auto& SCDesc = m_pSwapChain->GetDesc();
         m_pImGui.reset(new ImGuiImplUWP(m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat, SCDesc.Width, SCDesc.Height));
 
-        InitializeSample();
+        InitializeEngine();
 
-        m_SampleInitialized = true;
+        m_EngineInitialized = true;
     }
 
 private:
@@ -247,13 +247,13 @@ private:
     InputControllerEventHandlerUWP^ m_InputControllerEventHandlerUWP;
 
     Microsoft::WRL::ComPtr<IDXGISwapChain3>	m_swapChain;
-    bool m_SampleInitialized = false;
+    bool m_EngineInitialized = false;
 };
 
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppUWP;
+    return new EngineAppUWP;
 }
 
 }

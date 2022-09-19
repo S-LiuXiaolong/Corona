@@ -22,13 +22,13 @@
 */
 
 #include <queue>
-#include "SampleApp.hpp"
+#include "EngineApp.hpp"
 #include "ImGuiImplIOS.hpp"
 
 namespace Diligent
 {
 
-class SampleAppIOS final : public SampleApp
+class EngineAppIOS final : public EngineApp
 {
 public:
     virtual void Initialize(int deviceType, void* layer) override final
@@ -38,7 +38,7 @@ public:
         InitializeDiligentEngine(&IOSWindow);
         const auto& SCDesc = m_pSwapChain->GetDesc();
         m_pImGui.reset(new ImGuiImplIOS(m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
-        InitializeSample();
+        InitializeEngine();
 
         if (m_DeviceType == RENDER_DEVICE_TYPE_METAL)
         {
@@ -53,29 +53,29 @@ public:
 
     virtual void Render() override
     {
-        SampleApp::Render();
+        EngineApp::Render();
     }
 
     virtual void OnTouchBegan(float x, float y) override final
     {
         if (!static_cast<ImGuiImplIOS*>(m_pImGui.get())->OnTouchEvent(x, y, true))
         {
-            m_TheSample->GetInputController().OnMouseButtonEvent(InputController::MouseButtonEvent::LMB_Pressed);
+            m_TheEngine->GetInputController().OnMouseButtonEvent(InputController::MouseButtonEvent::LMB_Pressed);
         }
-        m_TheSample->GetInputController().OnMouseMove(x, y);
+        m_TheEngine->GetInputController().OnMouseMove(x, y);
     }
 
     virtual void OnTouchMoved(float x, float y) override final
     {
         static_cast<ImGuiImplIOS*>(m_pImGui.get())->OnTouchEvent(x, y, true);
-        m_TheSample->GetInputController().OnMouseMove(x, y);
+        m_TheEngine->GetInputController().OnMouseMove(x, y);
     }
 
     virtual void OnTouchEnded(float x, float y) override final
     {
         static_cast<ImGuiImplIOS*>(m_pImGui.get())->OnTouchEvent(x, y, false);
-        m_TheSample->GetInputController().OnMouseMove(x, y);
-        m_TheSample->GetInputController().OnMouseButtonEvent(InputController::MouseButtonEvent::LMB_Released);
+        m_TheEngine->GetInputController().OnMouseMove(x, y);
+        m_TheEngine->GetInputController().OnMouseButtonEvent(InputController::MouseButtonEvent::LMB_Released);
     }
 
 private:
@@ -83,7 +83,7 @@ private:
 
 NativeAppBase* CreateApplication()
 {
-    return new SampleAppIOS;
+    return new EngineAppIOS;
 }
 
 } // namespace Diligent

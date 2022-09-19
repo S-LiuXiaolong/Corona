@@ -1,0 +1,11 @@
+Model Information:
+* title:	SAZABI MSN-04 Gundam
+* source:	https://sketchfab.com/3d-models/sazabi-msn-04-gundam-eef0fd28e05a4e33a111424745bc9587
+* author:	kunnatee (https://sketchfab.com/kunnatee)
+
+Model License:
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions must have the same license.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "SAZABI MSN-04 Gundam" (https://sketchfab.com/3d-models/sazabi-msn-04-gundam-eef0fd28e05a4e33a111424745bc9587) by kunnatee (https://sketchfab.com/kunnatee) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
