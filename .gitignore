@@ -2,3 +2,7 @@ build
 out
 .vs
 .vscode
+DiligentCore
+DiligentFX
+DiligentSamples
+DiligentTools

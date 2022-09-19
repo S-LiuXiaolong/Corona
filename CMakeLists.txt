@@ -9,11 +9,12 @@ set(CMAKE_XCODE_SCHEME_MALLOC_SCRIBBLE YES)
 # Place guard pages on each side of large (4096 bytes or more) buffers
 set(CMAKE_XCODE_SCHEME_MALLOC_GUARD_EDGES YES)
 
-project(DiligentEngine)
+project(Corona)
 
 option(DILIGENT_BUILD_TOOLS "Build DiligentTools module" ON)
 option(DILIGENT_BUILD_FX "Build DiligentFX module" ON)
 option(DILIGENT_BUILD_SAMPLES "Build DiligentSamples module" ON)
+option(CORONA_BUILD_ENGINE "Build Corona Engine" ON)
 
 add_subdirectory(DiligentCore)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/DiligentCorePro")
@@ -45,6 +46,10 @@ endif()
 
 if(${DILIGENT_BUILD_SAMPLES})
     add_subdirectory(DiligentSamples)
+endif()
+
+if(${CORONA_BUILD_ENGINE})
+    add_subdirectory(Engine)
 endif()
 
 if(TARGET GLTFViewer)
