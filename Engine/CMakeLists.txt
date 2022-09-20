@@ -107,6 +107,7 @@ endfunction()
 if(TARGET Diligent-NativeAppBase AND TARGET Diligent-TextureLoader AND TARGET Diligent-Imgui)
     add_subdirectory(EngineBase)
     add_subdirectory(CoronaEditor)
+    add_subdirectory(AnimationTest)
 endif()
 
 # Create a custom target to run source code formatting validation command

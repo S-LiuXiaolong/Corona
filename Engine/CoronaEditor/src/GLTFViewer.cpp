@@ -116,6 +116,7 @@ void GLTFViewer::LoadModel(const char* Path)
 
     m_CameraId = 0;
     m_Cameras.clear();
+    // TODO: Get skeleton from Node struct.
     for (const auto* node : m_Model->LinearNodes)
     {
         if (node->pCamera && node->pCamera->Type == GLTF::Camera::Projection::Perspective)
@@ -260,6 +261,7 @@ void GLTFViewer::Initialize(const EngineInitInfo& InitInfo)
         CreateGLTFResourceCache();
 
     LoadModel(!m_InitialModelPath.empty() ? m_InitialModelPath.c_str() : GLTFModels[m_SelectedModel].second);
+
 }
 
 void GLTFViewer::UpdateUI()
