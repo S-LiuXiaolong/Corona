@@ -178,7 +178,8 @@ void GLTFViewer::LoadModel(const char* Path)
 
             Transform *= ModelTransform;
 
-            translation = float3(Transform.m30, Transform.m31, Transform.m32);
+            // Solved in a dirty way (only right for fox)
+            translation = float3(-Transform.m32, Transform.m31, Transform.m30);
             SkeletonVerts.push_back(translation);
 
             auto joint_parent = joint->Parent;
@@ -200,7 +201,7 @@ void GLTFViewer::LoadModel(const char* Path)
 
             Transform *= ModelTransform;
 
-            translation = float3(Transform.m30, Transform.m31, Transform.m32);
+            translation = float3(-Transform.m32, Transform.m31, Transform.m30);
             SkeletonVerts.push_back(translation);
         
         }
@@ -913,15 +914,15 @@ void GLTFViewer::Update(double CurrTime, double ElapsedTime)
     EngineBase::Update(CurrTime, ElapsedTime);
     UpdateUI();
 
-    if (!m_Model->Animations.empty() && m_PlayAnimation)
-    {
-        float& AnimationTimer = m_AnimationTimers[m_AnimationIndex];
-        AnimationTimer += static_cast<float>(ElapsedTime);
-        AnimationTimer = std::fmod(AnimationTimer, m_Model->Animations[m_AnimationIndex].End);
-        m_Model->UpdateAnimation(m_AnimationIndex, AnimationTimer);
-
-        GetGlobalTranslation();
-    }
+//     if (!m_Model->Animations.empty() && m_PlayAnimation)
+//     {
+//         float& AnimationTimer = m_AnimationTimers[m_AnimationIndex];
+//         AnimationTimer += static_cast<float>(ElapsedTime);
+//         AnimationTimer = std::fmod(AnimationTimer, m_Model->Animations[m_AnimationIndex].End);
+//         m_Model->UpdateAnimation(m_AnimationIndex, AnimationTimer);
+// 
+//         GetGlobalTranslation();
+//     }
 }
 
 } // namespace Diligent
