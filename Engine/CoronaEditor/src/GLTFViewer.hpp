@@ -53,7 +53,10 @@ private:
     void CreateEnvMapPSO(IRenderStateNotationLoader* pRSNLoader);
     void CreateEnvMapSRB();
     void CreateBoundBoxPSO(IRenderStateNotationLoader* pRSNLoader);
+    void CreateSkeletonPSO();
     void LoadModel(const char* Path);
+    void GetGlobalTranslation();
+//    void DrawSkeleton();
     void ResetView();
     void UpdateUI();
     void CreateGLTFResourceCache();
@@ -104,6 +107,9 @@ private:
     RefCntAutoPtr<IBuffer>                m_EnvMapRenderAttribsCB;
     RefCntAutoPtr<IPipelineState>         m_BoundBoxPSO;
     RefCntAutoPtr<IShaderResourceBinding> m_BoundBoxSRB;
+    RefCntAutoPtr<IPipelineState>         m_SkeletonPSO;
+    RefCntAutoPtr<IShaderResourceBinding> m_SkeletonSRB;
+    RefCntAutoPtr<IBuffer>                m_SkeletonVertexBuffer;
 
     bool                                 m_bUseResourceCache = false;
     RefCntAutoPtr<GLTF::ResourceManager> m_pResourceMgr;
@@ -121,6 +127,8 @@ private:
     std::vector<const GLTF::Camera*> m_Cameras;
 
     std::string m_InitialModelPath;
+
+    std::vector<float3> SkeletonVerts;
 };
 
 } // namespace Diligent

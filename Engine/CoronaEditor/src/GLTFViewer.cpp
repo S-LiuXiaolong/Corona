@@ -71,12 +71,13 @@ struct EnvMapRenderAttribs
 // clang-format off
 const std::pair<const char*, const char*> GLTFViewer::GLTFModels[] =
 {
-    {"Damaged Helmet",      "models/DamagedHelmet/DamagedHelmet.gltf"},
-    {"Metal Rough Spheres", "models/MetalRoughSpheres/MetalRoughSpheres.gltf"},
-    {"Flight Helmet",       "models/FlightHelmet/FlightHelmet.gltf"},
-    {"Cesium Man",          "models/CesiumMan/CesiumMan.gltf"},
-    {"Boom Box",            "models/BoomBoxWithAxes/BoomBoxWithAxes.gltf"},
-    {"Normal Tangent Test", "models/NormalTangentTest/NormalTangentTest.gltf"}
+//     {"Damaged Helmet",      "models/DamagedHelmet/DamagedHelmet.gltf"},
+//     {"Metal Rough Spheres", "models/MetalRoughSpheres/MetalRoughSpheres.gltf"},
+//     {"Flight Helmet",       "models/FlightHelmet/FlightHelmet.gltf"},
+//     {"Cesium Man",          "models/CesiumMan/CesiumMan.gltf"},
+//     {"Boom Box",            "models/BoomBoxWithAxes/BoomBoxWithAxes.gltf"},
+//     {"Normal Tangent Test", "models/NormalTangentTest/NormalTangentTest.gltf"},
+    {"Fox",                 "models/Fox/Fox.gltf"}
 };
 // clang-format on
 
@@ -122,7 +123,150 @@ void GLTFViewer::LoadModel(const char* Path)
         if (node->pCamera && node->pCamera->Type == GLTF::Camera::Projection::Perspective)
             m_Cameras.push_back(node->pCamera.get());
     }
+
+    unsigned int requiredVerts = 0;
+    //    std::vector<float3> globalTranslationForAllNodes;
+    for (auto& skin : m_Model->Skins)
+    {
+//         for (auto joint : skin->Joints)
+//         {
+//             float3 translation = joint->Translation;
+// 
+//             auto parent = joint->Parent;
+//             while (parent != nullptr)
+//             {
+//                 translation += parent->Translation;
+//                 parent = parent->Parent;
+//             }
+//             // Multiple skins haven't been considered here.
+//             translation += Translate;
+//             translation *= Scale;
+//             translation.y -= 2 * translation.y;
+// 
+//             globalTranslationForAllNodes.push_back(translation);
+//         }
+        for (auto joint : skin->Joints)
+        {
+            auto parent = joint->Parent;
+            if (parent != nullptr)
+            {
+                requiredVerts += 2;
+            }
+        }
+    }
+
+    //    SkeletonVerts.resize(requiredVerts);
+
+    for (auto& skin : m_Model->Skins)
+    {
+        for (auto joint : skin->Joints)
+        {
+            float3 translation = joint->Translation;
+            Quaternion rotation    = joint->Rotation;
+            float3     scale       = joint->Scale;
+            float4x4   Transform   = rotation.ToMatrix() * float4x4::Scale(scale) * float4x4::Translation(translation);
+        
+            auto parent = joint->Parent;
+            while (parent != nullptr)
+            {
+                translation = parent->Translation;
+                rotation    = parent->Rotation;
+                scale       = parent->Scale;
+                Transform *= rotation.ToMatrix() * float4x4::Scale(scale) * float4x4::Translation(translation);
+                parent = parent->Parent;
+            }
+
+            Transform *= ModelTransform;
+
+            translation = float3(Transform.m30, Transform.m31, Transform.m32);
+            SkeletonVerts.push_back(translation);
+
+            auto joint_parent = joint->Parent;
+            translation       = joint_parent->Translation;
+            rotation          = joint_parent->Rotation;
+            scale             = joint_parent->Scale;
+            Transform         = rotation.ToMatrix() * float4x4::Scale(scale) * float4x4::Translation(translation);
+
+            auto parent_parent = joint_parent->Parent;
+            while (parent_parent != nullptr)
+            {
+                translation = parent_parent->Translation;
+                rotation    = parent_parent->Rotation;
+                scale       = parent_parent->Scale;
+                Transform *= rotation.ToMatrix() * float4x4::Scale(scale) * float4x4::Translation(translation);
+                parent_parent = parent_parent->Parent;
+            }
+            // Multiple skins haven't been considered here.
+
+            Transform *= ModelTransform;
+
+            translation = float3(Transform.m30, Transform.m31, Transform.m32);
+            SkeletonVerts.push_back(translation);
+        
+        }
+
+    }
+
+    
+
+//    SkeletonVerts = std::move(globalTranslationForAllNodes);
+
+
 }
+
+void GLTFViewer::GetGlobalTranslation()
+{
+    std::vector<float3> globalTranslationForAllNodes;
+
+    // Center and scale model
+    float3 ModelDim{m_Model->AABBTransform[0][0], m_Model->AABBTransform[1][1], m_Model->AABBTransform[2][2]};
+    float  Scale     = (1.0f / std::max(std::max(ModelDim.x, ModelDim.y), ModelDim.z)) * 0.5f;
+    auto   Translate = -float3(m_Model->AABBTransform[3][0], m_Model->AABBTransform[3][1], m_Model->AABBTransform[3][2]);
+    Translate += -0.5f * ModelDim;
+    float4x4 InvYAxis = float4x4::Identity();
+    InvYAxis._22      = -1;
+
+    for (auto& skin : m_Model->Skins)
+    {
+        for (auto joint : skin->Joints)
+        {
+            float3 translation = joint->Translation;
+
+            auto parent = joint->Parent;
+            while (parent != nullptr)
+            {
+                translation += parent->Translation;
+                parent = parent->Parent;
+            }
+            // Multiple skins haven't been considered here.
+            translation += Translate;
+            translation *= Scale;
+
+            globalTranslationForAllNodes.push_back(translation);
+        }
+    }
+
+//    SkeletonVerts = std::move(globalTranslationForAllNodes);
+}
+
+// void GLTFViewer::DrawSkeleton()
+// {
+//     float3* buffer = new float3[SkeletonVerts.size()];
+//     if (!SkeletonVerts.empty())
+//     {
+//         memcpy(buffer, &SkeletonVerts[0], SkeletonVerts.size() * sizeof(float3));
+//     }
+//     // Create a vertex buffer that stores cube vertices
+//     BufferDesc VertBuffDesc;
+//     VertBuffDesc.Name      = "Cube vertex buffer";
+//     VertBuffDesc.Usage     = USAGE_IMMUTABLE;
+//     VertBuffDesc.BindFlags = BIND_VERTEX_BUFFER;
+//     VertBuffDesc.Size      = sizeof(SkeletonVerts);
+//     BufferData VBData;
+//     VBData.pData    = buffer;
+//     VBData.DataSize = sizeof(buffer);
+//     m_pDevice->CreateBuffer(VertBuffDesc, &VBData, &m_SkeletonVertexBuffer);
+// }
 
 void GLTFViewer::ResetView()
 {
@@ -255,6 +399,8 @@ void GLTFViewer::Initialize(const EngineInitInfo& InitInfo)
 
     CreateBoundBoxPSO(pRSNLoader);
 
+    CreateSkeletonPSO();
+
     m_LightDirection = normalize(float3(0.5f, -0.6f, -0.2f));
 
     if (m_bUseResourceCache)
@@ -262,6 +408,22 @@ void GLTFViewer::Initialize(const EngineInitInfo& InitInfo)
 
     LoadModel(!m_InitialModelPath.empty() ? m_InitialModelPath.c_str() : GLTFModels[m_SelectedModel].second);
 
+    GetGlobalTranslation();
+    float3 buffer[48];
+    if (!SkeletonVerts.empty())
+    {
+        memcpy(buffer, &SkeletonVerts[0], SkeletonVerts.size() * sizeof(float3));
+    }
+    // Create a vertex buffer that stores cube vertices
+    BufferDesc VertBuffDesc;
+    VertBuffDesc.Name      = "Cube vertex buffer";
+    VertBuffDesc.Usage     = USAGE_IMMUTABLE;
+    VertBuffDesc.BindFlags = BIND_VERTEX_BUFFER;
+    VertBuffDesc.Size      = sizeof(buffer);
+    BufferData VBData;
+    VBData.pData    = buffer;
+    VBData.DataSize = sizeof(buffer);
+    m_pDevice->CreateBuffer(VertBuffDesc, &VBData, &m_SkeletonVertexBuffer);
 }
 
 void GLTFViewer::UpdateUI()
@@ -276,6 +438,7 @@ void GLTFViewer::UpdateUI()
             if (ImGui::Combo("Model", &m_SelectedModel, Models, _countof(GLTFModels)))
             {
                 LoadModel(GLTFModels[m_SelectedModel].second);
+                /*GetGlobalTranslation();*/
             }
         }
 #ifdef PLATFORM_WIN32
@@ -288,6 +451,7 @@ void GLTFViewer::UpdateUI()
             if (!FileName.empty())
             {
                 LoadModel(FileName.c_str());
+                /*GetGlobalTranslation();*/
             }
         }
 #endif
@@ -342,6 +506,7 @@ void GLTFViewer::UpdateUI()
                 ImGui::Combo("Active Animation", reinterpret_cast<int*>(&m_AnimationIndex), Animations.data(), static_cast<int>(Animations.size()));
                 ImGui::TreePop();
             }
+            /*GetGlobalTranslation();*/
         }
 
         ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
@@ -457,6 +622,89 @@ void GLTFViewer::CreateBoundBoxPSO(IRenderStateNotationLoader* pRSNLoader)
     m_BoundBoxPSO->CreateShaderResourceBinding(&m_BoundBoxSRB, true);
 }
 
+void GLTFViewer::CreateSkeletonPSO()
+{
+    // Pipeline state object encompasses configuration of all GPU stages
+
+    GraphicsPipelineStateCreateInfo PSOCreateInfo;
+
+    // Pipeline state name is used by the engine to report issues.
+    // It is always a good idea to give objects descriptive names.
+    PSOCreateInfo.PSODesc.Name = "Skeleton PSO";
+
+    // This is a graphics pipeline
+    PSOCreateInfo.PSODesc.PipelineType = PIPELINE_TYPE_GRAPHICS;
+
+    // clang-format off
+    // This tutorial will render to a single render target
+    PSOCreateInfo.GraphicsPipeline.NumRenderTargets             = 1;
+    // Set render target format which is the format of the swap chain's color buffer
+    PSOCreateInfo.GraphicsPipeline.RTVFormats[0]                = m_pSwapChain->GetDesc().ColorBufferFormat;
+    // Use the depth buffer format from the swap chain
+    PSOCreateInfo.GraphicsPipeline.DSVFormat                    = m_pSwapChain->GetDesc().DepthBufferFormat;
+    // Primitive topology defines what kind of primitives will be rendered by this pipeline state
+    PSOCreateInfo.GraphicsPipeline.PrimitiveTopology            = PRIMITIVE_TOPOLOGY_LINE_LIST;
+    // No back face culling for this tutorial
+    PSOCreateInfo.GraphicsPipeline.RasterizerDesc.CullMode      = CULL_MODE_NONE;
+    // Disable depth testing
+    PSOCreateInfo.GraphicsPipeline.DepthStencilDesc.DepthEnable = False;
+    // clang-format on
+
+    ShaderCreateInfo ShaderCI;
+    // Tell the system that the shader source code is in HLSL.
+    // For OpenGL, the engine will convert this into GLSL under the hood.
+    ShaderCI.SourceLanguage = SHADER_SOURCE_LANGUAGE_HLSL;
+    // OpenGL backend requires emulated combined HLSL texture samplers (g_Texture + g_Texture_sampler combination)
+    ShaderCI.UseCombinedTextureSamplers = true;
+
+    // In this tutorial, we will load shaders from file. To be able to do that,
+    // we need to create a shader source stream factory
+    RefCntAutoPtr<IShaderSourceInputStreamFactory> pShaderSourceFactory;
+    m_pEngineFactory->CreateDefaultShaderSourceStreamFactory(nullptr, &pShaderSourceFactory);
+    ShaderCI.pShaderSourceStreamFactory = pShaderSourceFactory;
+    // Create a vertex shader
+    RefCntAutoPtr<IShader> pVS;
+    {
+        ShaderCI.Desc.ShaderType = SHADER_TYPE_VERTEX;
+        ShaderCI.EntryPoint      = "main";
+        ShaderCI.Desc.Name       = "Default VS";
+        ShaderCI.FilePath        = "F:/work_space/Corona/Engine/CoronaEditor/assets/shaders/default.vsh";
+        m_pDevice->CreateShader(ShaderCI, &pVS);
+    }
+
+    // Create a pixel shader
+    RefCntAutoPtr<IShader> pPS;
+    {
+        ShaderCI.Desc.ShaderType = SHADER_TYPE_PIXEL;
+        ShaderCI.EntryPoint      = "main";
+        ShaderCI.Desc.Name       = "Default PS";
+        ShaderCI.FilePath        = "F:/work_space/Corona/Engine/CoronaEditor/assets/shaders/default.psh";
+        m_pDevice->CreateShader(ShaderCI, &pPS);
+    }
+
+    // clang-format off
+    // Define vertex shader input layout
+    LayoutElement LayoutElems[] =
+    {
+        // Attribute 0 - vertex position
+        LayoutElement{0, 0, 3, VT_FLOAT32, False}
+    };
+    // clang-format on
+    PSOCreateInfo.GraphicsPipeline.InputLayout.LayoutElements = LayoutElems;
+    PSOCreateInfo.GraphicsPipeline.InputLayout.NumElements    = _countof(LayoutElems);
+
+    PSOCreateInfo.pVS = pVS;
+    PSOCreateInfo.pPS = pPS;
+
+    // Define variable type that will be used by default
+    PSOCreateInfo.PSODesc.ResourceLayout.DefaultVariableType = SHADER_RESOURCE_VARIABLE_TYPE_STATIC;
+
+    m_pDevice->CreateGraphicsPipelineState(PSOCreateInfo, &m_SkeletonPSO);
+    
+    m_SkeletonPSO->GetStaticVariableByName(SHADER_TYPE_VERTEX, "cbCameraAttribs")->Set(m_CameraAttribsCB);
+    m_SkeletonPSO->CreateShaderResourceBinding(&m_SkeletonSRB, true);
+}
+
 GLTFViewer::~GLTFViewer()
 {
 }
@@ -559,6 +807,7 @@ void GLTFViewer::Render()
         m_GLTFRenderer->Render(m_pImmediateContext, *m_Model, m_RenderParams, &m_ModelResourceBindings);
     }
 
+
     if (m_BoundBoxMode != BoundBoxMode::None)
     {
         m_pImmediateContext->SetPipelineState(m_BoundBoxPSO);
@@ -585,6 +834,25 @@ void GLTFViewer::Render()
         DrawAttribs drawAttribs(3, DRAW_FLAG_VERIFY_ALL);
         m_pImmediateContext->Draw(drawAttribs);
     }
+
+    if (!m_Model->Animations.empty())
+    {
+        // Bind vertex
+        const Uint64 offset   = 0;
+        IBuffer*     pBuffs[] = {m_SkeletonVertexBuffer};
+        m_pImmediateContext->SetVertexBuffers(0, 1, pBuffs, &offset, RESOURCE_STATE_TRANSITION_MODE_TRANSITION, SET_VERTEX_BUFFERS_FLAG_RESET);
+
+        // Set the pipeline state
+        m_pImmediateContext->SetPipelineState(m_SkeletonPSO);
+        // Commit shader resources. RESOURCE_STATE_TRANSITION_MODE_TRANSITION mode
+        // makes sure that resources are transitioned to required states.
+        m_pImmediateContext->CommitShaderResources(m_SkeletonSRB, RESOURCE_STATE_TRANSITION_MODE_VERIFY);
+
+        DrawAttribs drawAttrs;
+        drawAttrs.NumVertices = (Uint32)SkeletonVerts.size();
+        m_pImmediateContext->Draw(drawAttrs);
+    }
+
 }
 
 
@@ -651,6 +919,8 @@ void GLTFViewer::Update(double CurrTime, double ElapsedTime)
         AnimationTimer += static_cast<float>(ElapsedTime);
         AnimationTimer = std::fmod(AnimationTimer, m_Model->Animations[m_AnimationIndex].End);
         m_Model->UpdateAnimation(m_AnimationIndex, AnimationTimer);
+
+        GetGlobalTranslation();
     }
 }
 

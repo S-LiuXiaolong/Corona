@@ -15,6 +15,8 @@ set(SHADERS
     assets/shaders/BoundBox.psh
     assets/shaders/env_map.vsh
     assets/shaders/env_map.psh
+    assets/shaders/default.vsh
+    assets/shaders/default.psh
 )
 
 set(EXTERNAL_SHADERS
@@ -32,9 +34,10 @@ file(GLOB DAMAGED_HELMENT_MODEL LIST_DIRECTORIES false assets/models/DamagedHelm
 file(GLOB FLIGHT_HELMENT_MODEL LIST_DIRECTORIES false assets/models/FlightHelmet/*.*)
 file(GLOB METAL_ROUGH_SPHERES_MODEL LIST_DIRECTORIES false assets/models/MetalRoughSpheres/*.*)
 file(GLOB NORMAL_TANGENT_TEST_MODEL LIST_DIRECTORIES false assets/models/NormalTangentTest/*.*)
+file(GLOB FOX_MODEL LIST_DIRECTORIES false assets/models/Fox/*.*)
 
 set(MODELS ${BOOM_BOX_MODEL} ${CESIUM_MAN_MODEL} ${DAMAGED_HELMENT_MODEL}
-           ${FLIGHT_HELMENT_MODEL} ${METAL_ROUGH_SPHERES_MODEL} ${NORMAL_TANGENT_TEST_MODEL})
+           ${FLIGHT_HELMENT_MODEL} ${METAL_ROUGH_SPHERES_MODEL} ${NORMAL_TANGENT_TEST_MODEL} ${FOX_MODEL})
 set(TEXTURES assets/textures/papermill.ktx)
 
 set(RENDER_STATES assets/render_states/RenderStates.json)
@@ -107,6 +110,11 @@ set_source_files_properties(${METAL_ROUGH_SPHERES_MODEL} PROPERTIES
 set_source_files_properties(${NORMAL_TANGENT_TEST_MODEL} PROPERTIES
     VS_DEPLOYMENT_LOCATION "models/NormalTangentTest"
     MACOSX_PACKAGE_LOCATION "Resources/models/NormalTangentTest"
+)
+
+set_source_files_properties(${FOX_MODEL} PROPERTIES
+    VS_DEPLOYMENT_LOCATION "models/Fox"
+    MACOSX_PACKAGE_LOCATION "Resources/models/Fox"
 )
 
 # We have to use a different group name (Assets with capital A) to override grouping that was set by add_sample_app

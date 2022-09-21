@@ -110,5 +110,3 @@ if(TARGET Diligent-NativeAppBase AND TARGET Diligent-TextureLoader AND TARGET Di
     add_subdirectory(AnimationTest)
 endif()
 
-# Create a custom target to run source code formatting validation command
-add_format_validation_target(Engine "${CMAKE_CURRENT_SOURCE_DIR}" Engine)
