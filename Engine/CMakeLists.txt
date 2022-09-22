@@ -33,7 +33,8 @@ function(add_submodule APP_SUBMODULE IDE_FOLDER SOURCE INCLUDE SHADERS ASSETS)
         # will fail to resolve Diligent::CreateApplication() function.
         Diligent-NativeAppBase
         Diligent-BuildSettings
-        Corona-EngineBase
+        EngineBase
+        EngineCore
     )
     set_common_target_properties(${APP_SUBMODULE})
 
@@ -106,6 +107,7 @@ endfunction()
 
 if(TARGET Diligent-NativeAppBase AND TARGET Diligent-TextureLoader AND TARGET Diligent-Imgui)
     add_subdirectory(EngineBase)
+    add_subdirectory(EngineCore)
     add_subdirectory(CoronaEditor)
     add_subdirectory(AnimationTest)
 endif()
