@@ -5,9 +5,9 @@
 
 namespace Diligent
 {
-	class FileSystem;
-	class WindowSystem;
-	class RenderSystem;
+	class CFileSystem;
+	class CWindowSystem;
+	class CRenderSystem;
 
 	class RuntimeGlobalContext
 	{
@@ -16,9 +16,9 @@ namespace Diligent
 		void shutdownSystems();
 
 	public:
-		std::shared_ptr<FileSystem> m_file_system;
-		std::shared_ptr<WindowSystem> m_window_system;
-		std::shared_ptr<RenderSystem> m_render_system;
+		std::shared_ptr<CFileSystem> m_file_system;
+		std::shared_ptr<CWindowSystem> m_window_system;
+		std::shared_ptr<CRenderSystem> m_render_system;
 	};
 
 	extern RuntimeGlobalContext g_runtime_global_context;

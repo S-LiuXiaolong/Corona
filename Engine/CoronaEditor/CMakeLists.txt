@@ -2,6 +2,9 @@ cmake_minimum_required (VERSION 3.6)
 
 project(CoronaEditor CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(SOURCE
     src/ImguiDemo.cpp
     ${DILIGENT_DEAR_IMGUI_PATH}/imgui_demo.cpp

@@ -11,6 +11,9 @@ set(CMAKE_XCODE_SCHEME_MALLOC_GUARD_EDGES YES)
 
 project(Corona)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 option(DILIGENT_BUILD_TOOLS "Build DiligentTools module" ON)
 option(DILIGENT_BUILD_FX "Build DiligentFX module" ON)
 option(DILIGENT_BUILD_SAMPLES "Build DiligentSamples module" ON)
