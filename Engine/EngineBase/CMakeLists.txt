@@ -25,13 +25,16 @@ else()
 endif()
 
 set(SOURCE 
+    src/EngineApp.cpp
+    src/EngineBase.cpp
     src/Win32/EngineAppWin32.cpp
     src/Win32/InputControllerWin32.cpp
-    src/EngineApp.cpp
 )
 set(INCLUDE 
     include/EngineApp.hpp
+    include/EngineBase.hpp
     include/Win32/InputControllerWin32.hpp
+    include/InputController.hpp
 )
 
 add_library(EngineBase STATIC ${SOURCE} ${INCLUDE})

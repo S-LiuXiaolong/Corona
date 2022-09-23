@@ -30,7 +30,7 @@ set_common_target_properties(EngineCore)
 
 target_include_directories(EngineCore
 PUBLIC
-    include
+    ./
 )
 
 if(MSVC)

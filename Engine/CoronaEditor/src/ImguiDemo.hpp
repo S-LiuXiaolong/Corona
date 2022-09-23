@@ -50,8 +50,6 @@ public:
     virtual void WindowResize(Uint32 Width, Uint32 Height) override final;
 
 private:
-    void CreateSkeletonPSO();
-    void LoadModel(const char* Path);
     void UpdateUI();
 
     std::unique_ptr<GLTF::Model> m_Model;
