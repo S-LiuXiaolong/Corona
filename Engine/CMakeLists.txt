@@ -45,6 +45,7 @@ function(add_submodule APP_SUBMODULE IDE_FOLDER SOURCE INCLUDE SHADERS ASSETS)
     endif()
 
     set_target_properties(${APP_SUBMODULE} PROPERTIES
+        CXX_STANDARD 17
         FOLDER ${IDE_FOLDER}
     )
 
