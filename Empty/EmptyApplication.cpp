@@ -2,6 +2,7 @@
 
 namespace Corona
 {
-    BaseApplication g_App;
+    GfxConfiguration cfg;
+    BaseApplication g_App(cfg);
     IApplication *g_pApp = &g_App;
 }

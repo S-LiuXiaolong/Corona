@@ -1,26 +1,36 @@
 #include "BaseApplication.h"
 
-// Parse command line, read configuration, initialize all submodules
-int Corona::BaseApplication::Initialize()
+namespace Corona
 {
-    m_bQuit = false;
+    bool BaseApplication::m_bQuit = false;
 
-    return 0;
-}
+    BaseApplication::BaseApplication(GfxConfiguration& cfg)
+        :m_Config(cfg)
+    {
+    }
 
-// Finalize all submodules and clean up all runtime temporary files.
-void Corona::BaseApplication::Finalize()
-{
+    // Parse command line, read configuration, initialize all submodules
+    int BaseApplication::Initialize()
+    {
+        int result = 0;
 
-}
+        std::wcout << m_Config;
 
-// One cycle of the main loop
-void Corona::BaseApplication::Tick()
-{
+        return result;
+    }
 
-}
+    // Finalize all submodules and clean up all runtime temporary files.
+    void BaseApplication::Finalize()
+    {
+    }
 
-bool Corona::BaseApplication::IsQuit()
-{
-    return m_bQuit;
+    // One cycle of the main loop
+    void BaseApplication::Tick()
+    {
+    }
+
+    bool BaseApplication::IsQuit()
+    {
+        return m_bQuit;
+    }
 }
