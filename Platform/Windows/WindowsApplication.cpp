@@ -1,13 +1,6 @@
 #include "WindowsApplication.h"
 #include <tchar.h>
 
-namespace Corona
-{
-    GfxConfiguration config(8, 8, 8, 8, 32, 0, 0, 960, 540, _T("Corona Engine (Windows)"));
-    WindowsApplication g_App(config);
-    IApplication* g_pApp = &g_App;
-}
-
 using namespace Corona;
 
 int WindowsApplication::Initialize()
@@ -57,6 +50,8 @@ int WindowsApplication::Initialize()
     // display the window on the screen
     ShowWindow(hWnd, SW_SHOW);
 
+    m_hWnd = hWnd;
+
     return result;
 }
 
@@ -84,20 +79,47 @@ void WindowsApplication::Tick()
 // this is the main message handler for the program
 LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    // ?
+    WindowsApplication* pThis;
+    if (message == WM_NCCREATE)
+    {
+        pThis = static_cast<WindowsApplication*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
+
+        SetLastError(0);
+        if (!SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis)))
+        {
+            if (GetLastError() != 0)
+                return FALSE;
+        }
+    }
+    else
+    {
+        pThis = reinterpret_cast<WindowsApplication*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+    }
+
     // sort through and find what code to run for the message given
     switch(message)
     {
-	case WM_PAINT:
-        // we will replace this part with Rendering Module
-	    {
-	    } break;
+        // pThis is nullptr and OnDraw make mistakes
+// 	case WM_PAINT:
+// 	    {
+//             pThis->OnDraw();
+// 	    } 
+//         break;
+
+    case WM_KEYDOWN:
+        {
+            // we will replace this with input manager
+            m_bQuit = true;
+        } 
+        break;
 
         // this message is read when the window is closed
     case WM_DESTROY:
         {
             // close the application entirely
             PostQuitMessage(0);
-            BaseApplication::m_bQuit = true;
+            m_bQuit = true;
             return 0;
         }
     }

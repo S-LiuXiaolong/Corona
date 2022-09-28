@@ -27,6 +27,9 @@ namespace Corona {
     // largest valid block size
     static const uint32_t kMaxBlockSize = 
         kBlockSizes[kNumBlockSizes - 1];
+        
+    size_t*        MemoryManager::m_pBlockSizeLookup;
+    Allocator*     MemoryManager::m_pAllocators;
 
     int MemoryManager::Initialize()
     {

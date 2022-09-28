@@ -15,9 +15,15 @@ namespace Corona
         // one cycle of the main loop
         virtual void Tick();
 
+        inline HWND GetMainWindow() const { return m_hWnd; }
+        
+    private:
         static LRESULT CALLBACK WindowProc(HWND hWnd,
                                         UINT message,
                                         WPARAM wParam,
                                         LPARAM lParam);
+
+    private:
+        HWND m_hWnd;
     };
 }

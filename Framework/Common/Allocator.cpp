@@ -46,7 +46,7 @@ namespace Corona
 
         m_szAlignmentSize = m_szBlockSize - minimal_size;
 
-        m_nBlockPerPage = (m_szPageSize - sizeof(PageHeader)) / m_szBlockSize;
+        m_nBlockPerPage = uint32_t((m_szPageSize - sizeof(PageHeader)) / m_szBlockSize);
     }
 
     void* Allocator::Allocate()
