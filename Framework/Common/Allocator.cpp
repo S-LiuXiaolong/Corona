@@ -3,7 +3,7 @@
 #include <cstring>
 
 #ifndef ALIGN
-#define ALIGN(x, a) (((x) + ((a) - 1)) & ~((a) - 1))
+#define ALIGN(x, a)         (((x) + ((a) - 1)) & ~((a) - 1))
 #endif
 
 namespace Corona

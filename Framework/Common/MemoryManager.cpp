@@ -1,6 +1,13 @@
 #include "MemoryManager.h"
 #include <malloc.h>
 
+// extern "C" void* malloc(size_t size);
+// extern "C" void free(void* p);
+
+#ifndef ALIGN
+#define ALIGN(x, a) (((x) + ((a) - 1)) & ~((a) - 1))
+#endif
+
 using namespace Corona;
 
 namespace Corona {
@@ -84,6 +91,21 @@ namespace Corona {
         else
             return malloc(size);
     }
+
+	void* MemoryManager::Allocate(size_t size, size_t alignment)
+	{
+		uint8_t* p;
+		size += alignment;
+		Allocator* pAlloc = LookUpAllocator(size);
+		if (pAlloc)
+			p = reinterpret_cast<uint8_t*>(pAlloc->Allocate());
+		else
+			p = reinterpret_cast<uint8_t*>(malloc(size));
+
+		p = reinterpret_cast<uint8_t*>(ALIGN(reinterpret_cast<size_t>(p), alignment));
+
+		return static_cast<void*>(p);
+	}
 
     void MemoryManager::Free(void* p, size_t size)
     {

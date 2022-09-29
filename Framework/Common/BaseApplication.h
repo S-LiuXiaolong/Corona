@@ -27,6 +27,6 @@ namespace Corona
 
     private:
         // hide the default construct to enforce a configuration
-        BaseApplication(){};
+        BaseApplication() {};
     };
 }

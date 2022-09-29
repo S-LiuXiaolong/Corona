@@ -13,6 +13,7 @@ include_directories("${PROJECT_SOURCE_DIR}/RHI")
 IF(${UNIX})
     include_directories("${PROJECT_SOURCE_DIR}/Platform/Linux")
 ELSEIF(${WIN32})
+    add_definitions(/D _CRT_SECURE_NO_WARNINGS)
     include_directories("${PROJECT_SOURCE_DIR}/Platform/Windows")
 ENDIF(${UNIX})
 
