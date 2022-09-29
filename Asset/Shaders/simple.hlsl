@@ -52,3 +52,4 @@ float4 PSMain(v2p input) : SV_TARGET
 
 	return float4(vLightInts, 1);
 }
+

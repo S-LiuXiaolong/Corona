@@ -8,10 +8,10 @@
 #define ALIGN(x, a) (((x) + ((a) - 1)) & ~((a) - 1))
 #endif
 
-using namespace Corona;
-
-namespace Corona {
-    static const uint32_t kBlockSizes[] = {
+namespace Corona 
+{
+    static const uint32_t kBlockSizes[] = 
+    {
         // 4-increments
         4,  8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
         52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 
@@ -47,14 +47,16 @@ namespace Corona {
             // initialize block size lookup table
             m_pBlockSizeLookup = new size_t[kMaxBlockSize + 1];
             size_t j = 0;
-            for (size_t i = 0; i <= kMaxBlockSize; i++) {
+            for (size_t i = 0; i <= kMaxBlockSize; i++) 
+            {
                 if (i > kBlockSizes[j]) ++j;
                 m_pBlockSizeLookup[i] = j;
             }
 
             // initialize the allocators
             m_pAllocators = new Allocator[kNumBlockSizes];
-            for (size_t i = 0; i < kNumBlockSizes; i++) {
+            for (size_t i = 0; i < kNumBlockSizes; i++) 
+            {
                 m_pAllocators[i].Reset(kBlockSizes[i], kPageSize, kAlignment);
             }
 

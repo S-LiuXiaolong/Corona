@@ -6,7 +6,8 @@
 using namespace std;
 using namespace Corona;
 
-namespace Corona {
+namespace Corona 
+{
     MemoryManager* g_pMemoryManager = new MemoryManager();
 }
 
