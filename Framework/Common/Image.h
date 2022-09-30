@@ -12,5 +12,7 @@ namespace Corona
         uint32_t pitch;
         size_t data_size;
     } Image;
+
+    std::ostream& operator<<(std::ostream& out, const Image& image);
     
 }

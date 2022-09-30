@@ -4,4 +4,5 @@ mkdir External\build\crossguid
 pushd External\build\crossguid
 cmake -S ..\..\src\crossguid -B .
 cmake --build . --config Release
+cmake --build . --config Debug
 popd

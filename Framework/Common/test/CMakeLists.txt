@@ -1,3 +1,0 @@
-add_executable(AssetLoaderTest AssetLoaderTest.cpp)
-
-target_link_libraries(AssetLoaderTest Common)
