@@ -1,3 +1,6 @@
 [submodule "External/ispc"]
 	path = External/ispc
 	url = https://github.com/ispc/ispc.git
+[submodule "External/crossguid"]
+	path = External/crossguid
+	url = https://github.com/graeme-hill/crossguid.git
