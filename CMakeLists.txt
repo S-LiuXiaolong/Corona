@@ -29,10 +29,13 @@ set(MYGE_EXTERNAL_ROOT ${PROJECT_SOURCE_DIR}/External/${MYGE_TARGET_PLATFORM}/)
 include_directories("${MYGE_EXTERNAL_ROOT}/include")
 # don't know how to get pre-build type in cmake
 # set(MYGE_EXTERNAL_LIBRARY_PATH ${MYGE_EXTERNAL_ROOT}/lib/${MYBUILD_TYPE_DEFINE}/)
-set(MYGE_EXTERNAL_LIBRARY_PATH ${MYGE_EXTERNAL_ROOT}/lib/Debug/)
+set(MYGE_EXTERNAL_LIBRARY_PATH ${MYGE_EXTERNAL_ROOT}/lib)
 
 # include(CTest)
 add_subdirectory(Framework)
 add_subdirectory(Platform)
 add_subdirectory(RHI)
 add_subdirectory(Test)
+
+MESSAGE( STATUS "MYGE_EXTERNAL_LIBRARY_PATH: " ${MYGE_EXTERNAL_LIBRARY_PATH} )
+MESSAGE( STATUS "OPENGEX_LIBRARY_DEBUG: " ${OPENGEX_LIBRARY_DEBUG} )
