@@ -3,7 +3,7 @@
 	url = https://github.com/ispc/ispc.git
 [submodule "External/src/crossguid"]
 	path = External/src/crossguid
-	url = https://github.com/Shepherd-Liu/crossguid.git
+	url = https://github.com/graeme-hill/crossguid.git
 [submodule "External/src/OpenGEX"]
 	path = External/src/OpenGEX
 	url = https://github.com/Shepherd-Liu/OpenGEX.git

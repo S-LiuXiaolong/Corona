@@ -19,6 +19,24 @@ target_link_libraries(Common GeomMath)
 #     find_library(XG_LIBRARY crossguid PATHS ${MYGE_EXTERNAL_LIBRARY_PATH})
 # endif()
 
+set(CORONA_LIBRARIES_LIST crossguid OpenDDL OpenGEX)
+
+# foreach(search_lib ${CORONA_LIBRARIES_LIST})
+#     find_library(CORONA_EXLIB_DEBUG NAMES ${search_lib} 
+#         PATHS
+#         ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug
+#     )
+# 
+#     find_library(CORONA_EXLIB_RELEASE NAMES ${search_lib}
+#         PATHS
+#         ${MYGE_EXTERNAL_LIBRARY_PATH}/Release
+#     )
+# 
+#     set(CORONA_EXLIBRARY optimized ${CORONA_EXLIB_DEBUG} debug ${CORONA_EXLIB_RELEASE})
+# endforeach(search_lib)
+
+MESSAGE( STATUS "CORONA_EXLIBRARY: " ${CORONA_EXLIBRARY} )
+
 find_library(XG_LIBRARY_DEBUG           crossguid-dgb PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
 find_library(XG_LIBRARY_RELEASE         crossguid PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
 
