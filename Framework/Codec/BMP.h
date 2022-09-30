@@ -59,6 +59,7 @@ namespace Corona
                 img.Width = pBmpHeader->Width;
                 img.Height = pBmpHeader->Height;
                 img.bitcount = 32;
+                // set alignment to 4 (i.e. 3 + 1 = 4)
                 img.pitch = ((img.Width * img.bitcount >> 3) + 3) & ~3;
                 img.data_size = img.pitch * img.Height;
                 img.data = reinterpret_cast<R8G8B8A8Unorm*>(g_pMemoryManager->Allocate(img.data_size));
