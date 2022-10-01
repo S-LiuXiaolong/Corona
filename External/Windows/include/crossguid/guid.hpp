@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <array>
 #include <sstream>
-#include <string_view>
+#include <string>
 #include <utility>
 #include <iomanip>
 
@@ -49,17 +49,12 @@ BEGIN_XG_NAMESPACE
 class Guid
 {
 public:
-	explicit Guid(const std::array<unsigned char, 16> &bytes);
-	explicit Guid(std::array<unsigned char, 16> &&bytes);
-
-	explicit Guid(std::string_view fromString);
+	Guid(const std::array<unsigned char, 16> &bytes);
+	Guid(const unsigned char *bytes);
+	Guid(const std::string &fromString);
 	Guid();
-	
-	Guid(const Guid &other) = default;
-	Guid &operator=(const Guid &other) = default;
-	Guid(Guid &&other) = default;
-	Guid &operator=(Guid &&other) = default;
-
+	Guid(const Guid &other);
+	Guid &operator=(const Guid &other);
 	bool operator==(const Guid &other) const;
 	bool operator!=(const Guid &other) const;
 
@@ -77,7 +72,6 @@ private:
 
 	// make the << operator a friend so it can access _bytes
 	friend std::ostream &operator<<(std::ostream &s, const Guid &guid);
-	friend bool operator<(const Guid &lhs, const Guid &rhs);
 };
 
 Guid newGuid();
@@ -103,28 +97,6 @@ void initJni(JNIEnv *env);
 Guid newGuid(JNIEnv *env);
 #endif
 
-namespace details
-{
-	template <typename...> struct hash;
-
-	template<typename T> 
-	struct hash<T> : public std::hash<T>
-	{
-		using std::hash<T>::hash;
-	};
-
-
-	template <typename T, typename... Rest>
-	struct hash<T, Rest...>
-	{
-		inline std::size_t operator()(const T& v, const Rest&... rest) {
-			std::size_t seed = hash<Rest...>{}(rest...);
-			seed ^= hash<T>{}(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			return seed;
-		}
-	};
-}
-
 END_XG_NAMESPACE
 
 namespace std
@@ -132,7 +104,7 @@ namespace std
 	// Template specialization for std::swap<Guid>() --
 	// See guid.cpp for the function definition
 	template <>
-	void swap(xg::Guid &guid0, xg::Guid &guid1) noexcept;
+	[[maybe_unused]] void swap(xg::Guid &guid0, xg::Guid &guid1);
 
 	// Specialization for std::hash<Guid> -- this implementation
 	// uses std::hash<std::string> on the stringification of the guid
@@ -140,10 +112,13 @@ namespace std
 	template <>
 	struct hash<xg::Guid>
 	{
-		std::size_t operator()(xg::Guid const &guid) const
+		typedef xg::Guid argument_type;
+		typedef std::size_t result_type;
+
+		result_type operator()(argument_type const &guid) const
 		{
-			const uint64_t* p = reinterpret_cast<const uint64_t*>(guid.bytes().data());
-			return xg::details::hash<uint64_t, uint64_t>{}(p[0], p[1]);
+			std::hash<std::string> hasher;
+			return static_cast<result_type>(hasher(guid.str()));
 		}
 	};
 }

@@ -36,6 +36,3 @@ add_subdirectory(Framework)
 add_subdirectory(Platform)
 add_subdirectory(RHI)
 add_subdirectory(Test)
-
-MESSAGE( STATUS "MYGE_EXTERNAL_LIBRARY_PATH: " ${MYGE_EXTERNAL_LIBRARY_PATH} )
-MESSAGE( STATUS "OPENGEX_LIBRARY_DEBUG: " ${OPENGEX_LIBRARY_DEBUG} )

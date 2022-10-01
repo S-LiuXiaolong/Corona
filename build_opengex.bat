@@ -1,5 +1,4 @@
 @echo off
-git submodule update --init External\src\OpenGEX
 mkdir External\build\OpenGEX
 pushd External\build\OpenGEX
 cmake -S ..\..\src\OpenGEX -B .
