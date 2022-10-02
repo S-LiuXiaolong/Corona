@@ -20,9 +20,9 @@ int main()
     g_pMemoryManager->Initialize();
     
     AssetLoader asset_loader;
-    const std::string gltfFile = asset_loader.GetFilePath("Scene/fox.glb");
-    //bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, gltfFile);
-    bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, gltfFile); // for binary glTF(.glb)
+    const std::string gltfFile = asset_loader.GetFilePath("Scene/Fox/Fox.gltf");
+    bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, gltfFile);
+    //bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, gltfFile); // for binary glTF(.glb)
 
     if (!warn.empty()) {
     printf("Warn: %s\n", warn.c_str());
