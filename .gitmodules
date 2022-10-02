@@ -7,3 +7,6 @@
 [submodule "External/src/OpenGEX"]
 	path = External/src/OpenGEX
 	url = https://github.com/Shepherd-Liu/OpenGEX.git
+[submodule "External/src/tinygltf"]
+	path = External/src/tinygltf
+	url = https://github.com/Shepherd-Liu/tinygltf.git

@@ -6,6 +6,7 @@ GraphicsManager.cpp
 Image.cpp
 MemoryManager.cpp
 SceneManager.cpp
+SceneObject.cpp
 main.cpp
 )
 
@@ -45,6 +46,9 @@ find_library(OPENDDL_LIBRARY_RELEASE    OpenDDL PATHS ${MYGE_EXTERNAL_LIBRARY_PA
 
 find_library(OPENGEX_LIBRARY_DEBUG      OpenGEX PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
 find_library(OPENGEX_LIBRARY_RELEASE    OpenGEX PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
+
+find_library(TINYGLTF_LIBRARY_DEBUG      tinyglTF PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
+find_library(TINYGLTF_LIBRARY_RELEASE    tinyglTF PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
 # target_link_libraries(Common ${XG_LIBRARY} ${OPENDDL_LIBRARY} ${OPENGEX_LIBRARY})
 
 if(WIN32)

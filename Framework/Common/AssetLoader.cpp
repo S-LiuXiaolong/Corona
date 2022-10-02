@@ -58,7 +58,45 @@ namespace Corona
         return false;
     }
 
-    // ?
+    const std::string AssetLoader::GetFilePath(const char* name)
+    {
+        FILE *fp = nullptr;
+        // loop N times up the hierarchy, testing at each level
+        std::string upPath;
+        std::string fullPath;
+        // find path in parent hierarchy in 10 loops like '../' '../../'
+        for (int32_t i = 0; i < 10; i++) 
+        {
+            std::vector<std::string>::iterator src = m_strSearchPath.begin();
+            bool looping = true;
+            while (looping) 
+            {
+                fullPath.assign(upPath);  // reset to current upPath.
+                if (src != m_strSearchPath.end()) 
+                {
+                    fullPath.append(*src);
+                    fullPath.append("/Asset/");
+                    src++;
+                }
+                else 
+                {
+                    fullPath.append("Asset/");
+                    looping = false;
+                }
+                fullPath.append(name);
+
+                fp = fopen(fullPath.c_str(), "rb");
+
+                if (fp)
+                    return fullPath;
+            }
+
+            upPath.append("../");
+        }
+
+        return nullptr;
+    }
+
     AssetLoader::AssetFilePtr AssetLoader::OpenFile(const char* name, AssetOpenMode mode)
     {
         FILE *fp = nullptr;
