@@ -88,17 +88,17 @@ namespace Corona
         const uint32_t FirstIndex;
         const uint32_t IndexCount;
         const uint32_t VertexCount;
-        const uint32_t MaterialId;
+        // const uint32_t MaterialId;
+
+        // const BoundBox BB;
 
     public:
         SceneObjectPrimitive(uint32_t _FirstIndex,
                              uint32_t _IndexCount,
-                             uint32_t _VertexCount,
-                             uint32_t _MaterialId) : BaseSceneObject(SceneObjectType::SceneObjectTypePrimitive),
-                                                     FirstIndex{_FirstIndex},
-                                                     IndexCount{_IndexCount},
-                                                     VertexCount{_VertexCount},
-                                                     MaterialId{_MaterialId}
+                             uint32_t _VertexCount) : BaseSceneObject(SceneObjectType::SceneObjectTypePrimitive),
+                                                      FirstIndex{_FirstIndex},
+                                                      IndexCount{_IndexCount},
+                                                      VertexCount{_VertexCount}
         {
         }
 
@@ -271,10 +271,10 @@ namespace Corona
         /// Model create information
         struct CreateInfo
         {
-            const char *FileName = nullptr;
+            std::string FileName = nullptr;
 
             CreateInfo() = default;
-            explicit CreateInfo(const char *_FileName) : FileName(_FileName){};
+            explicit CreateInfo(std::string _FileName) : FileName(_FileName){};
         };
 
         Model(const CreateInfo &CI);
@@ -311,16 +311,20 @@ namespace Corona
         using ConvertedBufferViewMap = std::unordered_map<ConvertedBufferViewKey, ConvertedBufferViewData, ConvertedBufferViewKey::Hasher>;
 
         void LoadNode(SceneNode *parent,
-                    const tinygltf::Node &gltf_node,
-                    uint32_t nodeIndex,
-                    const tinygltf::Model &gltf_model,
-                    std::vector<uint32_t> &IndexData,
-                    std::vector<VertexBasicAttribs> &VertexBasicData,
-                    ConvertedBufferViewMap &ConvertedBuffers);
+                      const tinygltf::Node &gltf_node,
+                      uint32_t nodeIndex,
+                      const tinygltf::Model &gltf_model,
+                      std::vector<uint32_t> &IndexData,
+                      std::vector<VertexBasicAttribs> &VertexBasicData,
+                      ConvertedBufferViewMap &ConvertedBuffers);
 
+        // Used for skinning
         void ConvertBuffers(const ConvertedBufferViewKey &Key,
-                        ConvertedBufferViewData &Data,
-                        const tinygltf::Model &gltf_model,
-                        std::vector<VertexBasicAttribs> &VertexBasicData) const;
+                            ConvertedBufferViewData &Data,
+                            const tinygltf::Model &gltf_model,
+                            std::vector<VertexBasicAttribs> &VertexBasicData) const;
+
+        // TODO: put all index and vertex data into every primitive
+        void UpdatePrimitiveData();
     };
 }

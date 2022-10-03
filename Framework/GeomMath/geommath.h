@@ -168,7 +168,7 @@ namespace Corona {
     template <template<typename> class TT, typename T>
     void VectorAdd(TT<T>& result, const TT<T>& vec1, const TT<T>& vec2)
     {
-        ispc::AddByElement(vec1, vec2, result, (int32_t)countof(result.data));
+        ispc::AddByElement(vec1, vec2, result, static_cast<int32_t>(countof(result.data)));
     }
 
     template <template<typename> class TT, typename T>
@@ -183,7 +183,7 @@ namespace Corona {
     template <template<typename> class TT, typename T>
     void VectorSub(TT<T>& result, const TT<T>& vec1, const TT<T>& vec2)
     {
-        ispc::SubByElement(vec1, vec2, result, (int32_t)countof(result.data));
+        ispc::SubByElement(vec1, vec2, result, static_cast<int32_t>(countof(result.data)));
     }
 
     template <template<typename> class TT, typename T>
@@ -204,13 +204,13 @@ namespace Corona {
     template <template <typename> class TT, typename T>
     inline void DotProduct(T& result, const TT<T>& vec1, const TT<T>& vec2)
     {
-        ispc::DotProduct(vec1, vec2, &result, (int32_t)countof(vec1.data));
+        ispc::DotProduct(vec1, vec2, &result, static_cast<int32_t>(countof(vec1.data)));
     }
 
     template <typename T>
     inline void MulByElement(T& result, const T& a, const T& b)
     {
-        ispc::MulByElement(a, b, result, (int32_t)countof(result.data));
+        ispc::MulByElement(a, b, result, static_cast<int32_t>(countof(result.data));
     }
 
 
@@ -319,7 +319,7 @@ namespace Corona {
     template <typename T>
     inline void Normalize(T& result)
     {
-        ispc::Normalize(result, (int32_t)countof(result.data));
+        ispc::Normalize(result, static_cast<int32_t>(countof(result.data)));
     }
 
     inline void MatrixRotationYawPitchRoll(Matrix4X4f& matrix, const float yaw, const float pitch, const float roll)
