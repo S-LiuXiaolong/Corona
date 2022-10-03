@@ -234,7 +234,16 @@ namespace Corona
 
         ~ParameterValueMap() = default;
 
-        friend std::ostream& operator<<(std::ostream& out, const ParameterValueMap& obj);
+        friend std::ostream& operator<<(std::ostream& out, const ParameterValueMap& obj)
+        {
+            out << "Parameter Value: " << obj.Value << std::endl;
+            if (obj.ValueMap) 
+            {
+                out << "Parameter Map: " << *obj.ValueMap << std::endl;
+            }
+
+            return out;
+        }
     };
 
     typedef ParameterValueMap<Vector4f> Color;

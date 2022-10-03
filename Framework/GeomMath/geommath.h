@@ -408,6 +408,18 @@ namespace Corona {
         return;
     }
 
+    inline static Matrix4X4f BuildIdentityMatrix()
+    {
+        Matrix4X4f identity = {{{
+            { 1.0f, 0.0f, 0.0f, 0.0f},
+            { 0.0f, 1.0f, 0.0f, 0.0f},
+            { 0.0f, 0.0f, 1.0f, 0.0f},
+            { 0.0f, 0.0f, 0.0f, 1.0f}
+        }}};
+        
+        return identity;
+    }
+
 
     inline void BuildPerspectiveFovLHMatrix(Matrix4X4f& matrix, const float fieldOfView, const float screenAspect, const float screenNear, const float screenDepth)
     {
