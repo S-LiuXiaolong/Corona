@@ -61,6 +61,15 @@ namespace Corona
         }
     }
 
+    Model::Model(const CreateInfo& CI)
+    {
+        LoadFromFile(CI);
+    }
+
+    Model::~Model()
+    {
+    }
+
     void Model::LoadFromFile(const CreateInfo &CI)
     {
         if (CI.FileName == "")
@@ -86,15 +95,15 @@ namespace Corona
 
         if (!fileLoaded)
         {
-            printf("Failed to load gltf file ", filename, ": ", error);
+            printf("Failed to load gltf file");
         }
         if (!warning.empty())
         {
-            printf("Loaded gltf file ", filename, " with the following warning:", warning);
+            printf("Loaded gltf file");
         }
         if (!error.empty())
         {
-            printf("Loaded gltf file ", filename, " with the following error:", error);
+            printf("Loaded gltf file");
         }
 
         std::vector<uint32_t> IndexData;
@@ -151,17 +160,33 @@ namespace Corona
         // float3 Translation;
         if (gltf_node.translation.size() == 3)
         {
-            NewNode->Translation = Vector3f{gltf_node.translation[0], gltf_node.translation[1], gltf_node.translation[2]};
+            NewNode->Translation = Vector3f
+            {
+                static_cast<float>(gltf_node.translation[0]), 
+                static_cast<float>(gltf_node.translation[1]), 
+                static_cast<float>(gltf_node.translation[2])
+            };
         }
 
         if (gltf_node.rotation.size() == 4)
         {
-            NewNode->Rotation = Vector4f{gltf_node.rotation[0], gltf_node.rotation[1], gltf_node.rotation[2], gltf_node.rotation[3]};
+            NewNode->Rotation = Vector4f
+            {
+                static_cast<float>(gltf_node.rotation[0]), 
+                static_cast<float>(gltf_node.rotation[1]), 
+                static_cast<float>(gltf_node.rotation[2]), 
+                static_cast<float>(gltf_node.rotation[3])
+            };
         }
 
         if (gltf_node.scale.size() == 3)
         {
-            NewNode->Scale = Vector3f{gltf_node.scale[0], gltf_node.scale[1], gltf_node.scale[2]};
+            NewNode->Scale = Vector3f
+            {
+				static_cast<float>(gltf_node.scale[0]),
+				static_cast<float>(gltf_node.scale[1]),
+				static_cast<float>(gltf_node.scale[2])
+            };
         }
 
         if (gltf_node.matrix.size() == 16)
@@ -295,19 +320,83 @@ namespace Corona
                         }
                     }
 
+                    // TODO: add function to get index and vertex data in constructor of SceneObjectPrimitive
                     pNewMesh->Primitives.emplace_back( //
-                        indexStart,
-                        indexCount,
-                        vertexCount
-                        // primitive.material >= 0 ? static_cast<uint32_t>(primitive.material) : static_cast<uint32_t>(Materials.size() - 1),
-                        // PosMin,
-                        // PosMax
-                        //
+                        std::make_shared<SceneObjectPrimitive>(indexStart,
+                                                            indexCount,
+                                                            vertexCount,
+                                                            std::move(VertexBasicData),
+                                                            std::move(IndexData))
+                                                            // primitive.material >= 0 ? static_cast<uint32_t>(primitive.material) : static_cast<uint32_t>(Materials.size() - 1),
+                                                            // PosMin,
+                                                            // PosMax
+                                                            //
                     );
                 }
             }
 
             NewNode->pMesh = std::move(pNewMesh);
+        }
+
+        // Node contains camera
+        if (gltf_node.camera >= 0)
+        {
+            const auto& gltf_cam = gltf_model.cameras[gltf_node.camera];
+
+            std::unique_ptr<SceneObjectCamera> pNewCamera;
+
+            if (gltf_cam.type == "perspective")
+            {
+                // pNewCamera->Type                    = Camera::Projection::Perspective;
+                // pNewCamera->Perspective.AspectRatio = static_cast<float>(gltf_cam.perspective.aspectRatio);
+                // pNewCamera->Perspective.YFov        = static_cast<float>(gltf_cam.perspective.yfov);
+                // pNewCamera->Perspective.ZNear       = static_cast<float>(gltf_cam.perspective.znear);
+                // pNewCamera->Perspective.ZFar        = static_cast<float>(gltf_cam.perspective.zfar);
+                pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>
+                (
+                    static_cast<float>(gltf_cam.perspective.aspectRatio),
+                    static_cast<float>(gltf_cam.perspective.yfov),
+                    static_cast<float>(gltf_cam.perspective.znear),
+                    static_cast<float>(gltf_cam.perspective.zfar)
+                );
+                pNewCamera->Name = gltf_cam.name;
+            }
+            else if (gltf_cam.type == "orthographic")
+            {
+                // pNewCamera->Type               = Camera::Projection::Orthographic;
+                // pNewCamera->Orthographic.XMag  = static_cast<float>(gltf_cam.orthographic.xmag);
+                // pNewCamera->Orthographic.YMag  = static_cast<float>(gltf_cam.orthographic.ymag);
+                // pNewCamera->Orthographic.ZNear = static_cast<float>(gltf_cam.orthographic.znear);
+                // pNewCamera->Orthographic.ZFar  = static_cast<float>(gltf_cam.orthographic.zfar);
+                pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>
+                (
+                    static_cast<float>(gltf_cam.orthographic.xmag),
+                    static_cast<float>(gltf_cam.orthographic.ymag),
+                    static_cast<float>(gltf_cam.orthographic.znear),
+                    static_cast<float>(gltf_cam.orthographic.zfar)
+                );
+                pNewCamera->Name = gltf_cam.name;
+            }
+            else
+            {
+                // TODO: Add an assert here
+                // UNEXPECTED("Unexpected camera type: ", gltf_cam.type);
+                printf("Unexpected camera type");
+                pNewCamera.reset();
+            }
+
+            if (pNewCamera)
+                NewNode->pCamera = std::move(pNewCamera);
+        }
+
+        LinearNodes.push_back(NewNode.get());
+        if (parent)
+        {
+            parent->Children.push_back(std::move(NewNode));
+        }
+        else
+        {
+            Nodes.push_back(std::move(NewNode));
         }
     }
 
@@ -315,6 +404,10 @@ namespace Corona
                                ConvertedBufferViewData &Data,
                                const tinygltf::Model &gltf_model,
                                std::vector<VertexBasicAttribs> &VertexBasicData) const
+    {
+    }
+
+    void Model::UpdatePrimitiveData()
     {
     }
 }

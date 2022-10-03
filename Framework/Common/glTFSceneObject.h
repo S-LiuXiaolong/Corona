@@ -46,6 +46,14 @@ namespace Corona
 
     std::ostream &operator<<(std::ostream &out, SceneObjectType type);
 
+	struct VertexBasicAttribs
+	{
+		Vector3f pos;
+		Vector3f normal;
+		Vector2f uv0;
+		Vector2f uv1;
+	};
+
     using namespace xg;
     class BaseSceneObject
     {
@@ -81,6 +89,7 @@ namespace Corona
         friend std::ostream &operator<<(std::ostream &out, const BaseSceneObject &obj);
     };
 
+    struct Model;
     class SceneObjectPrimitive : public BaseSceneObject
     {
         // To be rewrite to add vertexBuffer and indexBuffer here.
@@ -92,14 +101,24 @@ namespace Corona
 
         // const BoundBox BB;
 
+        // TODO: These two are for test and can be changes to void* when used to add into buffers.
+        std::vector<VertexBasicAttribs> VertexData;
+        std::vector<uint32_t> IndexData;
+
     public:
         SceneObjectPrimitive(uint32_t _FirstIndex,
                              uint32_t _IndexCount,
-                             uint32_t _VertexCount) : BaseSceneObject(SceneObjectType::SceneObjectTypePrimitive),
-                                                      FirstIndex{_FirstIndex},
-                                                      IndexCount{_IndexCount},
-                                                      VertexCount{_VertexCount}
+                             uint32_t _VertexCount,
+                             std::vector<VertexBasicAttribs>&& _VertexData,
+                             std::vector<uint32_t>&& _IndexData) :
+            BaseSceneObject(SceneObjectType::SceneObjectTypePrimitive),
+            FirstIndex{ _FirstIndex },
+            IndexCount{ _IndexCount },
+            VertexCount{ _VertexCount },
+            VertexData{ _VertexData },
+            IndexData{ _IndexData }
         {
+            // TODO: Add function here.
         }
 
         SceneObjectPrimitive(SceneObjectPrimitive &&) = default;
@@ -239,14 +258,6 @@ namespace Corona
 
     struct Model
     {
-        struct VertexBasicAttribs
-        {
-            Vector3f pos;
-            Vector3f normal;
-            Vector2f uv0;
-            Vector2f uv1;
-        };
-
         // struct VertexSkinAttribs
         // {
         //     Vector4f joint0;
@@ -271,7 +282,7 @@ namespace Corona
         /// Model create information
         struct CreateInfo
         {
-            std::string FileName = nullptr;
+            std::string FileName = "";
 
             CreateInfo() = default;
             explicit CreateInfo(std::string _FileName) : FileName(_FileName){};

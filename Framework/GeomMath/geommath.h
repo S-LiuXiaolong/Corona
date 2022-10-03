@@ -76,7 +76,7 @@ namespace Corona {
 		    swizzle<Vector2Type, T, 1, 0> yx;
         };
 
-        Vector2Type<T>() {};
+        Vector2Type<T>() : x(0), y(0) {};
         Vector2Type<T>(const T& _v) : x(_v), y(_v) {};
         Vector2Type<T>(const T& _x, const T& _y) : x(_x), y(_y) {};
 
@@ -107,7 +107,7 @@ namespace Corona {
 		    swizzle<Vector3Type, T, 2, 1, 0> zyx;
         };
 
-        Vector3Type<T>() {};
+        Vector3Type<T>() : x(0), y(0), z(0) {};
         Vector3Type<T>(const T& _v) : x(_v), y(_v), z(_v) {};
         Vector3Type<T>(const T& _x, const T& _y, const T& _z) : x(_x), y(_y), z(_z) {};
 
@@ -132,7 +132,7 @@ namespace Corona {
 		    swizzle<Vector4Type, T, 2, 1, 0, 3> bgra;
         };
 
-        Vector4Type<T>() {};
+        Vector4Type<T>() : x(0), y(0), z(0), w(0) {};
         Vector4Type<T>(const T& _v) : x(_v), y(_v), z(_v), w(_v) {};
         Vector4Type<T>(const T& _x, const T& _y, const T& _z, const T& _w) : x(_x), y(_y), z(_z), w(_w) {};
         Vector4Type<T>(const Vector3Type<T>& v3) : x(v3.x), y(v3.y), z(v3.z), w(1.0f) {};
@@ -210,7 +210,7 @@ namespace Corona {
     template <typename T>
     inline void MulByElement(T& result, const T& a, const T& b)
     {
-        ispc::MulByElement(a, b, result, static_cast<int32_t>(countof(result.data));
+        ispc::MulByElement(a, b, result, static_cast<int32_t>(countof(result.data)));
     }
 
 
