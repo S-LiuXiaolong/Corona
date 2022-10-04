@@ -136,7 +136,7 @@ namespace Corona
         // TODO: use this function to get boundbox and BVH
         // CalculateSceneDimensions();
 
-        UpdatePrimitiveData();
+        // UpdatePrimitiveData();
     }
 
     void Model::LoadNode(SceneNode *parent,

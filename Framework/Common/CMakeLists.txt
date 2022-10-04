@@ -6,7 +6,6 @@ GraphicsManager.cpp
 Image.cpp
 MemoryManager.cpp
 SceneManager.cpp
-SceneObject.cpp
 glTFSceneObject.cpp
 main.cpp
 )

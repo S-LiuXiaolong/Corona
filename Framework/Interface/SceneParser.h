@@ -2,13 +2,13 @@
 #include <memory>
 #include <string>
 #include "Interface.h"
-#include "SceneNode.h"
+#include "glTFSceneObject.h"
 
 namespace Corona
 {
     Interface SceneParser
     {
     public:
-        virtual std::unique_ptr<BaseSceneNode> Parse(const std::string& buf) = 0;
+        virtual std::unique_ptr<Model> LoadFromFile(const std::string& buf) {};
     };
 }

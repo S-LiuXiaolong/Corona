@@ -4,9 +4,6 @@
 [submodule "External/src/crossguid"]
 	path = External/src/crossguid
 	url = https://github.com/S-LiuXiaolong/crossguid.git
-[submodule "External/src/OpenGEX"]
-	path = External/src/OpenGEX
-	url = https://github.com/S-LiuXiaolong/OpenGEX.git
 [submodule "External/src/tinygltf"]
 	path = External/src/tinygltf
 	url = https://github.com/S-LiuXiaolong/tinygltf.git

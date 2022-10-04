@@ -1,7 +1,7 @@
 #pragma once
 #include "geommath.h"
 #include "IRuntimeModule.h"
-#include "SceneNode.h"
+#include "gltfSceneObject.h"
 
 namespace Corona
 {
@@ -16,6 +16,6 @@ namespace Corona
         virtual void Tick();
 
     protected:
-        SceneEmptyNode m_RootNode;
+        // SceneEmptyNode m_RootNode;
     };
 }
