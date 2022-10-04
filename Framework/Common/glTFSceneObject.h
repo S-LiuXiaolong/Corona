@@ -285,65 +285,65 @@ namespace Corona
         std::vector<std::string> Extensions;
 
         Model();
-        Model(const CreateInfo &CI);
+        // Model(const CreateInfo &CI);
         ~Model();
 
-    private:
-        void LoadFromFile(const CreateInfo &CI);
+    // private:
+    //     void LoadFromFile(const CreateInfo &CI);
 
-        struct ConvertedBufferViewKey
-        {
-            int PosAccess = -1;
-            int UV0Access = -1;
-            int UV1Access = -1;
-            int NormAccess = -1;
-            // int JointAccess = -1;
-            // int WeightAccess = -1;
+    //     struct ConvertedBufferViewKey
+    //     {
+    //         int PosAccess = -1;
+    //         int UV0Access = -1;
+    //         int UV1Access = -1;
+    //         int NormAccess = -1;
+    //         // int JointAccess = -1;
+    //         // int WeightAccess = -1;
 
-            bool operator==(const ConvertedBufferViewKey& Rhs) const
-            {
-                return PosAccess == Rhs.PosAccess &&
-                    UV0Access == Rhs.UV0Access &&
-                    UV1Access == Rhs.UV1Access &&
-                    NormAccess == Rhs.NormAccess;
-					// JointAccess == Rhs.JointAccess &&
-					// WeightAccess == Rhs.WeightAccess;
-            }
+    //         bool operator==(const ConvertedBufferViewKey& Rhs) const
+    //         {
+    //             return PosAccess == Rhs.PosAccess &&
+    //                 UV0Access == Rhs.UV0Access &&
+    //                 UV1Access == Rhs.UV1Access &&
+    //                 NormAccess == Rhs.NormAccess;
+	// 				// JointAccess == Rhs.JointAccess &&
+	// 				// WeightAccess == Rhs.WeightAccess;
+    //         }
 
-            struct Hasher
-            {
-                // TODO: add hash function here
-                size_t operator()(const ConvertedBufferViewKey& Key) const
-                {
-                    return 0;
-                }
-            };
-        };
+    //         struct Hasher
+    //         {
+    //             // TODO: add hash function here
+    //             size_t operator()(const ConvertedBufferViewKey& Key) const
+    //             {
+    //                 return 0;
+    //             }
+    //         };
+    //     };
 
-        struct ConvertedBufferViewData
-        {
-            size_t VertexBasicDataOffset = ~size_t(0);
-            size_t VertexSkinDataOffset = ~size_t(0);
+    //     struct ConvertedBufferViewData
+    //     {
+    //         size_t VertexBasicDataOffset = ~size_t(0);
+    //         size_t VertexSkinDataOffset = ~size_t(0);
 
-            bool IsInitialized() const { return VertexBasicDataOffset != ~size_t(0); }
-        };
+    //         bool IsInitialized() const { return VertexBasicDataOffset != ~size_t(0); }
+    //     };
 
-        using ConvertedBufferViewMap = std::unordered_map<ConvertedBufferViewKey, ConvertedBufferViewData, ConvertedBufferViewKey::Hasher>;
+    //     using ConvertedBufferViewMap = std::unordered_map<ConvertedBufferViewKey, ConvertedBufferViewData, ConvertedBufferViewKey::Hasher>;
 
-        void LoadNode(SceneNode *parent,
-                      const tinygltf::Node &gltf_node,
-                      uint32_t nodeIndex,
-                      const tinygltf::Model &gltf_model,
-                      std::vector<uint32_t> &IndexData,
-                      std::vector<VertexBasicAttribs> &VertexBasicData,
-                      ConvertedBufferViewMap &ConvertedBuffers);
+    //     void LoadNode(SceneNode *parent,
+    //                   const tinygltf::Node &gltf_node,
+    //                   uint32_t nodeIndex,
+    //                   const tinygltf::Model &gltf_model,
+    //                   std::vector<uint32_t> &IndexData,
+    //                   std::vector<VertexBasicAttribs> &VertexBasicData,
+    //                   ConvertedBufferViewMap &ConvertedBuffers);
 
-        void ConvertBuffers(const ConvertedBufferViewKey &Key,
-                            ConvertedBufferViewData &Data,
-                            const tinygltf::Model &gltf_model,
-                            std::vector<VertexBasicAttribs> &VertexBasicData) const;
+    //     void ConvertBuffers(const ConvertedBufferViewKey &Key,
+    //                         ConvertedBufferViewData &Data,
+    //                         const tinygltf::Model &gltf_model,
+    //                         std::vector<VertexBasicAttribs> &VertexBasicData) const;
 
-        // TODO: put all index and vertex data into every primitive
-        void UpdatePrimitiveData();
+    //     // TODO: put all index and vertex data into every primitive
+    //     void UpdatePrimitiveData();
     };
 }
