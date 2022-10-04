@@ -19,6 +19,8 @@ int main()
     Model::CreateInfo CI = {};
 	CI.FileName = gltfFile;
 	Model m_Model{ CI };
+
+    std::unique_ptr<Model> pModel = std::make_unique<Model>(Model::CreateInfo{ gltfFile });
     
     std::unique_ptr<int> test = nullptr;
     test.reset();

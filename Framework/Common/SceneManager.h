@@ -1,7 +1,7 @@
 #pragma once
 #include "geommath.h"
 #include "IRuntimeModule.h"
-#include "gltfSceneObject.h"
+#include "SceneParser.h"
 
 namespace Corona
 {
@@ -15,7 +15,16 @@ namespace Corona
 
         virtual void Tick();
 
+        void LoadScene(std::string scene_file_name);
+
+        const Scene& GetSceneForRendering();
+
     protected:
-        // SceneEmptyNode m_RootNode;
+        void LoadGltfScene(std::string gltf_scene_file_name);
+
+    protected:
+        std::unique_ptr<Scene> m_pScene;
     };
+
+    extern SceneManager* g_pSceneManager;
 }

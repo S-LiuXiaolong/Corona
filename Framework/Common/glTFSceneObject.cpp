@@ -61,6 +61,14 @@ namespace Corona
         }
     }
 
+	Model::Model()
+	{
+		Nodes = std::vector<std::unique_ptr<SceneNode>>{};
+		LinearNodes = std::vector<SceneNode*>{};
+
+		Extensions = std::vector<std::string>{};
+	}
+
     Model::Model(const CreateInfo &CI)
     {
         LoadFromFile(CI);

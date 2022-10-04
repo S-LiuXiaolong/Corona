@@ -43,6 +43,7 @@ namespace Corona
 
     std::ostream &operator<<(std::ostream &out, SceneObjectType type);
 
+    /// @brief Some util struct maybe used by other functions
     struct VertexBasicAttribs
     {
         Vector3f pos;
@@ -241,8 +242,8 @@ namespace Corona
         std::vector<std::unique_ptr<SceneNode>> Children;
 
         Matrix4X4f Matrix;
-        std::unique_ptr<SceneObjectMesh> pMesh;
-        std::unique_ptr<SceneObjectCamera> pCamera;
+        std::shared_ptr<SceneObjectMesh> pMesh;
+        std::shared_ptr<SceneObjectCamera> pCamera;
         Vector3f Translation;
         Vector3f Scale;
         Quaternion Rotation;
@@ -254,6 +255,14 @@ namespace Corona
 
     struct Model
     {
+        /// Model create information
+        struct CreateInfo
+        {
+            std::string FileName = "";
+
+            CreateInfo() = default;
+            explicit CreateInfo(std::string _FileName) : FileName(_FileName){};
+        };
         // struct VertexSkinAttribs
         // {
         //     Vector4f joint0;
@@ -275,15 +284,7 @@ namespace Corona
         // std::vector<std::unique_ptr<Material>> Materials;
         std::vector<std::string> Extensions;
 
-        /// Model create information
-        struct CreateInfo
-        {
-            std::string FileName = "";
-
-            CreateInfo() = default;
-            explicit CreateInfo(std::string _FileName) : FileName(_FileName){};
-        };
-
+        Model();
         Model(const CreateInfo &CI);
         ~Model();
 
@@ -337,7 +338,6 @@ namespace Corona
                       std::vector<VertexBasicAttribs> &VertexBasicData,
                       ConvertedBufferViewMap &ConvertedBuffers);
 
-        // Used for skinning
         void ConvertBuffers(const ConvertedBufferViewKey &Key,
                             ConvertedBufferViewData &Data,
                             const tinygltf::Model &gltf_model,
