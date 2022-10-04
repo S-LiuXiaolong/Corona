@@ -61,7 +61,7 @@ namespace Corona
         }
     }
 
-    Model::Model(const CreateInfo& CI)
+    Model::Model(const CreateInfo &CI)
     {
         LoadFromFile(CI);
     }
@@ -160,44 +160,38 @@ namespace Corona
         // float3 Translation;
         if (gltf_node.translation.size() == 3)
         {
-            NewNode->Translation = Vector3f
-            {
-                static_cast<float>(gltf_node.translation[0]), 
-                static_cast<float>(gltf_node.translation[1]), 
-                static_cast<float>(gltf_node.translation[2])
-            };
+            NewNode->Translation = Vector3f{
+                static_cast<float>(gltf_node.translation[0]),
+                static_cast<float>(gltf_node.translation[1]),
+                static_cast<float>(gltf_node.translation[2])};
         }
 
         if (gltf_node.rotation.size() == 4)
         {
-            NewNode->Rotation = Vector4f
-            {
-                static_cast<float>(gltf_node.rotation[0]), 
-                static_cast<float>(gltf_node.rotation[1]), 
-                static_cast<float>(gltf_node.rotation[2]), 
-                static_cast<float>(gltf_node.rotation[3])
-            };
+            NewNode->Rotation = Vector4f{
+                static_cast<float>(gltf_node.rotation[0]),
+                static_cast<float>(gltf_node.rotation[1]),
+                static_cast<float>(gltf_node.rotation[2]),
+                static_cast<float>(gltf_node.rotation[3])};
         }
 
         if (gltf_node.scale.size() == 3)
         {
-            NewNode->Scale = Vector3f
-            {
-				static_cast<float>(gltf_node.scale[0]),
-				static_cast<float>(gltf_node.scale[1]),
-				static_cast<float>(gltf_node.scale[2])
-            };
+            NewNode->Scale = Vector3f{
+                static_cast<float>(gltf_node.scale[0]),
+                static_cast<float>(gltf_node.scale[1]),
+                static_cast<float>(gltf_node.scale[2])};
         }
 
         if (gltf_node.matrix.size() == 16)
         {
             std::vector<double> vals = gltf_node.matrix;
             NewNode->Matrix = Matrix4X4f //
-            {
-                static_cast<float>(vals[0]), static_cast<float>(vals[1]), static_cast<float>(vals[2]), static_cast<float>(vals[3]),
-                static_cast<float>(vals[4]), static_cast<float>(vals[5]), static_cast<float>(vals[6]), static_cast<float>(vals[7]),
-                static_cast<float>(vals[8]), static_cast<float>(vals[9]), static_cast<float>(vals[10]), static_cast<float>(vals[11]) //
-            };
+                {
+                    static_cast<float>(vals[0]), static_cast<float>(vals[1]), static_cast<float>(vals[2]), static_cast<float>(vals[3]),
+                    static_cast<float>(vals[4]), static_cast<float>(vals[5]), static_cast<float>(vals[6]), static_cast<float>(vals[7]),
+                    static_cast<float>(vals[8]), static_cast<float>(vals[9]), static_cast<float>(vals[10]), static_cast<float>(vals[11]) //
+                };
         }
 
         // Node with children
@@ -206,20 +200,20 @@ namespace Corona
             for (size_t i = 0; i < gltf_node.children.size(); i++)
             {
                 LoadNode(NewNode.get(), gltf_model.nodes[gltf_node.children[i]], gltf_node.children[i],
-                        gltf_model, IndexData, VertexBasicData, ConvertedBuffers);
+                         gltf_model, IndexData, VertexBasicData, ConvertedBuffers);
             }
         }
 
         if (gltf_node.mesh >= 0)
         {
-            const tinygltf::Mesh& gltf_mesh = gltf_model.meshes[gltf_node.mesh];
+            const tinygltf::Mesh &gltf_mesh = gltf_model.meshes[gltf_node.mesh];
             std::unique_ptr<SceneObjectMesh> pNewMesh{new SceneObjectMesh{NewNode->Matrix}};
 
             for (size_t j = 0; j < gltf_mesh.primitives.size(); j++)
             {
-                const tinygltf::Primitive& primitive = gltf_mesh.primitives[j];
+                const tinygltf::Primitive &primitive = gltf_mesh.primitives[j];
 
-                uint32_t indexStart = static_cast<uint32_t> (IndexData.size());
+                uint32_t indexStart = static_cast<uint32_t>(IndexData.size());
                 uint32_t vertexStart = 0;
 
                 uint32_t indexCount = 0;
@@ -231,12 +225,12 @@ namespace Corona
                 // vertices
                 {
                     ConvertedBufferViewKey Key;
-                    
+
                     {
                         auto position_it = primitive.attributes.find("POSITION");
                         // TODO: add assert function here: "Position attribute is required"
 
-                        const tinygltf::Accessor& posAccessor = gltf_model.accessors[position_it->second];
+                        const tinygltf::Accessor &posAccessor = gltf_model.accessors[position_it->second];
 
                         Key.PosAccess = position_it->second;
 
@@ -271,66 +265,72 @@ namespace Corona
                         Key.UV1Access = primitive.attributes.find("TEXCOORD_1")->second;
                     }
 
+                    auto &Data = ConvertedBuffers[Key];
+                    if (!Data.IsInitialized())
+                    {
+                        ConvertBuffers(Key, Data, gltf_model, VertexBasicData);
+                    }
+
                     // TODO: Skinning
 
                     // Indices
                     if (hasIndices)
                     {
-                        const tinygltf::Accessor&   accessor   = gltf_model.accessors[primitive.indices > -1 ? primitive.indices : 0];
-                        const tinygltf::BufferView& bufferView = gltf_model.bufferViews[accessor.bufferView];
-                        const tinygltf::Buffer&     buffer     = gltf_model.buffers[bufferView.buffer];
+                        const tinygltf::Accessor &accessor = gltf_model.accessors[primitive.indices > -1 ? primitive.indices : 0];
+                        const tinygltf::BufferView &bufferView = gltf_model.bufferViews[accessor.bufferView];
+                        const tinygltf::Buffer &buffer = gltf_model.buffers[bufferView.buffer];
 
                         indexCount = static_cast<uint32_t>(accessor.count);
 
-                        const void* dataPtr = &(buffer.data[accessor.byteOffset + bufferView.byteOffset]);
+                        const void *dataPtr = &(buffer.data[accessor.byteOffset + bufferView.byteOffset]);
 
                         IndexData.reserve(IndexData.size() + accessor.count);
                         switch (accessor.componentType)
                         {
-                            case TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT:
+                        case TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT:
+                        {
+                            const uint32_t *buf = static_cast<const uint32_t *>(dataPtr);
+                            for (size_t index = 0; index < accessor.count; index++)
                             {
-                                const uint32_t* buf = static_cast<const uint32_t*>(dataPtr);
-                                for (size_t index = 0; index < accessor.count; index++)
-                                {
-                                    IndexData.push_back(buf[index] + vertexStart);
-                                }
-                                break;
+                                IndexData.push_back(buf[index] + vertexStart);
                             }
-                            case TINYGLTF_PARAMETER_TYPE_UNSIGNED_SHORT:
+                            break;
+                        }
+                        case TINYGLTF_PARAMETER_TYPE_UNSIGNED_SHORT:
+                        {
+                            const uint16_t *buf = static_cast<const uint16_t *>(dataPtr);
+                            for (size_t index = 0; index < accessor.count; index++)
                             {
-                                const uint16_t* buf = static_cast<const uint16_t*>(dataPtr);
-                                for (size_t index = 0; index < accessor.count; index++)
-                                {
-                                    IndexData.push_back(buf[index] + vertexStart);
-                                }
-                                break;
+                                IndexData.push_back(buf[index] + vertexStart);
                             }
-                            case TINYGLTF_PARAMETER_TYPE_UNSIGNED_BYTE:
+                            break;
+                        }
+                        case TINYGLTF_PARAMETER_TYPE_UNSIGNED_BYTE:
+                        {
+                            const uint8_t *buf = static_cast<const uint8_t *>(dataPtr);
+                            for (size_t index = 0; index < accessor.count; index++)
                             {
-                                const uint8_t* buf = static_cast<const uint8_t*>(dataPtr);
-                                for (size_t index = 0; index < accessor.count; index++)
-                                {
-                                    IndexData.push_back(buf[index] + vertexStart);
-                                }
-                                break;
+                                IndexData.push_back(buf[index] + vertexStart);
                             }
-                            default:
-                                std::cerr << "Index component type " << accessor.componentType << " not supported!" << std::endl;
-                                return;
+                            break;
+                        }
+                        default:
+                            std::cerr << "Index component type " << accessor.componentType << " not supported!" << std::endl;
+                            return;
                         }
                     }
 
                     // TODO: add function to get index and vertex data in constructor of SceneObjectPrimitive
                     pNewMesh->Primitives.emplace_back( //
                         std::make_shared<SceneObjectPrimitive>(indexStart,
-                                                            indexCount,
-                                                            vertexCount,
-                                                            std::move(VertexBasicData),
-                                                            std::move(IndexData))
-                                                            // primitive.material >= 0 ? static_cast<uint32_t>(primitive.material) : static_cast<uint32_t>(Materials.size() - 1),
-                                                            // PosMin,
-                                                            // PosMax
-                                                            //
+                                                               indexCount,
+                                                               vertexCount,
+                                                               std::move(VertexBasicData),
+                                                               std::move(IndexData))
+                        // primitive.material >= 0 ? static_cast<uint32_t>(primitive.material) : static_cast<uint32_t>(Materials.size() - 1),
+                        // PosMin,
+                        // PosMax
+                        //
                     );
                 }
             }
@@ -341,7 +341,7 @@ namespace Corona
         // Node contains camera
         if (gltf_node.camera >= 0)
         {
-            const auto& gltf_cam = gltf_model.cameras[gltf_node.camera];
+            const auto &gltf_cam = gltf_model.cameras[gltf_node.camera];
 
             std::unique_ptr<SceneObjectCamera> pNewCamera;
 
@@ -352,13 +352,11 @@ namespace Corona
                 // pNewCamera->Perspective.YFov        = static_cast<float>(gltf_cam.perspective.yfov);
                 // pNewCamera->Perspective.ZNear       = static_cast<float>(gltf_cam.perspective.znear);
                 // pNewCamera->Perspective.ZFar        = static_cast<float>(gltf_cam.perspective.zfar);
-                pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>
-                (
+                pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>(
                     static_cast<float>(gltf_cam.perspective.aspectRatio),
                     static_cast<float>(gltf_cam.perspective.yfov),
                     static_cast<float>(gltf_cam.perspective.znear),
-                    static_cast<float>(gltf_cam.perspective.zfar)
-                );
+                    static_cast<float>(gltf_cam.perspective.zfar));
                 pNewCamera->Name = gltf_cam.name;
             }
             else if (gltf_cam.type == "orthographic")
@@ -368,13 +366,11 @@ namespace Corona
                 // pNewCamera->Orthographic.YMag  = static_cast<float>(gltf_cam.orthographic.ymag);
                 // pNewCamera->Orthographic.ZNear = static_cast<float>(gltf_cam.orthographic.znear);
                 // pNewCamera->Orthographic.ZFar  = static_cast<float>(gltf_cam.orthographic.zfar);
-                pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>
-                (
+                pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>(
                     static_cast<float>(gltf_cam.orthographic.xmag),
                     static_cast<float>(gltf_cam.orthographic.ymag),
                     static_cast<float>(gltf_cam.orthographic.znear),
-                    static_cast<float>(gltf_cam.orthographic.zfar)
-                );
+                    static_cast<float>(gltf_cam.orthographic.zfar));
                 pNewCamera->Name = gltf_cam.name;
             }
             else
@@ -405,6 +401,86 @@ namespace Corona
                                const tinygltf::Model &gltf_model,
                                std::vector<VertexBasicAttribs> &VertexBasicData) const
     {
+        const float *bufferPos = nullptr;
+        const float *bufferNormals = nullptr;
+        const float *bufferTexCoordSet0 = nullptr;
+        const float *bufferTexCoordSet1 = nullptr;
+
+        uint32_t vertexCount = 0;
+        int posStride = -1;
+        int normalsStride = -1;
+        int texCoordSet0Stride = -1;
+        int texCoordSet1Stride = -1;
+
+        if (Key.PosAccess >= 0)
+        {
+            const tinygltf::Accessor &posAccessor = gltf_model.accessors[Key.PosAccess];
+            const tinygltf::BufferView &posView = gltf_model.bufferViews[posAccessor.bufferView];
+            if (posAccessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT)
+                printf("Position component type is expected to be float");
+            if (posAccessor.type != TINYGLTF_TYPE_VEC3)
+                printf("Position type is expected to be vec3");
+            // VERIFY(posAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Position component type is expected to be float");
+            // VERIFY(posAccessor.type == TINYGLTF_TYPE_VEC3, "Position type is expected to be vec3");
+
+            bufferPos = reinterpret_cast<const float *>(&(gltf_model.buffers[posView.buffer].data[posAccessor.byteOffset + posView.byteOffset]));
+            vertexCount = static_cast<uint32_t>(posAccessor.count);
+
+            posStride = posAccessor.ByteStride(posView) / tinygltf::GetComponentSizeInBytes(posAccessor.componentType);
+            if (posStride <= 0)
+                printf("Position stride is invalid");
+            // VERIFY(posStride > 0, "Position stride is invalid");
+        }
+
+        if (Key.NormAccess >= 0)
+        {
+            const tinygltf::Accessor &normAccessor = gltf_model.accessors[Key.NormAccess];
+            const tinygltf::BufferView &normView = gltf_model.bufferViews[normAccessor.bufferView];
+            // VERIFY(normAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Normal component type is expected to be float");
+            // VERIFY(normAccessor.type == TINYGLTF_TYPE_VEC3, "Normal type is expected to be vec3");
+
+            bufferNormals = reinterpret_cast<const float *>(&(gltf_model.buffers[normView.buffer].data[normAccessor.byteOffset + normView.byteOffset]));
+            normalsStride = normAccessor.ByteStride(normView) / tinygltf::GetComponentSizeInBytes(normAccessor.componentType);
+            // VERIFY(normalsStride > 0, "Normal stride is invalid");
+        }
+
+        if (Key.UV0Access >= 0)
+        {
+            const tinygltf::Accessor &uvAccessor = gltf_model.accessors[Key.UV0Access];
+            const tinygltf::BufferView &uvView = gltf_model.bufferViews[uvAccessor.bufferView];
+            // VERIFY(uvAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "UV0 component type is expected to be float");
+            // VERIFY(uvAccessor.type == TINYGLTF_TYPE_VEC2, "UV0 type is expected to be vec2");
+
+            bufferTexCoordSet0 = reinterpret_cast<const float *>(&(gltf_model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
+            texCoordSet0Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
+            // VERIFY(texCoordSet0Stride > 0, "Texcoord0 stride is invalid");
+        }
+
+        if (Key.UV1Access >= 0)
+        {
+            const tinygltf::Accessor &uvAccessor = gltf_model.accessors[Key.UV1Access];
+            const tinygltf::BufferView &uvView = gltf_model.bufferViews[uvAccessor.bufferView];
+            // VERIFY(uvAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "UV1 component type is expected to be float");
+            // VERIFY(uvAccessor.type == TINYGLTF_TYPE_VEC2, "UV1 type is expected to be vec2");
+
+            bufferTexCoordSet1 = reinterpret_cast<const float *>(&(gltf_model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
+            texCoordSet1Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
+            // VERIFY(texCoordSet1Stride > 0, "Texcoord1 stride is invalid");
+        }
+        Data.VertexBasicDataOffset = VertexBasicData.size();
+
+        for (size_t v = 0; v < vertexCount; v++)
+        {
+			VertexBasicAttribs BasicAttribs{};
+
+			BasicAttribs.pos = Vector3f{ bufferPos + v * posStride };
+            BasicAttribs.normal = bufferNormals != nullptr ? normalize(Vector3f{ bufferNormals + v * normalsStride }) : Vector3f{};
+            // BasicAttribs.normal = bufferNormals != nullptr ? Vector3f{ bufferNormals + v * normalsStride } : Vector3f{};
+			BasicAttribs.uv0 = bufferTexCoordSet0 != nullptr ? Vector2f{bufferTexCoordSet0 + v * texCoordSet0Stride} : Vector2f{};
+			BasicAttribs.uv1 = bufferTexCoordSet1 != nullptr ? Vector2f{bufferTexCoordSet1 + v * texCoordSet1Stride} : Vector2f{};
+
+			VertexBasicData.push_back(BasicAttribs);
+        }
     }
 
     void Model::UpdatePrimitiveData()

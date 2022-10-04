@@ -46,13 +46,13 @@ namespace Corona
 
     std::ostream &operator<<(std::ostream &out, SceneObjectType type);
 
-	struct VertexBasicAttribs
-	{
-		Vector3f pos;
-		Vector3f normal;
-		Vector2f uv0;
-		Vector2f uv1;
-	};
+    struct VertexBasicAttribs
+    {
+        Vector3f pos;
+        Vector3f normal;
+        Vector2f uv0;
+        Vector2f uv1;
+    };
 
     using namespace xg;
     class BaseSceneObject
@@ -109,14 +109,13 @@ namespace Corona
         SceneObjectPrimitive(uint32_t _FirstIndex,
                              uint32_t _IndexCount,
                              uint32_t _VertexCount,
-                             std::vector<VertexBasicAttribs>&& _VertexData,
-                             std::vector<uint32_t>&& _IndexData) :
-            BaseSceneObject(SceneObjectType::SceneObjectTypePrimitive),
-            FirstIndex{ _FirstIndex },
-            IndexCount{ _IndexCount },
-            VertexCount{ _VertexCount },
-            VertexData{ _VertexData },
-            IndexData{ _IndexData }
+                             std::vector<VertexBasicAttribs> &&_VertexData,
+                             std::vector<uint32_t> &&_IndexData) : BaseSceneObject(SceneObjectType::SceneObjectTypePrimitive),
+                                                                   FirstIndex{_FirstIndex},
+                                                                   IndexCount{_IndexCount},
+                                                                   VertexCount{_VertexCount},
+                                                                   VertexData{_VertexData},
+                                                                   IndexData{_IndexData}
         {
             // TODO: Add function here.
         }
@@ -300,14 +299,26 @@ namespace Corona
             int UV0Access = -1;
             int UV1Access = -1;
             int NormAccess = -1;
-            int JointAccess = -1;
-            int WeightAccess = -1;
+            // int JointAccess = -1;
+            // int WeightAccess = -1;
 
-            bool operator==(const ConvertedBufferViewKey &Rhs) const;
+            bool operator==(const ConvertedBufferViewKey& Rhs) const
+            {
+                return PosAccess == Rhs.PosAccess &&
+                    UV0Access == Rhs.UV0Access &&
+                    UV1Access == Rhs.UV1Access &&
+                    NormAccess == Rhs.NormAccess;
+					// JointAccess == Rhs.JointAccess &&
+					// WeightAccess == Rhs.WeightAccess;
+            }
 
             struct Hasher
             {
-                size_t operator()(const ConvertedBufferViewKey &Key) const;
+                // TODO: add hash function here
+                size_t operator()(const ConvertedBufferViewKey& Key) const
+                {
+                    return 0;
+                }
             };
         };
 
