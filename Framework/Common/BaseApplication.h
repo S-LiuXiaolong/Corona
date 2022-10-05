@@ -1,6 +1,10 @@
 #pragma once
 #include "IApplication.h"
-#include "GfxConfiguration.h"
+// #include "GfxConfiguration.h"
+#include "GraphicsManager.h"
+#include "MemoryManager.h"
+#include "AssetLoader.h"
+#include "SceneManager.h"
 
 namespace Corona
 {

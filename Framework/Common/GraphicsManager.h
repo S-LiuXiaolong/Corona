@@ -13,4 +13,6 @@ namespace Corona
 
 	    virtual void Tick();
     };
+
+    extern GraphicsManager* g_pGraphicsManager;
 }
