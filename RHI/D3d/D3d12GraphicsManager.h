@@ -14,21 +14,37 @@ namespace Corona
         virtual int Initialize();
         virtual void Finalize();
 
-        virtual void Tick();
+        virtual void Clear();
+        virtual void Draw();
 
     private:
         HRESULT CreateDescriptorHeaps();
         HRESULT CreateRenderTarget();
         HRESULT CreateDepthStencil();
-        HRESULT CreateVertexBuffer(const Buffer& buffer);
-        HRESULT CreateIndexBuffer(const Buffer& buffer);
-        HRESULT CreateTextureBuffer(const Image& image);
-        HRESULT CreateSamplerBuffer();
-        HRESULT CreateConstantBuffer(const Buffer& buffer);
         HRESULT CreateGraphicsResources();
+        HRESULT CreateSamplerBuffer();
+        HRESULT CreateTextureBuffer();
+        HRESULT CreateConstantBuffer();
+        HRESULT CreateIndexBuffer(const Buffer& buffer);
+        HRESULT CreateVertexBuffer(const Buffer& buffer);
+        HRESULT CreateRootSignature();
+        HRESULT WaitForPreviousFrame();
+        HRESULT PopulateCommandList();
+
+    protected:
+        bool SetPerFrameShaderParameters();
+        bool SetPerBatchShaderParameters(int32_t index);
+
+        HRESULT InitializeBuffers();
+        HRESULT InitializeShader(const char* vsFileName, const char* fsFileName);
+        HRESULT RenderBuffers();
 
     private:
         static const uint32_t           kFrameCount  = 2;
+        static const uint32_t           kMaxSceneObjectCount  = 65535;
+        static const uint32_t           kMaxTextureCount  = 2048;
+		static const uint32_t		    kTextureDescStartIndex = kFrameCount * (1 + kMaxSceneObjectCount);
+
         ID3D12Device*                   m_pDev       = nullptr;             // the pointer to our Direct3D device interface
         D3D12_VIEWPORT                  m_ViewPort;                         // viewport structure
         D3D12_RECT                      m_ScissorRect;                      // scissor rect structure
@@ -40,7 +56,7 @@ namespace Corona
         ID3D12RootSignature*            m_pRootSignature = nullptr;         // a graphics root signature defines what resources are bound to the pipeline
         ID3D12DescriptorHeap*           m_pRtvHeap = nullptr;               // an array of descriptors of GPU objects
         ID3D12DescriptorHeap*           m_pDsvHeap = nullptr;               // an array of descriptors of GPU objects
-        ID3D12DescriptorHeap*           m_pCbvSrvUavHeap;                   // an array of descriptors of GPU objects
+        ID3D12DescriptorHeap*           m_pCbvHeap = nullptr;                   // an array of descriptors of GPU objects
         ID3D12DescriptorHeap*           m_pSamplerHeap;                     // an array of descriptors of GPU objects
         ID3D12PipelineState*            m_pPipelineState = nullptr;         // an object maintains the state of all currently set shaders
                                                                             // and certain fixed function state objects
@@ -50,12 +66,24 @@ namespace Corona
         uint32_t                        m_nRtvDescriptorSize;
         uint32_t                        m_nCbvSrvDescriptorSize;
 
-        ID3D12Resource*                 m_pVertexBuffer = nullptr;          // the pointer to the vertex buffer
-        D3D12_VERTEX_BUFFER_VIEW        m_VertexBufferView;                 // a view of the vertex buffer
-        ID3D12Resource*                 m_pIndexBuffer = nullptr;           // the pointer to the vertex buffer
-        D3D12_INDEX_BUFFER_VIEW         m_IndexBufferView;                  // a view of the vertex buffer
+        std::vector<ID3D12Resource*>    m_Buffers;                          // the pointer to the vertex buffer
+        std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_VertexBufferView;                 // a view of the vertex buffer
+        std::vector<D3D12_INDEX_BUFFER_VIEW>        m_IndexBufferView;                  // a view of the vertex buffer
         ID3D12Resource*                 m_pTextureBuffer = nullptr;         // the pointer to the texture buffer
-        ID3D12Resource*                 m_pConstantUploadBuffer = nullptr;  // the pointer to the depth stencil buffer
+
+        struct DrawBatchContext {
+            int32_t count;
+            std::shared_ptr<Matrix4X4f> transform;
+            // std::shared_ptr<SceneObjectMaterial> material;
+        };
+
+        std::vector<DrawBatchContext> m_DrawBatchContext;
+
+        uint8_t*                        m_pCbvDataBegin = nullptr;
+		static const size_t				kSizePerFrameConstantBuffer = (sizeof(DrawFrameContext) + 255) & 256; // CB size is required to be 256-byte aligned.
+		static const size_t				kSizePerBatchConstantBuffer = (sizeof(DrawBatchContext) + 255) & 256; // CB size is required to be 256-byte aligned.
+		static const size_t				kSizeConstantBufferPerFrame = kSizePerFrameConstantBuffer + kSizePerBatchConstantBuffer * kMaxSceneObjectCount;
+
 
         // Synchronization objects
         uint32_t                        m_nFrameIndex;

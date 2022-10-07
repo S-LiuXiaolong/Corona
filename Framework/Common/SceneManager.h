@@ -19,11 +19,14 @@ namespace Corona
 
         const Scene& GetSceneForRendering();
 
+        bool IsSceneChanged();
+
     protected:
         void LoadGltfScene(std::string gltf_scene_file_name);
 
     protected:
         std::unique_ptr<Scene> m_pScene;
+        bool m_bDirtyFlag = false;
     };
 
     extern SceneManager* g_pSceneManager;
