@@ -20,7 +20,7 @@ target_link_libraries(Common GeomMath)
 #     find_library(XG_LIBRARY crossguid PATHS ${MYGE_EXTERNAL_LIBRARY_PATH})
 # endif()
 
-set(CORONA_LIBRARIES_LIST crossguid OpenDDL OpenGEX)
+# set(CORONA_LIBRARIES_LIST crossguid OpenDDL OpenGEX)
 
 # foreach(search_lib ${CORONA_LIBRARIES_LIST})
 #     find_library(CORONA_EXLIB_DEBUG NAMES ${search_lib} 

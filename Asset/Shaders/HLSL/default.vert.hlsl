@@ -1,22 +1,16 @@
-#include "vsoutput.h.hlsl"
+#include "default.h.hlsl"
 
-struct a2v_default {
-    float3 inputPosition : POSITION;
-    float2 inputUV : TEXCOORD;
-};
-
-cbuffer PerFrameConstants : register(b0) {
-    row_major float4x4 modelMatrix;        // 64 bytes
-    row_major float4x4 viewMatrix;        // 64 bytes
-    row_major float4x4 projectionMatrix;  // 64 bytes
-};                                // totle 192 bytes
-
-default_vert_output default_vert_main(a2v_default a)
+default_vert_output default_vert_main(a2v_default input)
 {
-    default_vert_output o;
+    default_vert_output output;
 
-    o.pos = mul(mul(mul(float4(a.inputPosition, 1.0f), modelMatrix), viewMatrix), projectionMatrix);
-    o.uv = a.inputUV;
+	output.Position = mul(mul(mul(float4(input.Position.xyz, 1.0f), m_worldMatrix), m_viewMatrix), m_projectionMatrix);
+	float3 vN = (mul(mul(float4(input.Normal, 0.0f), m_worldMatrix), m_viewMatrix)).xyz;
+	output.vPosInView = (mul(mul(float4(input.Position.xyz, 1.0f), m_worldMatrix), m_viewMatrix)).xyz;
 
-    return o;
+	output.vNorm = vN;
+
+	//output.TextureUV = input.TextureUV;
+
+	return output;
 }
