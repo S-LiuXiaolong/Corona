@@ -95,31 +95,35 @@ namespace Corona
     void GraphicsManager::CalculateCameraMatrix()
     {
         auto& scene = g_pSceneManager->GetSceneForRendering();
-        auto pCameraNode = scene.GetFirstCamera();
-        if (pCameraNode)
-        {
-            m_DrawFrameContext.m_viewMatrix = *pCameraNode->GetCalculatedTransform();
-            InverseMatrix4X4f(m_DrawFrameContext.m_viewMatrix);
-        }
-        else
-        {
-            // use default build-in camera
-            Vector3f position = { 0, -5, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
-            BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
-        }
+        // auto pCameraNode = scene.GetFirstCamera();
+        // if (pCameraNode)
+        // {
+        //     m_DrawFrameContext.m_viewMatrix = *pCameraNode->GetCalculatedTransform();
+        //     InverseMatrix4X4f(m_DrawFrameContext.m_viewMatrix);
+        // }
+        // else
+        // {
+        //     // use default build-in camera
+        //     Vector3f position = { 0, -5, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+        //     BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
+        // }
+
+        // use default build-in camera
+        Vector3f position = { 0, -5, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+        BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
         float nearClipDistance = 1.0f;
         float farClipDistance = 100.0f;
 
-        if (pCameraNode) 
-        {
-            auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
-            // Set the field of view and screen aspect ratio.
-            fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
-            nearClipDistance = pCamera->GetNearClipDistance();
-            farClipDistance = pCamera->GetFarClipDistance();
-        }
+        // if (pCameraNode) 
+        // {
+        //     auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
+        //     // Set the field of view and screen aspect ratio.
+        //     fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
+        //     nearClipDistance = pCamera->GetNearClipDistance();
+        //     farClipDistance = pCamera->GetFarClipDistance();
+        // }
 
         const GfxConfiguration& conf = g_pApp->GetConfiguration();
 

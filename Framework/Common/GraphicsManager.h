@@ -1,5 +1,6 @@
 #pragma once
 #include "IRuntimeModule.h"
+#include "geommath.h"
 
 namespace Corona
 {

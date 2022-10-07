@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <stdint.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
@@ -66,7 +67,7 @@ namespace Corona
         uint32_t                        m_nRtvDescriptorSize;
         uint32_t                        m_nCbvSrvDescriptorSize;
 
-        std::vector<ID3D12Resource*>    m_Buffers;                          // the pointer to the vertex buffer
+        std::vector<ID3D12Resource*>    m_VertexBuffers;                          // the pointer to the vertex buffer
         std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_VertexBufferView;                 // a view of the vertex buffer
         std::vector<D3D12_INDEX_BUFFER_VIEW>        m_IndexBufferView;                  // a view of the vertex buffer
         ID3D12Resource*                 m_pTextureBuffer = nullptr;         // the pointer to the texture buffer

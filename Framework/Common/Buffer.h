@@ -62,6 +62,11 @@ namespace Corona
         }
 
         ~Buffer() { if (m_pData) g_pMemoryManager->Free(m_pData, m_szSize); m_pData = nullptr; }
+
+        uint8_t* GetData(void) { return m_pData; };
+        const uint8_t* GetData(void) const { return m_pData; };
+        size_t GetDataSize(void) const { return m_szSize; }
+
     public:
         uint8_t* m_pData;
         size_t m_szSize;
