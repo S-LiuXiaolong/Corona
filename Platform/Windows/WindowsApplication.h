@@ -16,6 +16,9 @@ namespace Corona
         virtual void Tick();
 
         inline HWND GetMainWindow() const { return m_hWnd; }
+
+    protected:
+        void CreateMainWindow();
         
     private:
         static LRESULT CALLBACK WindowProc(HWND hWnd,
@@ -23,7 +26,7 @@ namespace Corona
                                         WPARAM wParam,
                                         LPARAM lParam);
 
-    private:
+    protected:
         HWND m_hWnd;
     };
 }

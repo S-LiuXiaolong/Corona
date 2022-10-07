@@ -3,15 +3,8 @@
 
 using namespace Corona;
 
-int WindowsApplication::Initialize()
+void WindowsApplication::CreateMainWindow()
 {
-    int result;
-
-    result = BaseApplication::Initialize();
-
-    if(result != 0)
-        exit(result);
-
     // get the HINSTANCE of the Console Program
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
@@ -52,6 +45,19 @@ int WindowsApplication::Initialize()
     ShowWindow(hWnd, SW_SHOW);
 
     m_hWnd = hWnd;
+}
+
+int WindowsApplication::Initialize()
+{
+    int result;
+
+    CreateMainWindow();
+
+	// first call base class initialization
+    result = BaseApplication::Initialize();
+
+    if (result != 0)
+        exit(result);
 
     return result;
 }
@@ -62,6 +68,7 @@ void WindowsApplication::Finalize()
 
 void WindowsApplication::Tick()
 {
+    BaseApplication::Tick();
     // this struct holds Windows event messages
     MSG msg;
 
