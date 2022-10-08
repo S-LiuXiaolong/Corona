@@ -433,8 +433,10 @@ namespace Corona
 
 			tinygltf::TinyGLTF loader;
 			bool fileLoaded = false;
-			if (binary)
-				fileLoaded = loader.LoadBinaryFromFile(&gltf_model, &error, &warning, filename);
+            if (binary)
+                fileLoaded = loader.LoadBinaryFromFile(&gltf_model, &error, &warning, filename);
+            else
+                fileLoaded = loader.LoadASCIIFromFile(&gltf_model, &error, &warning, filename);
 
 			if (!fileLoaded)
 			{

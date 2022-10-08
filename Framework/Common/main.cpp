@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 		return ret;
 	}
 
-	g_pSceneManager->LoadScene("Scene/Box.glb");
+	g_pSceneManager->LoadScene("Scene/Suzanne/Suzanne.gltf");
 	auto& scene = g_pSceneManager->GetSceneForRendering();
 
 	if ((ret = g_pGraphicsManager->Initialize()) != 0) {
