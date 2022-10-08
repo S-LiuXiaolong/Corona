@@ -109,7 +109,7 @@ namespace Corona
         // }
 
         // use default build-in camera
-        Vector3f position = { 0, -5, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+        Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
         BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
@@ -130,7 +130,12 @@ namespace Corona
         float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
 
         // Build the perspective projection matrix.
-        BuildPerspectiveFovRHMatrix(m_DrawFrameContext.m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+        BuildPerspectiveFovLHMatrix(m_DrawFrameContext.m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+        //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
+        auto a = m_DrawFrameContext.m_worldMatrix * m_DrawFrameContext.m_viewMatrix * m_DrawFrameContext.m_projectionMatrix;
+
+        // TODO: ! Difference between here and DX12 : Matrices in DX12 are stored in column.
+        Transpose(m_DrawFrameContext.m_MVPMatrix, a);
     }
 
     void GraphicsManager::CalculateLights()
@@ -155,8 +160,8 @@ namespace Corona
         // }
 
         //  only support default light at the time
-        m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
-        m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+//         m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
+//         m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
 
     void GraphicsManager::InitializeBuffers()

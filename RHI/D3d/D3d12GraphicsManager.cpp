@@ -926,8 +926,8 @@ namespace Corona
                 auto& m_IndexData = pPrimitive->IndexData;
                 CreateIndexBuffer(m_IndexData);
 
-				SetPerBatchShaderParameters(n);
-				n++;
+				// SetPerBatchShaderParameters(n);
+				// n++;
             }
 
             pGeometry = scene.GetNextGeometry();
@@ -1167,7 +1167,7 @@ namespace Corona
         m_pCommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
         // clear the back buffer to a deep blue
-        const FLOAT clearColor[] = { 0.0f, 0.1f, 0.2f, 1.0f };
+        const FLOAT clearColor[] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
         m_pCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
         m_pCommandList->ClearDepthStencilView(m_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
     }

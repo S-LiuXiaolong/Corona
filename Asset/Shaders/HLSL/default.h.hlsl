@@ -14,17 +14,18 @@ cbuffer PerFrameConstants : register(b0)
     float4x4 m_worldMatrix;
 	float4x4 m_viewMatrix;
 	float4x4 m_projectionMatrix;
-	float4   m_lightPosition;
-	float4   m_lightColor;
+	float4x4 m_MVPMatrix;
+	// float4   m_lightPosition;
+	// float4   m_lightColor;
 };
 
-cbuffer PerBatchConstants : register(b1)
-{
-    float3 ambientColor;
-    float3 diffuseColor;
-    float3 specularColor;
-    float specularPower;
-};
+// cbuffer PerBatchConstants : register(b1)
+// {
+//     float3 ambientColor;
+//     float3 diffuseColor;
+//     float3 specularColor;
+//     float specularPower;
+// };
 
 #endif // !__STDCBUFFER_H__
 
