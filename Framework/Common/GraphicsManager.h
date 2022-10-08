@@ -38,15 +38,19 @@ namespace Corona
     protected:
         struct DrawFrameContext 
         {
-            Matrix4X4f  m_worldMatrix;
-            Matrix4X4f  m_viewMatrix;
-            Matrix4X4f  m_projectionMatrix;
-            Matrix4X4f  m_MVPMatrix;
+//             Matrix4X4f  m_worldMatrix;
+//             Matrix4X4f  m_viewMatrix;
+//             Matrix4X4f  m_projectionMatrix;
+            Matrix4X4f  m_worldViewMatrix;
+            Matrix4X4f  m_worldViewProjectionMatrix;
 //             Vector3f    m_lightPosition;
 //             Vector4f    m_lightColor;
         };
 
         DrawFrameContext    m_DrawFrameContext;
+        Matrix4X4f m_worldMatrix;
+        Matrix4X4f m_viewMatrix;
+        Matrix4X4f m_projectionMatrix;
     };
 
     extern GraphicsManager* g_pGraphicsManager;

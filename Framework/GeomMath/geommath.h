@@ -367,6 +367,13 @@ namespace Corona
         ispc::Transpose(matrix1, result, ROWS, COLS);
     }
 
+	template <template <typename, int, int> class TT, typename T, int ROWS, int COLS>
+	inline void Transpose(TT<T, ROWS, COLS>& matrix)
+	{
+        auto tempMatrix = matrix;
+		ispc::Transpose(tempMatrix, matrix, ROWS, COLS);
+	}
+
     template <typename T>
     inline void Normalize(T &result)
     {

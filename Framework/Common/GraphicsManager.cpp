@@ -81,7 +81,7 @@ namespace Corona
     void GraphicsManager::InitConstants()
     {
         // Initialize the world/model matrix to the identity matrix.
-        BuildIdentityMatrix(m_DrawFrameContext.m_worldMatrix);
+        BuildIdentityMatrix(m_worldMatrix);
     }
 
     bool GraphicsManager::InitializeShader(const char* vsFilename, const char* fsFilename)
@@ -111,7 +111,7 @@ namespace Corona
 
         // use default build-in camera
         Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
-        BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
+        BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
         float nearClipDistance = 0.1f;
@@ -131,12 +131,21 @@ namespace Corona
         float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
 
         // Build the perspective projection matrix.
-        BuildPerspectiveFovLHMatrix(m_DrawFrameContext.m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+        BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
-        auto a = m_DrawFrameContext.m_worldMatrix * m_DrawFrameContext.m_viewMatrix * m_DrawFrameContext.m_projectionMatrix;
+        m_DrawFrameContext.m_worldViewMatrix = m_worldMatrix * m_viewMatrix;
+        m_DrawFrameContext.m_worldViewProjectionMatrix = m_worldMatrix * m_viewMatrix * m_projectionMatrix;
+        
+        // 在C++的DirectXMath中，无论是XMFLOAT4X4，还是使用函数生成的XMMATRIX，都是采用行主序矩阵的解释方式,
+        // 而在HLSL中，默认的matrix或float4x4采用的是列主序矩阵的解释形式。
 
-        // TODO: ! Difference between here and DX12 : Matrices in DX12 are stored in column.
-        Transpose(m_DrawFrameContext.m_MVPMatrix, a);
+        // 经过组合，就一共有四种能够正常绘制的情况：
+        // 1、C++代码端不进行转置，HLSL中使用row_major matrix(行主序矩阵)，mul函数让向量放在左边(行向量)，这样实际运算就是(行向量 X 行主序矩阵) 。这种方法易于理解，但是这样做dp4运算取矩阵的列很不方便，在HLSL中会产生用于转置矩阵的大量指令，性能上有损失。
+        // 2、C++代码端进行转置，HLSL中使用matrix(列主序矩阵) ，mul函数让向量放在左边(行向量)，这样就是(行向量 X 列主序矩阵)，但C++这边需要进行一次矩阵转置，HLSL内部不产生转置 。这是官方例程所使用的方式，这样可以使得dp4运算可以直接取列主序矩阵的行，从而避免内部产生大量的转置指令。后续也使用这种方式。
+        // 3、C++代码端不进行转置，HLSL中使用matrix(列主序矩阵)，mul函数让向量放在右边(列向量)，实际运算是(列主序矩阵 X 列向量)。这种方法的确可行，取列矩阵的行也比较方便，效率上又和2等同，就是HLSL那边的矩阵乘法都要反过来写，然而DX本身就是崇尚行主矩阵的，把OpenGL的习惯带来这边有点。。。
+        // 4、C++代码端进行转置，HLSL中使用row_major matrix(行主序矩阵)，mul函数让向量放在右边(列向量)，实际运算是(行主序矩阵 X 列向量)。 就算这种方法也可以绘制出来，但还是很让人难受。
+        Transpose(m_DrawFrameContext.m_worldViewMatrix);
+        Transpose(m_DrawFrameContext.m_worldViewProjectionMatrix);
     }
 
     void GraphicsManager::CalculateLights()
@@ -180,14 +189,14 @@ namespace Corona
     {
         Matrix4X4f rotationMatrix;
         MatrixRotationX(rotationMatrix, radians);
-        m_DrawFrameContext.m_worldMatrix = m_DrawFrameContext.m_worldMatrix * rotationMatrix;
+        m_worldMatrix = m_worldMatrix * rotationMatrix;
     }
 
     void GraphicsManager::WorldRotateY(float radians)
     {
         Matrix4X4f rotationMatrix;
         MatrixRotationY(rotationMatrix, radians);
-        m_DrawFrameContext.m_worldMatrix = m_DrawFrameContext.m_worldMatrix * rotationMatrix;
+        m_worldMatrix = m_worldMatrix * rotationMatrix;
     }
 
 }

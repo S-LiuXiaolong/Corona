@@ -9,12 +9,14 @@ struct a2v_default
     float2 MaterialUV   : MATCOORD;
 };
 
+// ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)
 cbuffer PerFrameConstants : register(b0)
 {
-    float4x4 m_worldMatrix;
-	float4x4 m_viewMatrix;
-	float4x4 m_projectionMatrix;
-	float4x4 m_MVPMatrix;
+    // float4x4 m_worldMatrix;
+	// float4x4 m_viewMatrix;
+	// float4x4 m_projectionMatrix;
+	float4x4 m_worldViewMatrix;
+	float4x4 m_worldViewProjectionMatrix; // this 5 matrix cannot live together
 	// float4   m_lightPosition;
 	// float4   m_lightColor;
 };
