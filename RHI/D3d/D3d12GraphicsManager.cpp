@@ -367,176 +367,176 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateVertexBuffer(const Buffer& buffer)
+    HRESULT D3d12GraphicsManager::CreateVertexBuffer(std::vector<VertexBasicAttribs>& v_property_array)
     {
         HRESULT hr;
 
-        // ID3D12Resource* pVertexBufferUploadHeap;
+        ID3D12Resource* pVertexBufferUploadHeap;
 
-        // // create vertex GPU heap 
-        // D3D12_HEAP_PROPERTIES prop = {};
-        // prop.Type = D3D12_HEAP_TYPE_DEFAULT;
-        // prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        // prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        // prop.CreationNodeMask = 1;
-        // prop.VisibleNodeMask = 1;
+        // create vertex GPU heap 
+        D3D12_HEAP_PROPERTIES prop = {};
+        prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        prop.CreationNodeMask = 1;
+        prop.VisibleNodeMask = 1;
 
-        // D3D12_RESOURCE_DESC resourceDesc = {};
-        // resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        // resourceDesc.Alignment = 0;
-        // resourceDesc.Width = buffer.m_szSize;
-        // resourceDesc.Height = 1;
-        // resourceDesc.DepthOrArraySize = 1;
-        // resourceDesc.MipLevels = 1;
-        // resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-        // resourceDesc.SampleDesc.Count = 1;
-        // resourceDesc.SampleDesc.Quality = 0;
-        // resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-        // resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        D3D12_RESOURCE_DESC resourceDesc = {};
+        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        resourceDesc.Alignment = 0;
+        // size in byte of resource
+        resourceDesc.Width = v_property_array.size() * 10 * 4;
+        resourceDesc.Height = 1;
+        resourceDesc.DepthOrArraySize = 1;
+        resourceDesc.MipLevels = 1;
+        resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+        resourceDesc.SampleDesc.Count = 1;
+        resourceDesc.SampleDesc.Quality = 0;
+        resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-        // ID3D12Resource* pVertexBuffer;
+        ID3D12Resource* pVertexBuffer;
 
-        // if (FAILED(hr = m_pDev->CreateCommittedResource(
-        //     &prop,
-        //     D3D12_HEAP_FLAG_NONE,
-        //     &resourceDesc,
-        //     D3D12_RESOURCE_STATE_COPY_DEST,
-        //     nullptr,
-        //     IID_PPV_ARGS(&pVertexBuffer)
-        // )))
-        // {
-        //     return hr;
-        // }
+        if (FAILED(hr = m_pDev->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+            D3D12_RESOURCE_STATE_COPY_DEST,
+            nullptr,
+            IID_PPV_ARGS(&pVertexBuffer)
+        )))
+        {
+            return hr;
+        }
 
-        // prop.Type = D3D12_HEAP_TYPE_UPLOAD;
-        // prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        // prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        // prop.CreationNodeMask = 1;
-        // prop.VisibleNodeMask = 1;
+        prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        prop.CreationNodeMask = 1;
+        prop.VisibleNodeMask = 1;
 
-        // if (FAILED(hr = m_pDev->CreateCommittedResource(
-        //     &prop,
-        //     D3D12_HEAP_FLAG_NONE,
-        //     &resourceDesc,
-        //     D3D12_RESOURCE_STATE_GENERIC_READ,
-        //     nullptr,
-        //     IID_PPV_ARGS(&pVertexBufferUploadHeap)
-        // )))
-        // {
-        //     return hr;
-        // }
+        if (FAILED(hr = m_pDev->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS(&pVertexBufferUploadHeap)
+        )))
+        {
+            return hr;
+        }
 
-        // D3D12_SUBRESOURCE_DATA vertexData = {};
-        // // vertexData.pData = v_property_array.GetData();
+        D3D12_SUBRESOURCE_DATA vertexData = {};
+        vertexData.pData = v_property_array.data();
 
-        // UpdateSubresources<1>(m_pCommandList, pVertexBuffer, pVertexBufferUploadHeap, 0, 0, 1, &vertexData);
-        // D3D12_RESOURCE_BARRIER barrier = {};
-        // barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        // barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        // barrier.Transition.pResource = pVertexBuffer;
-        // barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-        // barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-        // barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        // m_pCommandList->ResourceBarrier(1, &barrier);
+        UpdateSubresources<1>(m_pCommandList, pVertexBuffer, pVertexBufferUploadHeap, 0, 0, 1, &vertexData);
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = pVertexBuffer;
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        m_pCommandList->ResourceBarrier(1, &barrier);
 
-        // // initialize the vertex buffer view
-        // D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-        // vertexBufferView.BufferLocation = pVertexBuffer->GetGPUVirtualAddress();
-        // vertexBufferView.StrideInBytes = (UINT)(v_property_array.GetDataSize() / v_property_array.GetVertexCount());
-        // vertexBufferView.SizeInBytes = (UINT)v_property_array.GetDataSize();
-        // m_VertexBufferView.push_back(vertexBufferView);
+        // initialize the vertex buffer view
+        D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+        vertexBufferView.BufferLocation = pVertexBuffer->GetGPUVirtualAddress();
+        vertexBufferView.StrideInBytes = 10 * 4;
+        vertexBufferView.SizeInBytes = v_property_array.size() * 10 * 4;
+        m_VertexBufferView.push_back(vertexBufferView);
 
-        // m_VertexBuffers.push_back(pVertexBuffer);
-        // m_VertexBuffers.push_back(pVertexBufferUploadHeap);
+        m_Buffers.push_back(pVertexBuffer);
+        m_Buffers.push_back(pVertexBufferUploadHeap);
 
-        // return hr;
-        return 0;
+        return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateIndexBuffer(const Buffer& buffer)
+    HRESULT D3d12GraphicsManager::CreateIndexBuffer(std::vector<uint32_t>& index_array)
     {
         HRESULT hr;
 
-        // ID3D12Resource* pIndexBufferUploadHeap;
+        ID3D12Resource* pIndexBufferUploadHeap;
 
-        // // create index GPU heap
-        // D3D12_HEAP_PROPERTIES prop = {};
-        // prop.Type = D3D12_HEAP_TYPE_DEFAULT;
-        // prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        // prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        // prop.CreationNodeMask = 1;
-        // prop.VisibleNodeMask = 1;
+        // create index GPU heap
+        D3D12_HEAP_PROPERTIES prop = {};
+        prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        prop.CreationNodeMask = 1;
+        prop.VisibleNodeMask = 1;
 
-        // D3D12_RESOURCE_DESC resourceDesc = {};
-        // resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        // resourceDesc.Alignment = 0;
-        // resourceDesc.Width = buffer.m_szSize;
-        // resourceDesc.Height = 1;
-        // resourceDesc.DepthOrArraySize = 1;
-        // resourceDesc.MipLevels = 1;
-        // resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-        // resourceDesc.SampleDesc.Count = 1;
-        // resourceDesc.SampleDesc.Quality = 0;
-        // resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-        // resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        D3D12_RESOURCE_DESC resourceDesc = {};
+        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        resourceDesc.Alignment = 0;
+        // ?
+        resourceDesc.Width = index_array.size() * 4;
+        resourceDesc.Height = 1;
+        resourceDesc.DepthOrArraySize = 1;
+        resourceDesc.MipLevels = 1;
+        resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+        resourceDesc.SampleDesc.Count = 1;
+        resourceDesc.SampleDesc.Quality = 0;
+        resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-        // ID3D12Resource* pIndexBuffer;
+        ID3D12Resource* pIndexBuffer;
 
-        // if (FAILED(hr = m_pDev->CreateCommittedResource(
-        //     &prop,
-        //     D3D12_HEAP_FLAG_NONE,
-        //     &resourceDesc,
-        //     D3D12_RESOURCE_STATE_COPY_DEST,
-        //     nullptr,
-        //     IID_PPV_ARGS(&pIndexBuffer)
-        // )))
-        // {
-        //     return hr;
-        // }
+        if (FAILED(hr = m_pDev->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+            D3D12_RESOURCE_STATE_COPY_DEST,
+            nullptr,
+            IID_PPV_ARGS(&pIndexBuffer)
+        )))
+        {
+            return hr;
+        }
 
-        // prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+        prop.Type = D3D12_HEAP_TYPE_UPLOAD;
 
-        // if (FAILED(hr = m_pDev->CreateCommittedResource(
-        //     &prop,
-        //     D3D12_HEAP_FLAG_NONE,
-        //     &resourceDesc,
-        //     D3D12_RESOURCE_STATE_GENERIC_READ,
-        //     nullptr,
-        //     IID_PPV_ARGS(&pIndexBufferUploadHeap)
-        // )))
-        // {
-        //     return hr;
-        // }
+        if (FAILED(hr = m_pDev->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS(&pIndexBufferUploadHeap)
+        )))
+        {
+            return hr;
+        }
 
-        // D3D12_SUBRESOURCE_DATA indexData = {};
-        // indexData.pData = index_array.GetData();
+        D3D12_SUBRESOURCE_DATA indexData = {};
+        indexData.pData = index_array.data();
         
-        // UpdateSubresources<1>(m_pCommandList, pIndexBuffer, pIndexBufferUploadHeap, 0, 0, 1, &indexData);
-        // D3D12_RESOURCE_BARRIER barrier = {};
-        // barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        // barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        // barrier.Transition.pResource = pIndexBuffer;
-        // barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-        // barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_INDEX_BUFFER;
-        // barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        // m_pCommandList->ResourceBarrier(1, &barrier);
+        UpdateSubresources<1>(m_pCommandList, pIndexBuffer, pIndexBufferUploadHeap, 0, 0, 1, &indexData);
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = pIndexBuffer;
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_INDEX_BUFFER;
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        m_pCommandList->ResourceBarrier(1, &barrier);
 
-        // // initialize the index buffer view
-        // D3D12_INDEX_BUFFER_VIEW indexBufferView;
-        // indexBufferView.BufferLocation = pIndexBuffer->GetGPUVirtualAddress();
-        // indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-        // indexBufferView.SizeInBytes = (UINT)index_array.GetDataSize();
-        // m_IndexBufferView.push_back(indexBufferView);
+        // initialize the index buffer view
+        D3D12_INDEX_BUFFER_VIEW indexBufferView;
+        indexBufferView.BufferLocation = pIndexBuffer->GetGPUVirtualAddress();
+        indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+        indexBufferView.SizeInBytes = (UINT)index_array.size() * 4;
+        m_IndexBufferView.push_back(indexBufferView);
 
-        // m_VertexBuffers.push_back(pIndexBuffer);
-        // m_VertexBuffers.push_back(pIndexBufferUploadHeap);
+        m_Buffers.push_back(pIndexBuffer);
+        m_Buffers.push_back(pIndexBufferUploadHeap);
 
-        // DrawBatchContext dbc;
-        // dbc.count = (UINT)index_array.GetIndexCount();
-        // m_DrawBatchContext.push_back(std::move(dbc));
+        DrawBatchContext dbc;
+        dbc.count = index_array.size();
+        m_DrawBatchContext.push_back(std::move(dbc));
 
-        // return hr;
-        return 0;
+        return hr;
     }
 
     HRESULT D3d12GraphicsManager::CreateTextureBuffer()
@@ -700,7 +700,7 @@ namespace Corona
         D3D12_RANGE readRange = { 0, 0 };
         hr = pConstantUploadBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin));
 
-        m_VertexBuffers.push_back(pConstantUploadBuffer);
+        m_Buffers.push_back(pConstantUploadBuffer);
 
         return hr;
     }
@@ -880,47 +880,58 @@ namespace Corona
         }
 
         auto& scene = g_pSceneManager->GetSceneForRendering();
-//         auto pGeometryNode = scene.GetFirstGeometry();
-//         int32_t n = 0;
-//         while(pGeometryNode)
-//         {
-//             // if (pGeometryNode->Visible())
-//             // {
-//             //     auto pGeometry = scene.GetGeometry(pGeometryNode->GetSceneObjectRef());
-//             //     assert(pGeometry);
-//             //     auto pMesh = pGeometry->GetMesh().lock();
-//             //     if(!pMesh) continue;
-//                 
-//             //     // Set the number of vertex properties.
-//             //     auto vertexPropertiesCount = pMesh->GetVertexPropertiesCount();
-//                 
-//             //     // Set the number of vertices in the vertex array.
-//             //     auto vertexCount = pMesh->GetVertexCount();
-// 
-//             //     Buffer buff;
-// 
-//             //     for (decltype(vertexPropertiesCount) i = 0; i < vertexPropertiesCount; i++)
-//             //     {
-//             //         const SceneObjectVertexArray& v_property_array = pMesh->GetVertexPropertyArray(i);
-// 
-//             //         CreateVertexBuffer(v_property_array);
-//             //     }
-// 
-//             //     auto indexGroupCount = pMesh->GetIndexGroupCount();
-// 
-//             //     for (decltype(indexGroupCount) i = 0; i < indexGroupCount; i++)
-//             //     {
-//             //         const SceneObjectIndexArray& index_array      = pMesh->GetIndexArray(i);
-// 
-//             //         CreateIndexBuffer(index_array);
-//             //     }
-// 
-//             //     SetPerBatchShaderParameters(n);
-//             //     n++;
-//             // }
-// 
-//             pGeometryNode = scene.GetNextGeometry();
-//        }
+        auto pGeometry = scene.GetFirstGeometry();
+        int32_t n = 0;
+        while(pGeometry)
+        {
+            // if (pGeometryNode->Visible())
+            // {
+            //     auto pGeometry = scene.GetGeometry(pGeometryNode->GetSceneObjectRef());
+            //     assert(pGeometry);
+            //     auto pMesh = pGeometry->GetMesh().lock();
+            //     if(!pMesh) continue;
+                
+            //     // Set the number of vertex properties.
+            //     auto vertexPropertiesCount = pMesh->GetVertexPropertiesCount();
+                
+            //     // Set the number of vertices in the vertex array.
+            //     auto vertexCount = pMesh->GetVertexCount();
+
+            //     Buffer buff;
+
+            //     for (decltype(vertexPropertiesCount) i = 0; i < vertexPropertiesCount; i++)
+            //     {
+            //         const SceneObjectVertexArray& v_property_array = pMesh->GetVertexPropertyArray(i);
+
+            //         CreateVertexBuffer(v_property_array);
+            //     }
+
+            //     auto indexGroupCount = pMesh->GetIndexGroupCount();
+
+            //     for (decltype(indexGroupCount) i = 0; i < indexGroupCount; i++)
+            //     {
+            //         const SceneObjectIndexArray& index_array      = pMesh->GetIndexArray(i);
+
+            //         CreateIndexBuffer(index_array);
+            //     }
+
+            //     SetPerBatchShaderParameters(n);
+            //     n++;
+            // }
+
+            for (auto& pPrimitive : pGeometry->Primitives)
+            {
+                auto& m_VertexData = pPrimitive->VertexData;
+                CreateVertexBuffer(m_VertexData);
+                auto& m_IndexData = pPrimitive->IndexData;
+                CreateIndexBuffer(m_IndexData);
+
+				SetPerBatchShaderParameters(n);
+				n++;
+            }
+
+            pGeometry = scene.GetNextGeometry();
+       }
 
         if (SUCCEEDED(hr = m_pCommandList->Close()))
         {
@@ -1098,10 +1109,10 @@ namespace Corona
         WaitForPreviousFrame();
 
         SafeRelease(&m_pFence);
-        for (auto p : m_VertexBuffers) {
+        for (auto p : m_Buffers) {
             SafeRelease(&p);
         }
-        m_VertexBuffers.clear();
+        m_Buffers.clear();
         SafeRelease(&m_pCommandList);
         SafeRelease(&m_pPipelineState);
         SafeRelease(&m_pRtvHeap);
@@ -1202,22 +1213,39 @@ namespace Corona
         // do 3D rendering on the back buffer here
         cbvSrvHandle[1].ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + nFrameResourceDescriptorOffset * m_nCbvSrvDescriptorSize;
         int32_t i = 0;
-        for (auto dbc : m_DrawBatchContext)
-        {
+        //for (auto dbc : m_DrawBatchContext)
+        //{
 
-            // CBV Per Batch
-            cbvSrvHandle[1].ptr = m_nCbvSrvDescriptorSize;
-            m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle[0]);
+        //    // CBV Per Batch
+        //    cbvSrvHandle[1].ptr = m_nCbvSrvDescriptorSize;
+        //    m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle[0]);
 
-            // select which vertex buffer(s) to use
-            m_pCommandList->IASetVertexBuffers(0, 2, &m_VertexBufferView[i * 2]);
-            // select which index buffer to use
-            m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
+        //    // select which vertex buffer(s) to use
+        //    m_pCommandList->IASetVertexBuffers(0, 2, &m_VertexBufferView[i * 2]);
+        //    // select which index buffer to use
+        //    m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
 
-            // draw the vertex buffer to the back buffer
-            m_pCommandList->DrawIndexedInstanced(dbc.count, 1, 0, 0, 0);
-            i++;
-        }
+        //    // draw the vertex buffer to the back buffer
+        //    m_pCommandList->DrawIndexedInstanced(dbc.count, 1, 0, 0, 0);
+        //    i++;
+        //}
+         
+		for (auto dbc : m_DrawBatchContext)
+		{
+
+		    // CBV Per Batch
+		    cbvSrvHandle[1].ptr = m_nCbvSrvDescriptorSize;
+		    m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle[0]);
+
+		    // select which vertex buffer(s) to use
+		    m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView[i]);
+		    // select which index buffer to use
+		    m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
+
+		    // draw the vertex buffer to the back buffer
+		    m_pCommandList->DrawIndexedInstanced(dbc.count, 1, 0, 0, 0);
+		    i++;
+		}
 
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;

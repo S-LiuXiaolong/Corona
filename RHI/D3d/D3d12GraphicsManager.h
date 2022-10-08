@@ -8,6 +8,7 @@
 #include "GraphicsManager.h"
 #include "Buffer.h"
 #include "Image.h"
+#include "glTFSceneObject.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -30,8 +31,10 @@ namespace Corona
         HRESULT CreateSamplerBuffer();
         HRESULT CreateTextureBuffer();
         HRESULT CreateConstantBuffer();
-        HRESULT CreateIndexBuffer(const Buffer& buffer);
-        HRESULT CreateVertexBuffer(const Buffer& buffer);
+        // HRESULT CreateIndexBuffer(const Buffer& buffer);
+        // HRESULT CreateVertexBuffer(const Buffer& buffer);
+        HRESULT CreateVertexBuffer(std::vector<VertexBasicAttribs>& v_property_array);
+        HRESULT CreateIndexBuffer(std::vector<uint32_t>& index_array);
         HRESULT CreateRootSignature();
         HRESULT WaitForPreviousFrame();
         HRESULT PopulateCommandList();
@@ -71,7 +74,7 @@ namespace Corona
         uint32_t                        m_nRtvDescriptorSize;
         uint32_t                        m_nCbvSrvDescriptorSize;
 
-        std::vector<ID3D12Resource*>    m_VertexBuffers;                          // the pointer to the vertex buffer
+        std::vector<ID3D12Resource*>    m_Buffers;                          // the pointer to the vertex buffer
         std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_VertexBufferView;                 // a view of the vertex buffer
         std::vector<D3D12_INDEX_BUFFER_VIEW>        m_IndexBufferView;                  // a view of the vertex buffer
         ID3D12Resource*                 m_pTextureBuffer = nullptr;         // the pointer to the texture buffer

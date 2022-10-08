@@ -39,6 +39,8 @@ namespace Corona
         SceneObjectTypePrimitive = "PRIM"_i32,
         SceneObjectTypeMesh = "MESH"_i32,
         SceneObjectTypeCamera = "CAMR"_i32,
+        SceneObjectTypeVertexArray = "VARR"_i32,
+        SceneObjectTypeIndexArray = "VARR"_i32
     };
 
     std::ostream &operator<<(std::ostream &out, SceneObjectType type);
@@ -87,7 +89,11 @@ namespace Corona
         friend std::ostream &operator<<(std::ostream &out, const BaseSceneObject &obj);
     };
 
-    struct Model;
+    // class SceneObjectVertexArray
+    // {
+    //     
+    // };
+
     class SceneObjectPrimitive : public BaseSceneObject
     {
         // To be rewrite to add vertexBuffer and indexBuffer here.

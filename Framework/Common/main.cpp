@@ -37,7 +37,8 @@ int main(int argc, char** argv)
 		return ret;
 	}
 
-	while (!g_pApp->IsQuit()) {
+	while (!g_pApp->IsQuit()) 
+	{
 		g_pApp->Tick();
         g_pMemoryManager->Tick();
         g_pAssetLoader->Tick();
