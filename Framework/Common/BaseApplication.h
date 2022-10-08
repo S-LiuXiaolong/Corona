@@ -5,6 +5,7 @@
 #include "MemoryManager.h"
 #include "AssetLoader.h"
 #include "SceneManager.h"
+#include "InputManager.h"
 
 namespace Corona
 {
