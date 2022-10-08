@@ -123,11 +123,12 @@ namespace Corona
                     looping = false;
                 }
                 fullPath.append(name);
-#ifdef DEBUG
+#ifdef _DEBUG
                 fprintf(stderr, "Trying to open %s\n", fullPath.c_str());
 #endif
                 switch(mode) 
                 {
+                    // TODO
                     case MY_OPEN_TEXT:
 #ifdef UNIX
                     fp = fopen(fullPath.c_str(), "r");
@@ -160,7 +161,10 @@ namespace Corona
             size_t length = GetSize(fp);
 
             pBuff = new Buffer(length + 1);
-            fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
+            length = fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
+#ifdef _DEBUG
+        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, (int)length);
+#endif
             pBuff->m_pData[length] = '\0';
 
             CloseFile(fp);
@@ -168,10 +172,6 @@ namespace Corona
             fprintf(stderr, "Error opening file '%s'\n", filePath);
             pBuff = new Buffer();
         }
-
-#ifdef DEBUG
-        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, length);
-#endif
 
         return *pBuff;
     }
@@ -185,17 +185,15 @@ namespace Corona
             size_t length = GetSize(fp);
 
             pBuff = new Buffer(length);
-            fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
-
+            length = fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
+#ifdef _DEBUG
+        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, (int)length);
+#endif
             CloseFile(fp);
         } else {
             fprintf(stderr, "Error opening file '%s'\n", filePath);
             pBuff = new Buffer();
         }
-
-#ifdef DEBUG
-        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, length);
-#endif
 
         return *pBuff;
     }
@@ -228,11 +226,6 @@ namespace Corona
         }
 
         sz = fread(buf.m_pData, buf.m_szSize, 1, static_cast<FILE*>(fp));
-
-
-    #ifdef DEBUG
-        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, length);
-    #endif
 
         return sz;
     }

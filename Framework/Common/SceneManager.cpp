@@ -22,10 +22,11 @@ namespace Corona
     {
     }
 
-    void SceneManager::LoadScene(std::string scene_file_name)
+    int SceneManager::LoadScene(std::string scene_file_name)
     {
         // now we only has gltf scene parser, call it directly
         LoadGltfScene(scene_file_name);
+        return 0;
     }
 
     const Scene& SceneManager::GetSceneForRendering()

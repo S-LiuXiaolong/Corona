@@ -58,4 +58,10 @@ IF(WIN32)
     endforeach(SHADER)
 ENDIF(WIN32)
 
+add_custom_command(TARGET Engine_Asset_Shaders
+                   COMMAND ${CMAKE_COMMAND} -E 
+                   copy_directory ${PROJECT_BINARY_DIR}/Asset/Shaders/HLSL ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL)
+
+
+
     

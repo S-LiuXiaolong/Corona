@@ -15,7 +15,7 @@ namespace Corona
 
         virtual void Tick();
 
-        void LoadScene(std::string scene_file_name);
+        int LoadScene(std::string scene_file_name);
 
         const Scene& GetSceneForRendering();
 

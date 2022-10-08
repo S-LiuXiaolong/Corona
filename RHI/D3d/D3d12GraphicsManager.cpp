@@ -46,170 +46,6 @@ namespace Corona
         *ppAdapter = pAdapter;
     }
 
-    // // ******************************************
-    // // following utility code copied from
-    // // d3dx12.h
-    // // MIT license
-    // // Original licensed as following:
-
-    // //*********************************************************
-    // //
-    // // Copyright (c) Microsoft. All rights reserved.
-    // // This code is licensed under the MIT License (MIT).
-    // // THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-    // // ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-    // // IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-    // // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-    // //
-    // //*********************************************************
-
-    // //------------------------------------------------------------------------------------------------
-    // // Row-by-row memcpy
-    // inline void MemcpySubresource(
-    // 	_In_ const D3D12_MEMCPY_DEST* pDest,
-    // 	_In_ const D3D12_SUBRESOURCE_DATA* pSrc,
-    // 	SIZE_T RowSizeInBytes,
-    // 	UINT NumRows,
-    // 	UINT NumSlices)
-    // {
-    // 	for (UINT z = 0; z < NumSlices; ++z)
-    // 	{
-    // 		BYTE* pDestSlice = reinterpret_cast<BYTE*>(pDest->pData) + pDest->SlicePitch * z;
-    // 		const BYTE* pSrcSlice = reinterpret_cast<const BYTE*>(pSrc->pData) + pSrc->SlicePitch * z;
-    // 		for (UINT y = 0; y < NumRows; ++y)
-    // 		{
-    // 			memcpy(pDestSlice + pDest->RowPitch * y,
-    // 				pSrcSlice + pSrc->RowPitch * y,
-    // 				RowSizeInBytes);
-    // 		}
-    // 	}
-    // }
-
-    // //------------------------------------------------------------------------------------------------
-    // // All arrays must be populated (e.g. by calling GetCopyableFootprints)
-    // inline UINT64 UpdateSubresources(
-    // 	_In_ ID3D12GraphicsCommandList* pCmdList,
-    // 	_In_ ID3D12Resource* pDestinationResource,
-    // 	_In_ ID3D12Resource* pIntermediate,
-    // 	_In_range_(0, D3D12_REQ_SUBRESOURCES) UINT FirstSubresource,
-    // 	_In_range_(0, D3D12_REQ_SUBRESOURCES - FirstSubresource) UINT NumSubresources,
-    // 	UINT64 RequiredSize,
-    // 	_In_reads_(NumSubresources) const D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts,
-    // 	_In_reads_(NumSubresources) const UINT* pNumRows,
-    // 	_In_reads_(NumSubresources) const UINT64* pRowSizesInBytes,
-    // 	_In_reads_(NumSubresources) const D3D12_SUBRESOURCE_DATA* pSrcData)
-    // {
-    // 	// Minor validation
-    // 	D3D12_RESOURCE_DESC IntermediateDesc = pIntermediate->GetDesc();
-    // 	D3D12_RESOURCE_DESC DestinationDesc = pDestinationResource->GetDesc();
-    // 	if (IntermediateDesc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER ||
-    // 		IntermediateDesc.Width < RequiredSize + pLayouts[0].Offset ||
-    // 		RequiredSize >(SIZE_T) - 1 ||
-    // 		(DestinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER &&
-    // 		(FirstSubresource != 0 || NumSubresources != 1)))
-    // 	{
-    // 		return 0;
-    // 	}
-
-    // 	BYTE* pData;
-    // 	HRESULT hr = pIntermediate->Map(0, NULL, reinterpret_cast<void**>(&pData));
-    // 	if (FAILED(hr))
-    // 	{
-    // 		return 0;
-    // 	}
-
-    // 	for (UINT i = 0; i < NumSubresources; ++i)
-    // 	{
-    // 		if (pRowSizesInBytes[i] >(SIZE_T)-1) return 0;
-    // 		D3D12_MEMCPY_DEST DestData = { pData + pLayouts[i].Offset, pLayouts[i].Footprint.RowPitch, pLayouts[i].Footprint.RowPitch * pNumRows[i] };
-    // 		MemcpySubresource(&DestData, &pSrcData[i], (SIZE_T)pRowSizesInBytes[i], pNumRows[i], pLayouts[i].Footprint.Depth);
-    // 	}
-    // 	pIntermediate->Unmap(0, NULL);
-
-    // 	if (DestinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
-    // 	{
-    // 		pCmdList->CopyBufferRegion(
-    // 			pDestinationResource, 0, pIntermediate, pLayouts[0].Offset, pLayouts[0].Footprint.Width);
-    // 	}
-    // 	else
-    // 	{
-    // 		for (UINT i = 0; i < NumSubresources; ++i)
-    // 		{
-    // 			D3D12_TEXTURE_COPY_LOCATION Dst = { pDestinationResource, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, i + FirstSubresource };
-    // 			D3D12_TEXTURE_COPY_LOCATION Src = { pIntermediate, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, pLayouts[i] };
-    // 			pCmdList->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);
-    // 		}
-    // 	}
-    // 	return RequiredSize;
-    // }
-
-    // //------------------------------------------------------------------------------------------------
-    // // Heap-allocating UpdateSubresources implementation
-    // inline UINT64 UpdateSubresources(
-    // 	_In_ ID3D12GraphicsCommandList* pCmdList,
-    // 	_In_ ID3D12Resource* pDestinationResource,
-    // 	_In_ ID3D12Resource* pIntermediate,
-    // 	UINT64 IntermediateOffset,
-    // 	_In_range_(0, D3D12_REQ_SUBRESOURCES) UINT FirstSubresource,
-    // 	_In_range_(0, D3D12_REQ_SUBRESOURCES - FirstSubresource) UINT NumSubresources,
-    // 	_In_reads_(NumSubresources) D3D12_SUBRESOURCE_DATA* pSrcData)
-    // {
-    // 	UINT64 RequiredSize = 0;
-    // 	UINT64 MemToAlloc = static_cast<UINT64>(sizeof(D3D12_PLACED_SUBRESOURCE_FOOTPRINT) + sizeof(UINT) + sizeof(UINT64)) * NumSubresources;
-    // 	if (MemToAlloc > SIZE_MAX)
-    // 	{
-    // 		return 0;
-    // 	}
-    // 	void* pMem = HeapAlloc(GetProcessHeap(), 0, static_cast<SIZE_T>(MemToAlloc));
-    // 	if (pMem == NULL)
-    // 	{
-    // 		return 0;
-    // 	}
-    // 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts = reinterpret_cast<D3D12_PLACED_SUBRESOURCE_FOOTPRINT*>(pMem);
-    // 	UINT64* pRowSizesInBytes = reinterpret_cast<UINT64*>(pLayouts + NumSubresources);
-    // 	UINT* pNumRows = reinterpret_cast<UINT*>(pRowSizesInBytes + NumSubresources);
-
-    // 	D3D12_RESOURCE_DESC Desc = pDestinationResource->GetDesc();
-    // 	ID3D12Device* pDevice;
-    // 	pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
-    // 	pDevice->GetCopyableFootprints(&Desc, FirstSubresource, NumSubresources, IntermediateOffset, pLayouts, pNumRows, pRowSizesInBytes, &RequiredSize);
-    // 	SafeRelease(&pDevice);
-
-    // 	UINT64 Result = UpdateSubresources(pCmdList, pDestinationResource, pIntermediate, FirstSubresource, NumSubresources, RequiredSize, pLayouts, pNumRows, pRowSizesInBytes, pSrcData);
-    // 	HeapFree(GetProcessHeap(), 0, pMem);
-    // 	return Result;
-    // }
-
-    // //------------------------------------------------------------------------------------------------
-    // // Stack-allocating UpdateSubresources implementation
-    // template <UINT MaxSubresources>
-    // inline UINT64 UpdateSubresources(
-    // 	_In_ ID3D12GraphicsCommandList* pCmdList,
-    // 	_In_ ID3D12Resource* pDestinationResource,
-    // 	_In_ ID3D12Resource* pIntermediate,
-    // 	UINT64 IntermediateOffset,
-    // 	_In_range_(0, MaxSubresources) UINT FirstSubresource,
-    // 	_In_range_(1, MaxSubresources - FirstSubresource) UINT NumSubresources,
-    // 	_In_reads_(NumSubresources) D3D12_SUBRESOURCE_DATA* pSrcData)
-    // {
-    // 	UINT64 RequiredSize = 0;
-    // 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT Layouts[MaxSubresources];
-    // 	UINT NumRows[MaxSubresources];
-    // 	UINT64 RowSizesInBytes[MaxSubresources];
-
-    // 	D3D12_RESOURCE_DESC Desc = pDestinationResource->GetDesc();
-    // 	ID3D12Device* pDevice;
-    // 	pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
-    // 	pDevice->GetCopyableFootprints(&Desc, FirstSubresource, NumSubresources, IntermediateOffset, Layouts, NumRows, RowSizesInBytes, &RequiredSize);
-    // 	SafeRelease(&pDevice);
-
-    // 	return UpdateSubresources(pCmdList, pDestinationResource, pIntermediate, FirstSubresource, NumSubresources, RequiredSize, Layouts, NumRows, RowSizesInBytes, pSrcData);
-    // }
-
-    // // ************************************************
-    // // Code copied from d3dx12.h finished here
-    // // ************************************************
-
     HRESULT D3d12GraphicsManager::WaitForPreviousFrame() {
         // WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
         // This is code implemented as such for simplicity. More advanced samples 
@@ -385,6 +221,7 @@ namespace Corona
         resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
         resourceDesc.Alignment = 0;
         // size in byte of resource
+        // TODO
         resourceDesc.Width = v_property_array.size() * 10 * 4;
         resourceDesc.Height = 1;
         resourceDesc.DepthOrArraySize = 1;
@@ -443,8 +280,9 @@ namespace Corona
         // initialize the vertex buffer view
         D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
         vertexBufferView.BufferLocation = pVertexBuffer->GetGPUVirtualAddress();
+        // TODO
         vertexBufferView.StrideInBytes = 10 * 4;
-        vertexBufferView.SizeInBytes = v_property_array.size() * 10 * 4;
+        vertexBufferView.SizeInBytes = (UINT)v_property_array.size() * 10 * 4;
         m_VertexBufferView.push_back(vertexBufferView);
 
         m_Buffers.push_back(pVertexBuffer);
@@ -533,7 +371,7 @@ namespace Corona
         m_Buffers.push_back(pIndexBufferUploadHeap);
 
         DrawBatchContext dbc;
-        dbc.count = index_array.size();
+        dbc.count = (int32_t)index_array.size();
         m_DrawBatchContext.push_back(std::move(dbc));
 
         return hr;
@@ -826,13 +664,6 @@ namespace Corona
         psod.pRootSignature = m_pRootSignature;
         psod.VS             = vertexShaderByteCode;
         psod.PS             = pixelShaderByteCode;
-//         ComPtr<ID3DBlob> VS;
-//         ComPtr<ID3DBlob> PS;
-//         UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;;
-//         D3DCompileFromFile(L"../../../Asset/Shaders/HLSL/default.hlsl", nullptr, nullptr, "VS", "vs_5_0", compileFlags, 0, VS.GetAddressOf(), nullptr);
-//         D3DCompileFromFile(L"../../../Asset/Shaders/HLSL/default.hlsl", nullptr, nullptr, "PS", "ps_5_0", compileFlags, 0, PS.GetAddressOf(), nullptr);
-//         psod.VS = CD3DX12_SHADER_BYTECODE(VS.Get());
-//         psod.PS = CD3DX12_SHADER_BYTECODE(PS.Get());
         psod.BlendState     = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
         psod.SampleMask     = UINT_MAX;
         psod.RasterizerState= CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);

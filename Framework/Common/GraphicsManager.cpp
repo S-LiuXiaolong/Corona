@@ -94,6 +94,7 @@ namespace Corona
 
     void GraphicsManager::CalculateCameraMatrix()
     {
+        // TODO
         auto& scene = g_pSceneManager->GetSceneForRendering();
         // auto pCameraNode = scene.GetFirstCamera();
         // if (pCameraNode)
@@ -113,7 +114,7 @@ namespace Corona
         BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
-        float nearClipDistance = 1.0f;
+        float nearClipDistance = 0.1f;
         float farClipDistance = 100.0f;
 
         // if (pCameraNode) 
@@ -140,6 +141,7 @@ namespace Corona
 
     void GraphicsManager::CalculateLights()
     {
+        // TODO
         auto& scene = g_pSceneManager->GetSceneForRendering();
         // auto pLightNode = scene.GetFirstLight();
         // if (pLightNode) 
