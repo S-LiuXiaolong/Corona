@@ -137,6 +137,8 @@ namespace Corona
 				BasicAttribs.pos = Vector3f{ bufferPos + v * posStride };
 				BasicAttribs.normal = bufferNormals != nullptr ? normalize(Vector3f{ bufferNormals + v * normalsStride }) : Vector3f{};
 				// BasicAttribs.normal = bufferNormals != nullptr ? Vector3f{ bufferNormals + v * normalsStride } : Vector3f{};
+                // ?
+                BasicAttribs.tangent = bufferTangents != nullptr ? Vector3f{ bufferTangents + v * tangentsStride } : Vector3f{};
 				BasicAttribs.uv0 = bufferTexCoordSet0 != nullptr ? Vector2f{ bufferTexCoordSet0 + v * texCoordSet0Stride } : Vector2f{};
 				BasicAttribs.uv1 = bufferTexCoordSet1 != nullptr ? Vector2f{ bufferTexCoordSet1 + v * texCoordSet1Stride } : Vector2f{};
 
