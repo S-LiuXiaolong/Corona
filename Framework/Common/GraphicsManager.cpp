@@ -148,22 +148,40 @@ namespace Corona
         //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
         // 
 		// Attention
-//         if (((int)(mPhi / PI) & 1) == 0)
-//         {
-// 			position.x = mRadius * sinf(mPhi) * cosf(mTheta);
-// 			position.y = mRadius * sinf(mPhi) * sinf(mTheta);
-//         }
-//         else
-//         {
-// 			position.x = mRadius * sinf(-mPhi) * cosf(mTheta);
-// 			position.y = mRadius * sinf(-mPhi) * sinf(mTheta);
-//         }
+        Vector3f mUp = up;
+        if (mPhi >= 0)
+        {
+			if (((int)(mPhi / PI) & 1) == 0)
+			{
+
+			}
+			else
+			{
+				mUp.x *= -1;
+				mUp.y *= -1;
+				mUp.z *= -1;
+			}
+        }
+        else
+        {
+			if (((int)(mPhi / PI) & 1) == 0)
+			{
+				mUp.x *= -1;
+				mUp.y *= -1;
+				mUp.z *= -1;
+			}
+			else
+			{
+
+			}
+        }
+
 		position.x = mRadius * sinf(mPhi) * cosf(mTheta);
 		position.y = mRadius * sinf(mPhi) * sinf(mTheta);
 		position.z = mRadius * cosf(mPhi);
 
         m_DrawFrameContext.m_cameraPosition = Vector4f(position, 1.0f);
-		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+		BuildViewMatrix(m_viewMatrix, position, lookAt, mUp);
 		// Build the perspective projection matrix.
 		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
 
@@ -245,6 +263,7 @@ namespace Corona
 	void GraphicsManager::CameraRotateX(float radians)
 	{
         mPhi += radians;
+        // mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
 	}
 
 	void GraphicsManager::CameraRotateZ(float radians)
@@ -278,10 +297,30 @@ namespace Corona
 		float dy = (0.05f * static_cast<float>(y - mLastMousePos_y)) * PI / 180;
 
 		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi -= dy;
+		if (mPhi >= 0)
+		{
+			if (((int)(mPhi / PI) & 1) == 0)
+			{
+                mTheta += dx;
+			}
+			else
+			{
+                mTheta -= dx;
+			}
 
-        mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
+		}
+		else
+		{
+			if (((int)(-mPhi / PI) & 1) == 0)
+			{
+				mTheta -= dx;
+			}
+			else
+			{
+				mTheta += dx;
+			}
+		}
+		mPhi -= dy;
 	}
 
 	void GraphicsManager::OnMouseMoveR(int x, int y)
