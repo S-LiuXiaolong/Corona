@@ -17,6 +17,13 @@ struct Light
 	float4   m_lightColor;
 };
 
+struct Material
+{
+	float4 DiffuseAlbedo;
+    float3 FresnelR0;
+    float Shininess;
+};
+
 // ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)
 cbuffer PerFrameConstants : register(b0)
 {
@@ -30,6 +37,7 @@ cbuffer PerFrameConstants : register(b0)
 	// Light    m_lights[MaxLights];
 	float4   m_lightPosition;
 	float4   m_lightColor;
+	float4   m_cameraPosition;
 };
 
 // cbuffer PerBatchConstants : register(b1)
@@ -47,10 +55,11 @@ cbuffer PerFrameConstants : register(b0)
 
 struct default_vert_output
 {
-    float4 Position     : SV_POSITION;
-    //float2 TextureUV    : TEXCOORD0;
-	float3 vNorm		: TEXCOORD0;
-	float3 vLightDir	: TEXCOORD1;
+    float4 Position      : SV_POSITION;
+	float4 WorldPosition : POSITION;
+    //float2 TextureUV     : TEXCOORD0;
+	float3 vNorm		 : TEXCOORD0;
+	float3 vLightDir	 : TEXCOORD1;
 };
 
 #endif // !__VSOUTPUT_H__

@@ -85,7 +85,7 @@ namespace Corona
 #ifdef _DEBUG
 		cerr << "[InputManager] W Key Down!" << endl;
 #endif
-		// position.x = mRadius*sinf(mPhi)*cosf(mTheta);Y(-0.2f);
+		g_pGraphicsManager->WorldRotateX(PI / 60.0f);
 	}
 
 	void InputManager::WKeyUp()
@@ -100,7 +100,7 @@ namespace Corona
 #ifdef _DEBUG
 		cerr << "[InputManager] S Key Down!" << endl;
 #endif
-		// position.x = mRadius*sinf(mPhi)*cosf(mTheta);Y(0.2f);
+		g_pGraphicsManager->WorldRotateX(-PI / 60.0f);
 	}
 
 	void InputManager::SKeyUp()
@@ -115,7 +115,7 @@ namespace Corona
 #ifdef _DEBUG
 		cerr << "[InputManager] A Key Down!" << endl;
 #endif
-		// position.x = mRadius*sinf(mPhi)*cosf(mTheta);X(0.2f);
+		g_pGraphicsManager->WorldRotateY(-PI / 60.0f);
 	}
 
 	void InputManager::AKeyUp()
@@ -130,7 +130,7 @@ namespace Corona
 #ifdef _DEBUG
 		cerr << "[InputManager] D Key Down!" << endl;
 #endif
-		// position.x = mRadius*sinf(mPhi)*cosf(mTheta);X(-0.2f);
+		g_pGraphicsManager->WorldRotateY(PI / 60.0f);
 	}
 
 	void InputManager::DKeyUp()
@@ -140,12 +140,42 @@ namespace Corona
 #endif
 	}
 
+	void InputManager::QKeyDown()
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] Q Key Down!" << endl;
+#endif
+		g_pGraphicsManager->WorldRotateZ(PI / 60.0f);
+	}
+
+	void InputManager::QKeyUp()
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] Q Key Up!" << endl;
+#endif
+	}
+
+	void InputManager::EKeyDown()
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] E Key Down!" << endl;
+#endif
+		g_pGraphicsManager->WorldRotateZ(-PI / 60.0f);
+	}
+
+	void InputManager::EKeyUp()
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] E Key Up!" << endl;
+#endif
+	}
+
 	void InputManager::IKeyDown()
 	{
 #ifdef _DEBUG
 		cerr << "[InputManager] I Key Down!" << endl;
 #endif
-		g_pGraphicsManager->CameraRotateY(0.2f);
+		g_pGraphicsManager->CameraRotateZ(0.2f);
 	}
 
 	void InputManager::IKeyUp()
@@ -158,7 +188,7 @@ namespace Corona
 #ifdef _DEBUG
 		cerr << "[InputManager] K Key Down!" << endl;
 #endif
-		g_pGraphicsManager->CameraRotateY(-0.2f);
+		g_pGraphicsManager->CameraRotateZ(-0.2f);
 	}
 
 	void InputManager::KKeyUp()
@@ -190,6 +220,30 @@ namespace Corona
 	void InputManager::LKeyUp()
 	{
 
+	}
+
+	void InputManager::OnMouseDown(int x, int y)
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] Mouse Down!" << endl;
+#endif
+		g_pGraphicsManager->OnMouseDown(x, y);
+	}
+
+	void InputManager::OnMouseMoveL(int x, int y)
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] Move While Mouse L Button Down!" << endl;
+#endif
+		g_pGraphicsManager->OnMouseMoveL(x, y);
+	}
+
+	void InputManager::OnMouseMoveR(int x, int y)
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] Move While Mouse R Button Down!" << endl;
+#endif
+		g_pGraphicsManager->OnMouseMoveR(x, y);
 	}
 
 }

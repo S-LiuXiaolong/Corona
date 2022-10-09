@@ -28,6 +28,10 @@ namespace Corona
             void AKeyUp();
             void DKeyDown();
             void DKeyUp();
+            void QKeyDown();
+            void QKeyUp();
+			void EKeyDown();
+			void EKeyUp();
 
 			void IKeyDown();
 			void IKeyUp();
@@ -37,6 +41,10 @@ namespace Corona
 			void JKeyUp();
 			void LKeyDown();
 			void LKeyUp();
+
+			void OnMouseDown(int x, int y);
+			void OnMouseMoveL(int x, int y);
+			void OnMouseMoveR(int x, int y);
 
     };
 

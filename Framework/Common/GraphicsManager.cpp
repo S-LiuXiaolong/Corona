@@ -146,9 +146,23 @@ namespace Corona
 //         // Build the perspective projection matrix.
 //         BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
+        // 
+		// Attention
+//         if (((int)(mPhi / PI) & 1) == 0)
+//         {
+// 			position.x = mRadius * sinf(mPhi) * cosf(mTheta);
+// 			position.y = mRadius * sinf(mPhi) * sinf(mTheta);
+//         }
+//         else
+//         {
+// 			position.x = mRadius * sinf(-mPhi) * cosf(mTheta);
+// 			position.y = mRadius * sinf(-mPhi) * sinf(mTheta);
+//         }
 		position.x = mRadius * sinf(mPhi) * cosf(mTheta);
-		position.z = mRadius * sinf(mPhi) * sinf(mTheta);
-		position.y = mRadius * cosf(mPhi);
+		position.y = mRadius * sinf(mPhi) * sinf(mTheta);
+		position.z = mRadius * cosf(mPhi);
+
+        m_DrawFrameContext.m_cameraPosition = Vector4f(position, 1.0f);
 		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 		// Build the perspective projection matrix.
 		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
@@ -221,12 +235,19 @@ namespace Corona
         m_worldMatrix = m_worldMatrix * rotationMatrix;
     }
 
+	void GraphicsManager::WorldRotateZ(float radians)
+	{
+		Matrix4X4f rotationMatrix;
+		MatrixRotationZ(rotationMatrix, radians);
+		m_worldMatrix = m_worldMatrix * rotationMatrix;
+	}
+
 	void GraphicsManager::CameraRotateX(float radians)
 	{
         mPhi += radians;
 	}
 
-	void GraphicsManager::CameraRotateY(float radians)
+	void GraphicsManager::CameraRotateZ(float radians)
 	{
         mTheta += radians;
 	}
@@ -243,5 +264,29 @@ namespace Corona
         lookAt = lookAt + Vector3f(0, distance, 0);
 	}
 
+
+	void GraphicsManager::OnMouseDown(int x, int y)
+	{
+		mLastMousePos_x = x;
+		mLastMousePos_y = y;
+	}
+
+	void GraphicsManager::OnMouseMoveL(int x, int y)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = (0.05f * static_cast<float>(x - mLastMousePos_x)) * PI / 180;
+		float dy = (0.05f * static_cast<float>(y - mLastMousePos_y)) * PI / 180;
+
+		// Update angles based on input to orbit camera around box.
+		mTheta += dx;
+		mPhi -= dy;
+
+        mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
+	}
+
+	void GraphicsManager::OnMouseMoveR(int x, int y)
+	{
+
+	}
 
 }

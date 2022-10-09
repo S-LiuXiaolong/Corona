@@ -165,6 +165,12 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
                 case 'S': // VK_S
                     g_pInputManager->SKeyDown();
                     break;
+				case 'Q': // VK_W
+					g_pInputManager->QKeyDown();
+					break;
+				case 'E': // VK_S
+					g_pInputManager->EKeyDown();
+					break;
 
 				case 'J': // VK_J
 					g_pInputManager->JKeyDown();
@@ -182,6 +188,26 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
 					break;
             }
         } 
+        break;
+
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+        g_pInputManager->OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+
+	case WM_MOUSEMOVE:
+        switch (wParam)
+        {
+        case MK_LBUTTON:
+            g_pInputManager->OnMouseMoveL(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            break;
+        case MK_RBUTTON:
+            g_pInputManager->OnMouseMoveR(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            break;
+        default:
+            break;
+        }
         break;
 
         // this message is read when the window is closed
