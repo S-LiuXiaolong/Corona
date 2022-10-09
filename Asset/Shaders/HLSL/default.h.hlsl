@@ -6,7 +6,7 @@ struct a2v_default
 	float3 Position		: POSITION;
 	float3 Normal		: NORMAL;
 	float2 TextureUV	: TEXCOORD;
-    float2 MaterialUV   : MATCOORD;
+	float3 Tangent		: TANGENT;
 };
 
 // ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)

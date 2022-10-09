@@ -23,15 +23,17 @@ namespace Corona
             int UV0Access = -1;
             int UV1Access = -1;
             int NormAccess = -1;
+            int TanAccess = -1;
             // int JointAccess = -1;
             // int WeightAccess = -1;
 
             bool operator==(const ConvertedBufferViewKey &Rhs) const
             {
                 return PosAccess == Rhs.PosAccess &&
-                       UV0Access == Rhs.UV0Access &&
-                       UV1Access == Rhs.UV1Access &&
-                       NormAccess == Rhs.NormAccess;
+                    UV0Access == Rhs.UV0Access &&
+                    UV1Access == Rhs.UV1Access &&
+                    NormAccess == Rhs.NormAccess &&
+                    TanAccess == Rhs.TanAccess;
                 // JointAccess == Rhs.JointAccess &&
                 // WeightAccess == Rhs.WeightAccess;
             }
@@ -64,12 +66,14 @@ namespace Corona
 		{
 			const float* bufferPos = nullptr;
 			const float* bufferNormals = nullptr;
+            const float* bufferTangents = nullptr;
 			const float* bufferTexCoordSet0 = nullptr;
 			const float* bufferTexCoordSet1 = nullptr;
 
 			uint32_t vertexCount = 0;
 			int posStride = -1;
 			int normalsStride = -1;
+            int tangentsStride = -1;
 			int texCoordSet0Stride = -1;
 			int texCoordSet1Stride = -1;
 
@@ -102,6 +106,18 @@ namespace Corona
 
 				bufferNormals = reinterpret_cast<const float*>(&(gltf_model.buffers[normView.buffer].data[normAccessor.byteOffset + normView.byteOffset]));
 				normalsStride = normAccessor.ByteStride(normView) / tinygltf::GetComponentSizeInBytes(normAccessor.componentType);
+				// VERIFY(normalsStride > 0, "Normal stride is invalid");
+			}
+            
+			if (Key.TanAccess >= 0)
+			{
+				const tinygltf::Accessor& tanAccessor = gltf_model.accessors[Key.TanAccess];
+				const tinygltf::BufferView& tanView = gltf_model.bufferViews[tanAccessor.bufferView];
+				// VERIFY(normAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Normal component type is expected to be float");
+				// VERIFY(normAccessor.type == TINYGLTF_TYPE_VEC3, "Normal type is expected to be vec3");
+
+				bufferTangents = reinterpret_cast<const float*>(&(gltf_model.buffers[tanView.buffer].data[tanAccessor.byteOffset + tanView.byteOffset]));
+                tangentsStride = tanAccessor.ByteStride(tanView) / tinygltf::GetComponentSizeInBytes(tanAccessor.componentType);
 				// VERIFY(normalsStride > 0, "Normal stride is invalid");
 			}
 
@@ -138,9 +154,8 @@ namespace Corona
 				BasicAttribs.normal = bufferNormals != nullptr ? normalize(Vector3f{ bufferNormals + v * normalsStride }) : Vector3f{};
 				// BasicAttribs.normal = bufferNormals != nullptr ? Vector3f{ bufferNormals + v * normalsStride } : Vector3f{};
                 // ?
-                BasicAttribs.tangent = bufferTangents != nullptr ? Vector3f{ bufferTangents + v * tangentsStride } : Vector3f{};
+                BasicAttribs.tangent = bufferTangents != nullptr ? normalize(Vector3f{ bufferTangents + v * tangentsStride }): Vector3f{};
 				BasicAttribs.uv0 = bufferTexCoordSet0 != nullptr ? Vector2f{ bufferTexCoordSet0 + v * texCoordSet0Stride } : Vector2f{};
-				BasicAttribs.uv1 = bufferTexCoordSet1 != nullptr ? Vector2f{ bufferTexCoordSet1 + v * texCoordSet1Stride } : Vector2f{};
 
 				VertexBasicData.push_back(BasicAttribs);
 			}
@@ -269,6 +284,11 @@ namespace Corona
                         {
                             Key.NormAccess = primitive.attributes.find("NORMAL")->second;
                         }
+
+						if (primitive.attributes.find("TANGENT") != primitive.attributes.end())
+						{
+							Key.TanAccess = primitive.attributes.find("TANGENT")->second;
+						}
 
                         if (primitive.attributes.find("TEXCOORD_0") != primitive.attributes.end())
                         {

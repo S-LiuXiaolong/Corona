@@ -51,7 +51,7 @@ namespace Corona
         Vector3f pos;
         Vector3f normal;
         Vector2f uv0;
-        Vector2f uv1;
+        Vector3f tangent;
     };
 
     using namespace xg;

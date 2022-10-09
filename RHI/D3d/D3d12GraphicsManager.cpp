@@ -222,7 +222,7 @@ namespace Corona
         resourceDesc.Alignment = 0;
         // size in byte of resource
         // TODO
-        resourceDesc.Width = v_property_array.size() * 10 * 4;
+        resourceDesc.Width = v_property_array.size() * 11 * 4;
         resourceDesc.Height = 1;
         resourceDesc.DepthOrArraySize = 1;
         resourceDesc.MipLevels = 1;
@@ -280,9 +280,9 @@ namespace Corona
         // initialize the vertex buffer view
         D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
         vertexBufferView.BufferLocation = pVertexBuffer->GetGPUVirtualAddress();
-        // TODO
-        vertexBufferView.StrideInBytes = 10 * 4;
-        vertexBufferView.SizeInBytes = (UINT)v_property_array.size() * 10 * 4;
+        // TODO: automatically calculate stride and size
+        vertexBufferView.StrideInBytes = 11 * 4;
+        vertexBufferView.SizeInBytes = (UINT)v_property_array.size() * 11 * 4;
         m_VertexBufferView.push_back(vertexBufferView);
 
         m_Buffers.push_back(pVertexBuffer);
@@ -619,10 +619,11 @@ namespace Corona
         // create the input layout object
         D3D12_INPUT_ELEMENT_DESC ied[] =
         {
+            // Attention: you cannot change here without changing VertexBuffer and VertexBufferView (in function CreateVertexBuffer)
             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-            {"MATCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+            {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
         };
 
         D3D12_RASTERIZER_DESC rsd = { D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_BACK, TRUE, D3D12_DEFAULT_DEPTH_BIAS, D3D12_DEFAULT_DEPTH_BIAS_CLAMP,
