@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "glTFSceneObject.h"
+#include "glTFSceneNode.h"
 #include "tinyglTF/tiny_gltf.h"
 #include "SceneParser.h"
 

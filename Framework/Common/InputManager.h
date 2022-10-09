@@ -18,6 +18,26 @@ namespace Corona
             void LeftArrowKeyUp();
             void RightArrowKeyDown();
             void RightArrowKeyUp();
+
+            // TODO: very dumb way
+            void WKeyDown();
+            void WKeyUp();
+            void SKeyDown();
+            void SKeyUp();
+            void AKeyDown();
+            void AKeyUp();
+            void DKeyDown();
+            void DKeyUp();
+
+			void IKeyDown();
+			void IKeyUp();
+			void KKeyDown();
+			void KKeyUp();
+			void JKeyDown();
+			void JKeyUp();
+			void LKeyDown();
+			void LKeyUp();
+
     };
 
     extern InputManager* g_pInputManager;

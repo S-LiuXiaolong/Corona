@@ -7,7 +7,7 @@
 #include "GraphicsManager.h"
 #include "Buffer.h"
 #include "Image.h"
-#include "glTFSceneObject.h"
+#include "glTFSceneNode.h"
 
 using Microsoft::WRL::ComPtr;
 

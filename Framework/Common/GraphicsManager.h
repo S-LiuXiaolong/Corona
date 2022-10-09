@@ -21,6 +21,11 @@ namespace Corona
         void WorldRotateX(float radians);
         void WorldRotateY(float radians);
 
+		void CameraRotateX(float radians);
+		void CameraRotateY(float radians);
+        void CameraTranslationX(float distance);
+        void CameraTranslationY(float distance);
+
     protected:
         bool SetPerFrameShaderParameters();
         bool SetPerBatchShaderParameters(const char* paramName, const Matrix4X4f& param);
@@ -38,19 +43,32 @@ namespace Corona
     protected:
         struct DrawFrameContext 
         {
-//             Matrix4X4f  m_worldMatrix;
+            Matrix4X4f  m_worldMatrix;
 //             Matrix4X4f  m_viewMatrix;
 //             Matrix4X4f  m_projectionMatrix;
             Matrix4X4f  m_worldViewMatrix;
             Matrix4X4f  m_worldViewProjectionMatrix;
-//             Vector3f    m_lightPosition;
-//             Vector4f    m_lightColor;
+            Vector3f    m_lightPosition;
+            Vector4f    m_lightColor;
         };
 
         DrawFrameContext    m_DrawFrameContext;
         Matrix4X4f m_worldMatrix;
         Matrix4X4f m_viewMatrix;
         Matrix4X4f m_projectionMatrix;
+
+        Vector3f position, lookAt, up;
+        float fieldOfView;
+		float nearClipDistance;
+		float farClipDistance;
+		float screenAspect;
+
+        float mTheta = 0.0f;
+        float mPhi = 0.0f;
+        float mRadius = 3.0f;
+
+        float mLastMousePos_x;
+        float mLastMousePos_y;
     };
 
     extern GraphicsManager* g_pGraphicsManager;

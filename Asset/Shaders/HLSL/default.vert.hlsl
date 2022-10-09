@@ -9,8 +9,8 @@ default_vert_output default_vert_main(a2v_default input)
 	// output.vPosInView = (mul(mul(float4(input.Position.xyz, 1.0f), m_worldMatrix), m_viewMatrix)).xyz;
 
 	output.Position = mul(float4(input.Position, 1.0f), m_worldViewProjectionMatrix);
-	float3 vN = (mul(float4(input.Normal, 0.0f), m_worldViewMatrix)).xyz;
-	output.vPosInView = (mul(float4(input.Position.xyz, 1.0f), m_worldViewMatrix)).xyz;
+	float3 vN = (mul(float4(input.Normal, 0.0f), m_worldMatrix)).xyz;
+	// output.vPosInView = (mul(float4(input.Position.xyz, 1.0f), m_worldViewMatrix)).xyz;
 
 	output.vNorm = vN;
 

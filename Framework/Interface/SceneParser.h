@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include "Interface.h"
-#include "glTFSceneObject.h"
+#include "glTFSceneNode.h"
 #include "Scene.h"
 
 namespace Corona

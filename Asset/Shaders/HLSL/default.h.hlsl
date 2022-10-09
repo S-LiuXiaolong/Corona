@@ -1,6 +1,8 @@
 #ifndef __STDCBUFFER_H__
 #define __STDCBUFFER_H__
 
+#define MaxLights 16
+
 struct a2v_default
 {
 	float3 Position		: POSITION;
@@ -9,16 +11,25 @@ struct a2v_default
 	float3 Tangent		: TANGENT;
 };
 
+struct Light
+{
+	float4   m_lightPosition;
+	float4   m_lightColor;
+};
+
 // ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)
 cbuffer PerFrameConstants : register(b0)
 {
-    // float4x4 m_worldMatrix;
+    float4x4 m_worldMatrix;
 	// float4x4 m_viewMatrix;
 	// float4x4 m_projectionMatrix;
 	float4x4 m_worldViewMatrix;
 	float4x4 m_worldViewProjectionMatrix; // this 5 matrix cannot live together
-	// float4   m_lightPosition;
-	// float4   m_lightColor;
+
+	// try multi-lights
+	// Light    m_lights[MaxLights];
+	float4   m_lightPosition;
+	float4   m_lightColor;
 };
 
 // cbuffer PerBatchConstants : register(b1)
@@ -38,8 +49,8 @@ struct default_vert_output
 {
     float4 Position     : SV_POSITION;
     //float2 TextureUV    : TEXCOORD0;
-	float3 vNorm		: TEXCOORD2;
-	float3 vPosInView	: TEXCOORD3;
+	float3 vNorm		: TEXCOORD0;
+	float3 vLightDir	: TEXCOORD1;
 };
 
 #endif // !__VSOUTPUT_H__

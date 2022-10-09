@@ -82,6 +82,19 @@ namespace Corona
     {
         // Initialize the world/model matrix to the identity matrix.
         BuildIdentityMatrix(m_worldMatrix);
+		// use default build-in camera
+        position.x = mRadius*sinf(mPhi)*cosf(mTheta);
+        position.z = mRadius*sinf(mPhi)*sinf(mTheta);
+        position.y = mRadius*cosf(mPhi);
+        lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+
+		fieldOfView = PI / 2.0f;
+		nearClipDistance = 0.1f;
+		farClipDistance = 100.0f;
+
+		const GfxConfiguration& conf = g_pApp->GetConfiguration();
+
+		screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
     }
 
     bool GraphicsManager::InitializeShader(const char* vsFilename, const char* fsFilename)
@@ -109,30 +122,38 @@ namespace Corona
         //     BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
         // }
 
-        // use default build-in camera
-        Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
-        BuildViewMatrix(m_viewMatrix, position, lookAt, up);
-
-        float fieldOfView = PI / 2.0f;
-        float nearClipDistance = 0.1f;
-        float farClipDistance = 100.0f;
-
-        // if (pCameraNode) 
-        // {
-        //     auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
-        //     // Set the field of view and screen aspect ratio.
-        //     fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
-        //     nearClipDistance = pCamera->GetNearClipDistance();
-        //     farClipDistance = pCamera->GetFarClipDistance();
-        // }
-
-        const GfxConfiguration& conf = g_pApp->GetConfiguration();
-
-        float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
-
-        // Build the perspective projection matrix.
-        BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+//         // use default build-in camera
+//         Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+//         BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+// 
+//         float fieldOfView = PI / 2.0f;
+//         float nearClipDistance = 0.1f;
+//         float farClipDistance = 100.0f;
+// 
+//         // if (pCameraNode) 
+//         // {
+//         //     auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
+//         //     // Set the field of view and screen aspect ratio.
+//         //     fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
+//         //     nearClipDistance = pCamera->GetNearClipDistance();
+//         //     farClipDistance = pCamera->GetFarClipDistance();
+//         // }
+// 
+//         const GfxConfiguration& conf = g_pApp->GetConfiguration();
+// 
+//         float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
+// 
+//         // Build the perspective projection matrix.
+//         BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
+		position.x = mRadius * sinf(mPhi) * cosf(mTheta);
+		position.z = mRadius * sinf(mPhi) * sinf(mTheta);
+		position.y = mRadius * cosf(mPhi);
+		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+		// Build the perspective projection matrix.
+		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+
+        m_DrawFrameContext.m_worldMatrix = m_worldMatrix;
         m_DrawFrameContext.m_worldViewMatrix = m_worldMatrix * m_viewMatrix;
         m_DrawFrameContext.m_worldViewProjectionMatrix = m_worldMatrix * m_viewMatrix * m_projectionMatrix;
         
@@ -144,6 +165,7 @@ namespace Corona
         // 2、C++代码端进行转置，HLSL中使用matrix(列主序矩阵) ，mul函数让向量放在左边(行向量)，这样就是(行向量 X 列主序矩阵)，但C++这边需要进行一次矩阵转置，HLSL内部不产生转置 。这是官方例程所使用的方式，这样可以使得dp4运算可以直接取列主序矩阵的行，从而避免内部产生大量的转置指令。后续也使用这种方式。
         // 3、C++代码端不进行转置，HLSL中使用matrix(列主序矩阵)，mul函数让向量放在右边(列向量)，实际运算是(列主序矩阵 X 列向量)。这种方法的确可行，取列矩阵的行也比较方便，效率上又和2等同，就是HLSL那边的矩阵乘法都要反过来写，然而DX本身就是崇尚行主矩阵的，把OpenGL的习惯带来这边有点。。。
         // 4、C++代码端进行转置，HLSL中使用row_major matrix(行主序矩阵)，mul函数让向量放在右边(列向量)，实际运算是(行主序矩阵 X 列向量)。 就算这种方法也可以绘制出来，但还是很让人难受。
+        Transpose(m_DrawFrameContext.m_worldMatrix);
         Transpose(m_DrawFrameContext.m_worldViewMatrix);
         Transpose(m_DrawFrameContext.m_worldViewProjectionMatrix);
     }
@@ -170,9 +192,9 @@ namespace Corona
         //     m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
         // }
 
-        //  only support default light at the time
-//         m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
-//         m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        // only support default light at the time
+        m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
+        m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
 
     void GraphicsManager::InitializeBuffers()
@@ -198,5 +220,28 @@ namespace Corona
         MatrixRotationY(rotationMatrix, radians);
         m_worldMatrix = m_worldMatrix * rotationMatrix;
     }
+
+	void GraphicsManager::CameraRotateX(float radians)
+	{
+        mPhi += radians;
+	}
+
+	void GraphicsManager::CameraRotateY(float radians)
+	{
+        mTheta += radians;
+	}
+
+    void GraphicsManager::CameraTranslationX(float distance)
+	{
+		position = position + Vector3f(distance, 0, 0);
+        lookAt = lookAt + Vector3f(distance, 0, 0);
+	}
+
+	void GraphicsManager::CameraTranslationY(float distance)
+	{
+        position = position + Vector3f(0, distance, 0);
+        lookAt = lookAt + Vector3f(0, distance, 0);
+	}
+
 
 }

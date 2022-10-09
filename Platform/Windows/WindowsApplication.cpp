@@ -152,8 +152,34 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
                 case VK_DOWN:
                     g_pInputManager->DownArrowKeyDown();
                     break;
-                default:
+
+                case 'A': // VK_A
+                    g_pInputManager->AKeyDown();
                     break;
+                case 'D': // VK_D
+                    g_pInputManager->DKeyDown();
+                    break;
+                case 'W': // VK_W
+                    g_pInputManager->WKeyDown();
+                    break;
+                case 'S': // VK_S
+                    g_pInputManager->SKeyDown();
+                    break;
+
+				case 'J': // VK_J
+					g_pInputManager->JKeyDown();
+					break;
+				case 'L': // VK_L
+					g_pInputManager->LKeyDown();
+					break;
+				case 'I': // VK_I
+					g_pInputManager->IKeyDown();
+					break;
+				case 'K': // VK_K
+					g_pInputManager->KKeyDown();
+					break;
+				default:
+					break;
             }
         } 
         break;
