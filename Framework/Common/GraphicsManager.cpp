@@ -325,7 +325,16 @@ namespace Corona
 
 	void GraphicsManager::OnMouseMoveR(int x, int y)
 	{
+// 		float dx = 0.0005f * static_cast<float>(x - mLastMousePos_x);
+// 		float dy = 0.0005f * static_cast<float>(y - mLastMousePos_y);
+// 
+// 		position = position + Vector3f(-dy, dx, 0.0f);
+// 		lookAt = lookAt + Vector3f(-dy, dx, 0.0f);
+	}
 
+	void GraphicsManager::OnMouseWheel(int delta)
+	{
+         fieldOfView += 0.05f * delta * PI / 180;
 	}
 
 }

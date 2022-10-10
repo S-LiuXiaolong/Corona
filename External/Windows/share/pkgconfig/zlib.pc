@@ -1,0 +1,13 @@
+prefix=C:/Program Files (x86)/zlib
+exec_prefix=C:/Program Files (x86)/zlib
+libdir=F:/work_space/Corona/External/build/zlib/../../Windows/lib
+sharedlibdir=F:/work_space/Corona/External/build/zlib/../../Windows/lib
+includedir=F:/work_space/Corona/External/build/zlib/../../Windows/include/zlib
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.12
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

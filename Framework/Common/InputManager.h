@@ -46,6 +46,8 @@ namespace Corona
 			void OnMouseMoveL(int x, int y);
 			void OnMouseMoveR(int x, int y);
 
+            void OnMouseWheel(int delta);
+
     };
 
     extern InputManager* g_pInputManager;

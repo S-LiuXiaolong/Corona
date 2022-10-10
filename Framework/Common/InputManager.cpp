@@ -246,6 +246,14 @@ namespace Corona
 		g_pGraphicsManager->OnMouseMoveR(x, y);
 	}
 
+	void InputManager::OnMouseWheel(int delta)
+	{
+#ifdef _DEBUG
+		cerr << "[InputManager] Mouse Wheel Action!" << endl;
+#endif
+		g_pGraphicsManager->OnMouseWheel(delta);
+	}
+
 }
 
 

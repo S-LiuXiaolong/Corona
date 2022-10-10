@@ -12,6 +12,7 @@
 #include "include/AddByElement.h"
 #include "include/SubByElement.h"
 #include "include/InverseMatrix4X4f.h"
+#include "include/DCT.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846f
@@ -294,7 +295,10 @@ namespace Corona
         }
     };
 
+    typedef Matrix<float, 3, 3> Matrix3X3f;
     typedef Matrix<float, 4, 4> Matrix4X4f;
+    typedef Matrix<int32_t, 8, 8> Matrix8X8i;
+    typedef Matrix<float, 8, 8> Matrix8X8f;
 
     template <typename T, int ROWS, int COLS>
     std::ostream &operator<<(std::ostream &out, Matrix<T, ROWS, COLS> matrix)
@@ -365,6 +369,12 @@ namespace Corona
         MatrixMultiply(result, matrix1, matrix2);
 
         return result;
+    }
+
+    template <typename T, int ROWS, int COLS>
+    void MatrixMulByElement(Matrix<T, ROWS, COLS>& result, const Matrix<T, ROWS, COLS>& matrix1, const Matrix<T, ROWS, COLS>& matrix2)
+    {
+        ispc::MulByElement(matrix1, matrix2, result, countof(result.data));
     }
 
     template <template <typename, int, int> class TT, typename T, int ROWS, int COLS>
@@ -598,5 +608,19 @@ namespace Corona
     inline bool InverseMatrix4X4f(Matrix4X4f& matrix)
     {
         return ispc::InverseMatrix4X4f(matrix);
+    }
+
+    inline Matrix8X8f DCT8X8(const Matrix8X8f& matrix)
+    {
+        Matrix8X8f result;
+        ispc::DCT8X8(matrix, result);
+        return result;
+    }
+
+    inline Matrix8X8f IDCT8X8(const Matrix8X8f& matrix)
+    {
+        Matrix8X8f result;
+        ispc::IDCT8X8(matrix, result);
+        return result;
     }
 }

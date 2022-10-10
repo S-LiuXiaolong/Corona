@@ -29,6 +29,7 @@ namespace Corona
         void OnMouseDown(int x, int y);
         void OnMouseMoveL(int x, int y);
         void OnMouseMoveR(int x, int y);
+        void OnMouseWheel(int delta);
 
     protected:
         bool SetPerFrameShaderParameters();

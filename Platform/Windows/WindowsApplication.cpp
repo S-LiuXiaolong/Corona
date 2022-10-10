@@ -210,6 +210,10 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
         }
         break;
 
+    case WM_MOUSEWHEEL:
+        g_pInputManager->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+        break;
+
         // this message is read when the window is closed
     case WM_DESTROY:
         {

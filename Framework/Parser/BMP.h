@@ -76,7 +76,7 @@ namespace Corona
                     {
                         for (uint32_t x = 0; x < img.Width; x++) 
                         {
-                            (img.data + img.Width * (img.Height - y - 1) + x)->bgra = *reinterpret_cast<R8G8B8A8Unorm*>(pSourceData + img.pitch * y + x * (img.bitcount >> 3));
+                            (reinterpret_cast<R8G8B8A8Unorm*>(img.data) + img.Width * (img.Height - y - 1) + x)->bgra = *reinterpret_cast<R8G8B8A8Unorm*>(pSourceData + img.pitch * y + x * (img.bitcount >> 3));
                         }
                     }
                 }

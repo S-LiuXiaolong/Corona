@@ -8,6 +8,9 @@
 //#include "portable.h"
 //#include "Image.h"
 #include "geommath.h"
+#include "Image.h"
+#include "AssetLoader.h"
+#include "BMP.h"
 
 namespace tinygltf
 {
@@ -38,6 +41,8 @@ namespace Corona
     {
         SceneObjectTypePrimitive = "PRIM"_i32,
         SceneObjectTypeMesh = "MESH"_i32,
+        SceneObjectTypeMaterial=   "MATL"_i32,
+        SceneObjectTypeTexture =   "TXTU"_i32,
         SceneObjectTypeCamera = "CAMR"_i32,
         SceneObjectTypeVertexArray = "VARR"_i32,
         SceneObjectTypeIndexArray = "VARR"_i32
@@ -237,6 +242,154 @@ namespace Corona
                                                                 YFov(yFov)
         {
         }
+    };
+
+    class SceneObjectMaterial : public BaseSceneObject
+    {
+    public:
+        enum PBR_WORKFLOW
+        {
+            PBR_WORKFLOW_METALL_ROUGH = 0,
+            PBR_WORKFLOW_SPEC_GLOSS
+        };
+
+        enum ALPHA_MODE
+        {
+            ALPHA_MODE_OPAQUE = 0,
+            ALPHA_MODE_MASK,
+            ALPHA_MODE_BLEND,
+            ALPHA_MODE_NUM_MODES
+        };
+
+        // Material attributes packed in a shader-friendly format
+        struct ShaderAttribs
+        {
+            Vector4f BaseColorFactor = Vector4f{1, 1, 1, 1};
+            Vector4f EmissiveFactor  = Vector4f{1, 1, 1, 1};
+            Vector4f SpecularFactor  = Vector4f{1, 1, 1, 1};
+
+            int   Workflow                     = PBR_WORKFLOW_METALL_ROUGH;
+            float BaseColorUVSelector          = -1;
+            float PhysicalDescriptorUVSelector = -1;
+            float NormalUVSelector             = -1;
+
+            float OcclusionUVSelector     = -1;
+            float EmissiveUVSelector      = -1;
+            float BaseColorSlice          = 0;
+            float PhysicalDescriptorSlice = 0;
+
+            float NormalSlice    = 0;
+            float OcclusionSlice = 0;
+            float EmissiveSlice  = 0;
+            float MetallicFactor = 1;
+
+            float RoughnessFactor = 1;
+            int   AlphaMode       = ALPHA_MODE_OPAQUE;
+            float AlphaCutoff     = 0.5f;
+            float Dummy0          = 0;
+
+            // When texture atlas is used, UV scale and bias applied to
+            // each texture coordinate set
+            Vector4f BaseColorUVScaleBias          = Vector4f{1, 1, 0, 0};
+            Vector4f PhysicalDescriptorUVScaleBias = Vector4f{1, 1, 0, 0};
+            Vector4f NormalUVScaleBias             = Vector4f{1, 1, 0, 0};
+            Vector4f OcclusionUVScaleBias          = Vector4f{1, 1, 0, 0};
+            Vector4f EmissiveUVScaleBias           = Vector4f{1, 1, 0, 0};
+
+            // Any user-specific data
+            Vector4f CustomData = Vector4f{0, 0, 0, 0};
+        };
+
+        enum TEXTURE_ID
+        {
+            // Base color for metallic-roughness workflow or
+            // diffuse color for specular-glossinees workflow
+            TEXTURE_ID_BASE_COLOR = 0,
+
+            // Metallic-roughness or specular-glossinees map
+            TEXTURE_ID_PHYSICAL_DESC,
+
+            TEXTURE_ID_NORMAL_MAP,
+            TEXTURE_ID_OCCLUSION,
+            TEXTURE_ID_EMISSIVE,
+            TEXTURE_ID_NUM_TEXTURES
+        };
+
+        ShaderAttribs Attribs;
+
+        bool DoubleSided = false;
+
+        // Texture indices in Model.Textures array
+        std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds = {};
+    public:
+        SceneObjectMaterial() : BaseSceneObject(SceneObjectType::SceneObjectTypeMaterial) {};
+    };
+
+    class SceneObjectTexture : public BaseSceneObject
+    {
+        protected:
+            std::string m_Name;
+            uint32_t m_nTexCoordIndex;
+            std::shared_ptr<Image> m_pImage;
+            std::vector<Matrix4X4f> m_Transforms;
+
+        public:
+            SceneObjectTexture() : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_nTexCoordIndex(0) {};
+            SceneObjectTexture(const std::string& name) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_Name(name), m_nTexCoordIndex(0) {};
+            SceneObjectTexture(uint32_t coord_index, std::shared_ptr<Image>& image) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_nTexCoordIndex(coord_index), m_pImage(image) {};
+            SceneObjectTexture(uint32_t coord_index, std::shared_ptr<Image>&& image) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_nTexCoordIndex(coord_index), m_pImage(std::move(image)) {};
+            SceneObjectTexture(SceneObjectTexture&) = default;
+            SceneObjectTexture(SceneObjectTexture&&) = default;
+            void AddTransform(Matrix4X4f& matrix) { m_Transforms.push_back(matrix); };
+            void SetName(const std::string& name) { m_Name = name; };
+            void SetName(std::string&& name) { m_Name = std::move(name); };
+            const std::string& GetName() const { return m_Name; };
+            void LoadTexture() {
+                if (!m_pImage)
+                {
+                    // we should lookup if the texture has been loaded already to prevent
+                    // duplicated load. This could be done in Asset Loader Manager.
+                    Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(m_Name.c_str());
+                    std::string ext = m_Name.substr(m_Name.find_last_of("."));
+                    // if (ext == ".jpg" || ext == ".jpeg")
+                    // {
+                    //     JfifParser jfif_parser;
+                    //     m_pImage = std::make_shared<Image>(jfif_parser.Parse(buf));
+                    // }
+                    // else if (ext == ".png")
+                    // {
+                    //     PngParser png_parser;
+                    //     m_pImage = std::make_shared<Image>(png_parser.Parse(buf));
+                    // }
+                    // else if (ext == ".bmp")
+                    // {
+                    //     BmpParser bmp_parser;
+                    //     m_pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+                    // }
+                    // else if (ext == ".tga")
+                    // {
+                    //     TgaParser tga_parser;
+                    //     m_pImage = std::make_shared<Image>(tga_parser.Parse(buf));
+                    // }
+                    if (ext == ".bmp")
+                    {
+                        BmpParser bmp_parser;
+                        m_pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+                    }
+                }
+            }
+
+            const Image& GetTextureImage() 
+            { 
+                if (!m_pImage)
+                {
+                    LoadTexture();
+                }
+
+                return *m_pImage; 
+            };
+
+        friend std::ostream& operator<<(std::ostream& out, const SceneObjectTexture& obj);
     };
 
 }
