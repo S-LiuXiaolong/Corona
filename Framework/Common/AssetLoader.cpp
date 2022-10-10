@@ -154,48 +154,52 @@ namespace Corona
 
     Buffer AssetLoader::SyncOpenAndReadText(const char *filePath)
     {
-        AssetFilePtr fp = OpenFile(filePath, MY_OPEN_TEXT);
-        Buffer* pBuff = nullptr;
+		AssetFilePtr fp = OpenFile(filePath, MY_OPEN_TEXT);
+		Buffer buff;
 
-        if (fp) {
-            size_t length = GetSize(fp);
+		if (fp) {
+			size_t length = GetSize(fp);
 
-            pBuff = new Buffer(length + 1);
-            length = fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
+			uint8_t* data = new uint8_t[length + 1];
+			length = fread(data, 1, length, static_cast<FILE*>(fp));
 #ifdef _DEBUG
-        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, (int)length);
+			fprintf(stderr, "Read file '%s', %zu bytes\n", filePath, length);
 #endif
-            pBuff->m_pData[length] = '\0';
 
-            CloseFile(fp);
-        } else {
-            fprintf(stderr, "Error opening file '%s'\n", filePath);
-            pBuff = new Buffer();
-        }
+			data[length] = '\0';
+			buff.SetData(data, length + 1);
 
-        return *pBuff;
+			CloseFile(fp);
+		}
+		else {
+			fprintf(stderr, "Error opening file '%s'\n", filePath);
+		}
+
+		return buff;
     }
 
     Buffer AssetLoader::SyncOpenAndReadBinary(const char *filePath)
     {
         AssetFilePtr fp = OpenFile(filePath, MY_OPEN_BINARY);
-        Buffer* pBuff = nullptr;
+		Buffer buff;
 
-        if (fp) {
-            size_t length = GetSize(fp);
+		if (fp) {
+			size_t length = GetSize(fp);
 
-            pBuff = new Buffer(length);
-            length = fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
+			uint8_t* data = new uint8_t[length];
+			fread(data, length, 1, static_cast<FILE*>(fp));
 #ifdef _DEBUG
-        fprintf(stderr, "Read file '%s', %d bytes\n", filePath, (int)length);
+			fprintf(stderr, "Read file '%s', %zu bytes\n", filePath, length);
 #endif
-            CloseFile(fp);
-        } else {
-            fprintf(stderr, "Error opening file '%s'\n", filePath);
-            pBuff = new Buffer();
-        }
+			buff.SetData(data, length);
 
-        return *pBuff;
+			CloseFile(fp);
+		}
+		else {
+			fprintf(stderr, "Error opening file '%s'\n", filePath);
+		}
+
+		return buff;
     }
 
     void AssetLoader::CloseFile(AssetFilePtr& fp)
@@ -225,7 +229,7 @@ namespace Corona
             return 0;
         }
 
-        sz = fread(buf.m_pData, buf.m_szSize, 1, static_cast<FILE*>(fp));
+        sz = fread(buf.GetData(), buf.GetDataSize(), 1, static_cast<FILE*>(fp));
 
         return sz;
     }

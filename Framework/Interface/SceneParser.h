@@ -3,6 +3,7 @@
 #include <string>
 #include "Interface.h"
 #include "glTFSceneNode.h"
+#include "AssetLoader.h"
 #include "Scene.h"
 
 namespace Corona

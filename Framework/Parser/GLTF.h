@@ -434,7 +434,60 @@ namespace Corona
             }
         }
 
-        void LoadMaterials(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene)
+        void ParseImage(std::string& imagePath, std::shared_ptr<Image>& pImage)
+        {
+            
+			// we should lookup if the texture has been loaded already to prevent
+            // duplicated load. This could be done in Asset Loader Manager.
+			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
+			std::string ext = imagePath.substr(imagePath.find_last_of("."));
+			if (ext == ".jpg" || ext == ".jpeg")
+			{
+				JfifParser jfif_parser;
+				pImage = std::make_shared<Image>(jfif_parser.Parse(buf));
+			}
+			else if (ext == ".png")
+			{
+				PngParser png_parser;
+				pImage = std::make_shared<Image>(png_parser.Parse(buf));
+			}
+			// else if (ext == ".bmp")
+			// {
+			//     BmpParser bmp_parser;
+			//     pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+			// }
+			// else if (ext == ".tga")
+			// {
+			//     TgaParser tga_parser;
+			//     pImage = std::make_shared<Image>(tga_parser.Parse(buf));
+			// }
+			else if (ext == ".bmp")
+			{
+				BmpParser bmp_parser;
+				pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+			}
+        }
+
+        // the BaseDir here is path of Texture's folder
+        void LoadTextures(const tinygltf::Model& gltf_model, std::unique_ptr<Scene>& pScene, std::string& BaseDir)
+        {
+            auto& m_Materials = pScene->Materials;
+            for (const tinygltf::Texture& gltf_tex : gltf_model.textures)
+            {
+                const tinygltf::Image& gltf_image = gltf_model.images[gltf_tex.source];
+
+                auto& ImageId = !gltf_image.uri.empty() ? (BaseDir + gltf_image.uri) : "";
+
+                if (!ImageId.empty())
+                {
+                    std::shared_ptr<Image> m_pImage{};
+                    ParseImage(ImageId, m_pImage);
+                }
+            }
+
+        }
+
+        void LoadMaterialsAndTextures(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene, std::string& BaseDir)
         {
             auto &m_Materials = pScene->Materials;
             for (const tinygltf::Material &gltf_mat : gltf_model.materials)
@@ -531,8 +584,8 @@ namespace Corona
                     {
                         if (ext_it->second.Has("specularGlossinessTexture"))
                         {
-                            auto index = ext_it->second.Get("specularGlossinessTexture").Get("index");
-                            auto texCoordSet = ext_it->second.Get("specularGlossinessTexture").Get("texCoord");
+                            auto& index = ext_it->second.Get("specularGlossinessTexture").Get("index");
+                            auto& texCoordSet = ext_it->second.Get("specularGlossinessTexture").Get("texCoord");
 
                             Mat.TextureIds[SceneObjectMaterial::TEXTURE_ID_PHYSICAL_DESC] = index.Get<int>();
                             Mat.Attribs.PhysicalDescriptorUVSelector = static_cast<float>(texCoordSet.Get<int>());
@@ -542,8 +595,8 @@ namespace Corona
 
                         if (ext_it->second.Has("diffuseTexture"))
                         {
-                            auto index = ext_it->second.Get("diffuseTexture").Get("index");
-                            auto texCoordSet = ext_it->second.Get("diffuseTexture").Get("texCoord");
+                            auto& index = ext_it->second.Get("diffuseTexture").Get("index");
+                            auto& texCoordSet = ext_it->second.Get("diffuseTexture").Get("texCoord");
 
                             Mat.TextureIds[SceneObjectMaterial::TEXTURE_ID_BASE_COLOR] = index.Get<int>();
                             Mat.Attribs.BaseColorUVSelector = static_cast<float>(texCoordSet.Get<int>());
@@ -551,10 +604,10 @@ namespace Corona
 
                         if (ext_it->second.Has("diffuseFactor"))
                         {
-                            auto factor = ext_it->second.Get("diffuseFactor");
+                            auto& factor = ext_it->second.Get("diffuseFactor");
                             for (uint32_t i = 0; i < factor.ArrayLen(); i++)
                             {
-                                const auto val = factor.Get(i);
+                                const auto& val = factor.Get(i);
                                 Mat.Attribs.BaseColorFactor[i] =
                                     val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
                             }
@@ -562,10 +615,10 @@ namespace Corona
 
                         if (ext_it->second.Has("specularFactor"))
                         {
-                            auto factor = ext_it->second.Get("specularFactor");
+                            auto& factor = ext_it->second.Get("specularFactor");
                             for (uint32_t i = 0; i < factor.ArrayLen(); i++)
                             {
-                                const auto val = factor.Get(i);
+                                const auto& val = factor.Get(i);
                                 Mat.Attribs.SpecularFactor[i] =
                                     val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
                             }
@@ -573,25 +626,44 @@ namespace Corona
                     }
                 }
 
-                // for (const auto &Param : TextureParams)
-                // {
-                //     auto TexIndex = Mat.TextureIds[Param.TextureId];
-                //     if (TexIndex >= 0)
-                //     {
-                //         const auto &TexInfo = Textures[TexIndex];
-                //         if (TexInfo.pAtlasSuballocation)
-                //         {
-                //             Param.UVScaleBias = TexInfo.pAtlasSuballocation->GetUVScaleBias();
-                //             Param.Slice = static_cast<float>(TexInfo.pAtlasSuballocation->GetSlice());
-                //         }
-                //     }
-                // }
+                 for (const auto &Param : TextureParams)
+                 {
+                     auto TexIndex = Mat.TextureIds[Param.TextureId];
+                     if (TexIndex >= 0)
+                     {
+						 // const auto &TexInfo = Textures[TexIndex];
+						 // if (TexInfo.pAtlasSuballocation)
+						 // {
+						 //     Param.UVScaleBias = TexInfo.pAtlasSuballocation->GetUVScaleBias();
+						 //     Param.Slice = static_cast<float>(TexInfo.pAtlasSuballocation->GetSlice());
+						 // }
+                     }
+                 }
+
+				 for (const tinygltf::Texture& gltf_tex : gltf_model.textures)
+				 {
+					 const tinygltf::Image& gltf_image = gltf_model.images[gltf_tex.source];
+					 auto& ImageId = !gltf_image.uri.empty() ? (BaseDir + gltf_image.uri) : "";
+
+                     
+					 if (!ImageId.empty())
+					 {
+						 std::shared_ptr<Image> m_pImage{};
+						 ParseImage(ImageId, m_pImage);
+                         auto texture = std::make_shared<SceneObjectTexture>(m_pImage);
+                         texture->SetName("");
+                         Mat.Textures[gltf_tex.source] = texture;
+					 }
+				 }
                 
-                m_Materials[gltf_mat.name] = std::make_shared<SceneObjectMaterial>(Mat);
+                 m_Materials[gltf_mat.name] = std::make_shared<SceneObjectMaterial>(Mat);
             }
 
             // Push a default material at the end of the list for meshes with no material assigned
-            m_Materials["default"] = std::make_shared<SceneObjectMaterial>();
+            if (m_Materials.empty())
+            {
+                m_Materials["default"] = std::make_shared<SceneObjectMaterial>();
+            }
         }
 
         virtual void Parse(std::unique_ptr<Scene> &pScene) final
@@ -599,7 +671,7 @@ namespace Corona
             if (pScene->name == "")
                 assert("File path must not be empty");
 
-            const std::string filename{pScene->name};
+            std::string filename{pScene->name};
 
             bool binary = false;
             size_t extpos = filename.rfind('.', filename.length());
@@ -632,9 +704,15 @@ namespace Corona
                 printf("Loaded gltf file");
             }
 
+            std::string baseDir;
+			extpos = filename.rfind('/', filename.length());
+			if (extpos != std::string::npos)
+			{
+                baseDir = filename.substr(0, extpos + 1);
+			}
+
             // LoadTextureSamplers(pDevice, gltf_model);
-            // LoadTextures(pDevice, gltf_model, LoaderData.BaseDir, pTextureCache, pResourceMgr);
-            // LoadMaterials(gltf_model, pScene);
+            LoadMaterialsAndTextures(gltf_model, pScene, baseDir);
 
             std::vector<uint32_t> IndexData;
             std::vector<VertexBasicAttribs> VertexBasicData;

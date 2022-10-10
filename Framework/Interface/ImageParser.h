@@ -8,6 +8,7 @@ namespace Corona
     Interface ImageParser
     {
     public:
-        virtual Image Parse(const Buffer& buf) = 0;
+        virtual ~ImageParser() = default;
+        virtual Image Parse(Buffer & buf) = 0;
     };
 }

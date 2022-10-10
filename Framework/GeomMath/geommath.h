@@ -405,7 +405,7 @@ namespace Corona
     template <typename T, int ROWS, int COLS>
     void MatrixMulByElement(Matrix<T, ROWS, COLS>& result, const Matrix<T, ROWS, COLS>& matrix1, const Matrix<T, ROWS, COLS>& matrix2)
     {
-        ispc::MulByElement(matrix1, matrix2, result, countof(result.data));
+        ispc::MulByElement(matrix1, matrix2, result, (uint32_t)countof(result.data));
     }
 
     template <template <typename, int, int> class TT, typename T, int ROWS, int COLS>

@@ -67,7 +67,15 @@ namespace Corona
         const uint8_t* GetData(void) const { return m_pData; };
         size_t GetDataSize(void) const { return m_szSize; }
 
-    public:
+		void SetData(uint8_t* data, size_t size) {
+			if (m_pData != nullptr) {
+				delete[] m_pData;
+			}
+			m_pData = data;
+			m_szSize = size;
+		}
+
+    protected:
         uint8_t* m_pData;
         size_t m_szSize;
         size_t m_szAlignment;

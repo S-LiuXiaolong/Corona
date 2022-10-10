@@ -11,6 +11,8 @@
 #include "Image.h"
 #include "AssetLoader.h"
 #include "BMP.h"
+#include "JPEG.h"
+#include "PNG.h"
 
 namespace tinygltf
 {
@@ -23,18 +25,7 @@ namespace tinygltf
 // You have to rename the two SceneObject namespace to GLTF and OGEX
 namespace Corona
 {
-    namespace details
-    {
-        constexpr int32_t i32(const char *s, int32_t v)
-        {
-            return *s ? i32(s + 1, v * 256 + *s) : v;
-        }
-    }
 
-    constexpr int32_t operator"" _i32(const char *s, size_t)
-    {
-        return details::i32(s, 0);
-    }
 
     // use ascii to get id of SceneObjectTypes
     enum SceneObjectType
@@ -244,6 +235,33 @@ namespace Corona
         }
     };
 
+	class SceneObjectTexture : public BaseSceneObject
+	{
+	protected:
+        // TODO: Add sampler (?)
+		std::string m_Name;
+        // std::shared_ptr<Sampler> m_pSampler;
+		std::shared_ptr<Image> m_pImage;
+
+	public:
+		SceneObjectTexture() : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture) {};
+		SceneObjectTexture(const std::string& name) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_Name(name) {};
+		SceneObjectTexture(std::shared_ptr<Image>& image) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_pImage(image) {};
+		SceneObjectTexture(std::shared_ptr<Image>&& image) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_pImage(std::move(image)) {};
+		SceneObjectTexture(SceneObjectTexture&) = default;
+		SceneObjectTexture(SceneObjectTexture&&) = default;
+		void SetName(const std::string& name) { m_Name = name; };
+		void SetName(std::string&& name) { m_Name = std::move(name); };
+		const std::string& GetName() const { return m_Name; };
+
+		const Image& GetTextureImage()
+		{
+			return *m_pImage;
+		};
+
+		friend std::ostream& operator<<(std::ostream& out, const SceneObjectTexture& obj);
+	};
+
     // class SceneObjectMaterial : public BaseSceneObject
     struct SceneObjectMaterial
     {
@@ -321,76 +339,10 @@ namespace Corona
         bool DoubleSided = false;
 
         // Texture indices in Model.Textures array
-        std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds = {};
+        std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds = {-1, -1, -1, -1, -1};
+        std::unordered_map<int, std::shared_ptr<SceneObjectTexture>> Textures;
     public:
         // SceneObjectMaterial() : BaseSceneObject(SceneObjectType::SceneObjectTypeMaterial) {};
-    };
-
-    class SceneObjectTexture : public BaseSceneObject
-    {
-        protected:
-            std::string m_Name;
-            uint32_t m_nTexCoordIndex;
-            std::shared_ptr<Image> m_pImage;
-            std::vector<Matrix4X4f> m_Transforms;
-
-        public:
-            SceneObjectTexture() : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_nTexCoordIndex(0) {};
-            SceneObjectTexture(const std::string& name) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_Name(name), m_nTexCoordIndex(0) {};
-            SceneObjectTexture(uint32_t coord_index, std::shared_ptr<Image>& image) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_nTexCoordIndex(coord_index), m_pImage(image) {};
-            SceneObjectTexture(uint32_t coord_index, std::shared_ptr<Image>&& image) : BaseSceneObject(SceneObjectType::SceneObjectTypeTexture), m_nTexCoordIndex(coord_index), m_pImage(std::move(image)) {};
-            SceneObjectTexture(SceneObjectTexture&) = default;
-            SceneObjectTexture(SceneObjectTexture&&) = default;
-            void AddTransform(Matrix4X4f& matrix) { m_Transforms.push_back(matrix); };
-            void SetName(const std::string& name) { m_Name = name; };
-            void SetName(std::string&& name) { m_Name = std::move(name); };
-            const std::string& GetName() const { return m_Name; };
-            void LoadTexture() {
-                if (!m_pImage)
-                {
-                    // we should lookup if the texture has been loaded already to prevent
-                    // duplicated load. This could be done in Asset Loader Manager.
-                    Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(m_Name.c_str());
-                    std::string ext = m_Name.substr(m_Name.find_last_of("."));
-                    // if (ext == ".jpg" || ext == ".jpeg")
-                    // {
-                    //     JfifParser jfif_parser;
-                    //     m_pImage = std::make_shared<Image>(jfif_parser.Parse(buf));
-                    // }
-                    // else if (ext == ".png")
-                    // {
-                    //     PngParser png_parser;
-                    //     m_pImage = std::make_shared<Image>(png_parser.Parse(buf));
-                    // }
-                    // else if (ext == ".bmp")
-                    // {
-                    //     BmpParser bmp_parser;
-                    //     m_pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
-                    // }
-                    // else if (ext == ".tga")
-                    // {
-                    //     TgaParser tga_parser;
-                    //     m_pImage = std::make_shared<Image>(tga_parser.Parse(buf));
-                    // }
-                    if (ext == ".bmp")
-                    {
-                        BmpParser bmp_parser;
-                        m_pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
-                    }
-                }
-            }
-
-            const Image& GetTextureImage() 
-            { 
-                if (!m_pImage)
-                {
-                    LoadTexture();
-                }
-
-                return *m_pImage; 
-            };
-
-        friend std::ostream& operator<<(std::ostream& out, const SceneObjectTexture& obj);
     };
 
 }

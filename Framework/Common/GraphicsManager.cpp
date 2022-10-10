@@ -122,59 +122,30 @@ namespace Corona
         //     BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
         // }
 
-//         // use default build-in camera
-//         Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
-//         BuildViewMatrix(m_viewMatrix, position, lookAt, up);
-// 
-//         float fieldOfView = PI / 2.0f;
-//         float nearClipDistance = 0.1f;
-//         float farClipDistance = 100.0f;
-// 
-//         // if (pCameraNode) 
-//         // {
-//         //     auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
-//         //     // Set the field of view and screen aspect ratio.
-//         //     fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
-//         //     nearClipDistance = pCamera->GetNearClipDistance();
-//         //     farClipDistance = pCamera->GetFarClipDistance();
-//         // }
-// 
-//         const GfxConfiguration& conf = g_pApp->GetConfiguration();
-// 
-//         float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
-// 
-//         // Build the perspective projection matrix.
-//         BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+        // // use default build-in camera
+        // Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+        // BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+
+        // float fieldOfView = PI / 2.0f;
+        // float nearClipDistance = 0.1f;
+        // float farClipDistance = 100.0f;
+
+        // // if (pCameraNode) 
+        // // {
+        // //     auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
+        // //     // Set the field of view and screen aspect ratio.
+        // //     fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
+        // //     nearClipDistance = pCamera->GetNearClipDistance();
+        // //     farClipDistance = pCamera->GetFarClipDistance();
+        // // }
+
+        // const GfxConfiguration& conf = g_pApp->GetConfiguration();
+
+        // float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
+
+        // // Build the perspective projection matrix.
+        // BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
-        // 
-		// Attention
-        Vector3f mUp = up;
-        // if (mPhi >= 0)
-        // {
-		// 	if (((int)(mPhi / PI) & 1) == 0)
-		// 	{
-
-		// 	}
-		// 	else
-		// 	{
-		// 		mUp.x *= -1;
-		// 		mUp.y *= -1;
-		// 		mUp.z *= -1;
-		// 	}
-        // }
-        // else
-        // {
-		// 	if (((int)(mPhi / PI) & 1) == 0)
-		// 	{
-		// 		mUp.x *= -1;
-		// 		mUp.y *= -1;
-		// 		mUp.z *= -1;
-		// 	}
-		// 	else
-		// 	{
-
-		// 	}
-        // }
 
         // The Axis Location:
         //               Y
@@ -192,7 +163,7 @@ namespace Corona
 		position.y = mRadius * cosf(mPhi);
 
         m_DrawFrameContext.m_cameraPosition = Vector4f(position, 1.0f);
-		BuildViewMatrix(m_viewMatrix, position, lookAt, mUp);
+		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 		// Build the perspective projection matrix.
 		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
 
@@ -306,31 +277,6 @@ namespace Corona
 		// Make each pixel correspond to a quarter of a degree.
 		float dx = (0.05f * static_cast<float>(x - mLastMousePos_x)) * PI / 180;
 		float dy = (0.05f * static_cast<float>(y - mLastMousePos_y)) * PI / 180;
-
-		// Update angles based on input to orbit camera around box.
-		// if (mPhi >= 0)
-		// {
-		// 	if (((int)(mPhi / PI) & 1) == 0)
-		// 	{
-        //         mTheta += dx;
-		// 	}
-		// 	else
-		// 	{
-        //         mTheta -= dx;
-		// 	}
-
-		// }
-		// else
-		// {
-		// 	if (((int)(-mPhi / PI) & 1) == 0)
-		// 	{
-		// 		mTheta -= dx;
-		// 	}
-		// 	else
-		// 	{
-		// 		mTheta += dx;
-		// 	}
-		// }
         mTheta -= dx;
 		mPhi -= dy;
 
