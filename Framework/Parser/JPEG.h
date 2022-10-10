@@ -289,6 +289,7 @@ class JfifParser : implements ImageParser {
 
                 // Decode AC
                 int ac_index = 1;
+                // TODO: wrong here
                 while (byte_offset < scan_data.size() && ac_index < 64) {
                     uint8_t ac_code =
                         m_treeHuffman
