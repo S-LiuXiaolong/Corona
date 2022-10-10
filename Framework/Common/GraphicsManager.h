@@ -69,8 +69,8 @@ namespace Corona
 		float farClipDistance;
 		float screenAspect;
 
-        float mTheta = 0.0f;
-        float mPhi = 0.2f * PI;
+        float mTheta = 0.5f * PI;
+        float mPhi = 0.5f * PI;
         float mRadius = 3.0f;
 
         int mLastMousePos_x;

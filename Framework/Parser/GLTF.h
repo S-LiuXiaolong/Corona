@@ -30,10 +30,10 @@ namespace Corona
             bool operator==(const ConvertedBufferViewKey &Rhs) const
             {
                 return PosAccess == Rhs.PosAccess &&
-                    UV0Access == Rhs.UV0Access &&
-                    UV1Access == Rhs.UV1Access &&
-                    NormAccess == Rhs.NormAccess &&
-                    TanAccess == Rhs.TanAccess;
+                       UV0Access == Rhs.UV0Access &&
+                       UV1Access == Rhs.UV1Access &&
+                       NormAccess == Rhs.NormAccess &&
+                       TanAccess == Rhs.TanAccess;
                 // JointAccess == Rhs.JointAccess &&
                 // WeightAccess == Rhs.WeightAccess;
             }
@@ -59,107 +59,107 @@ namespace Corona
         using ConvertedBufferViewMap = std::unordered_map<ConvertedBufferViewKey, ConvertedBufferViewData, ConvertedBufferViewKey::Hasher>;
 
     public:
-		void ConvertBuffers(const ConvertedBufferViewKey& Key,
-			ConvertedBufferViewData& Data,
-			const tinygltf::Model& gltf_model,
-			std::vector<VertexBasicAttribs>& VertexBasicData) const
-		{
-			const float* bufferPos = nullptr;
-			const float* bufferNormals = nullptr;
-            const float* bufferTangents = nullptr;
-			const float* bufferTexCoordSet0 = nullptr;
-			const float* bufferTexCoordSet1 = nullptr;
+        void ConvertBuffers(const ConvertedBufferViewKey &Key,
+                            ConvertedBufferViewData &Data,
+                            const tinygltf::Model &gltf_model,
+                            std::vector<VertexBasicAttribs> &VertexBasicData) const
+        {
+            const float *bufferPos = nullptr;
+            const float *bufferNormals = nullptr;
+            const float *bufferTangents = nullptr;
+            const float *bufferTexCoordSet0 = nullptr;
+            const float *bufferTexCoordSet1 = nullptr;
 
-			uint32_t vertexCount = 0;
-			int posStride = -1;
-			int normalsStride = -1;
+            uint32_t vertexCount = 0;
+            int posStride = -1;
+            int normalsStride = -1;
             int tangentsStride = -1;
-			int texCoordSet0Stride = -1;
-			int texCoordSet1Stride = -1;
+            int texCoordSet0Stride = -1;
+            int texCoordSet1Stride = -1;
 
-			if (Key.PosAccess >= 0)
-			{
-				const tinygltf::Accessor& posAccessor = gltf_model.accessors[Key.PosAccess];
-				const tinygltf::BufferView& posView = gltf_model.bufferViews[posAccessor.bufferView];
-				if (posAccessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT)
-					printf("Position component type is expected to be float");
-				if (posAccessor.type != TINYGLTF_TYPE_VEC3)
-					printf("Position type is expected to be vec3");
-				// VERIFY(posAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Position component type is expected to be float");
-				// VERIFY(posAccessor.type == TINYGLTF_TYPE_VEC3, "Position type is expected to be vec3");
+            if (Key.PosAccess >= 0)
+            {
+                const tinygltf::Accessor &posAccessor = gltf_model.accessors[Key.PosAccess];
+                const tinygltf::BufferView &posView = gltf_model.bufferViews[posAccessor.bufferView];
+                if (posAccessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT)
+                    printf("Position component type is expected to be float");
+                if (posAccessor.type != TINYGLTF_TYPE_VEC3)
+                    printf("Position type is expected to be vec3");
+                // VERIFY(posAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Position component type is expected to be float");
+                // VERIFY(posAccessor.type == TINYGLTF_TYPE_VEC3, "Position type is expected to be vec3");
 
-				bufferPos = reinterpret_cast<const float*>(&(gltf_model.buffers[posView.buffer].data[posAccessor.byteOffset + posView.byteOffset]));
-				vertexCount = static_cast<uint32_t>(posAccessor.count);
+                bufferPos = reinterpret_cast<const float *>(&(gltf_model.buffers[posView.buffer].data[posAccessor.byteOffset + posView.byteOffset]));
+                vertexCount = static_cast<uint32_t>(posAccessor.count);
 
-				posStride = posAccessor.ByteStride(posView) / tinygltf::GetComponentSizeInBytes(posAccessor.componentType);
-				if (posStride <= 0)
-					printf("Position stride is invalid");
-				// VERIFY(posStride > 0, "Position stride is invalid");
-			}
+                posStride = posAccessor.ByteStride(posView) / tinygltf::GetComponentSizeInBytes(posAccessor.componentType);
+                if (posStride <= 0)
+                    printf("Position stride is invalid");
+                // VERIFY(posStride > 0, "Position stride is invalid");
+            }
 
-			if (Key.NormAccess >= 0)
-			{
-				const tinygltf::Accessor& normAccessor = gltf_model.accessors[Key.NormAccess];
-				const tinygltf::BufferView& normView = gltf_model.bufferViews[normAccessor.bufferView];
-				// VERIFY(normAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Normal component type is expected to be float");
-				// VERIFY(normAccessor.type == TINYGLTF_TYPE_VEC3, "Normal type is expected to be vec3");
+            if (Key.NormAccess >= 0)
+            {
+                const tinygltf::Accessor &normAccessor = gltf_model.accessors[Key.NormAccess];
+                const tinygltf::BufferView &normView = gltf_model.bufferViews[normAccessor.bufferView];
+                // VERIFY(normAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Normal component type is expected to be float");
+                // VERIFY(normAccessor.type == TINYGLTF_TYPE_VEC3, "Normal type is expected to be vec3");
 
-				bufferNormals = reinterpret_cast<const float*>(&(gltf_model.buffers[normView.buffer].data[normAccessor.byteOffset + normView.byteOffset]));
-				normalsStride = normAccessor.ByteStride(normView) / tinygltf::GetComponentSizeInBytes(normAccessor.componentType);
-				// VERIFY(normalsStride > 0, "Normal stride is invalid");
-			}
-            
-			if (Key.TanAccess >= 0)
-			{
-				const tinygltf::Accessor& tanAccessor = gltf_model.accessors[Key.TanAccess];
-				const tinygltf::BufferView& tanView = gltf_model.bufferViews[tanAccessor.bufferView];
-				// VERIFY(normAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Normal component type is expected to be float");
-				// VERIFY(normAccessor.type == TINYGLTF_TYPE_VEC3, "Normal type is expected to be vec3");
+                bufferNormals = reinterpret_cast<const float *>(&(gltf_model.buffers[normView.buffer].data[normAccessor.byteOffset + normView.byteOffset]));
+                normalsStride = normAccessor.ByteStride(normView) / tinygltf::GetComponentSizeInBytes(normAccessor.componentType);
+                // VERIFY(normalsStride > 0, "Normal stride is invalid");
+            }
 
-				bufferTangents = reinterpret_cast<const float*>(&(gltf_model.buffers[tanView.buffer].data[tanAccessor.byteOffset + tanView.byteOffset]));
+            if (Key.TanAccess >= 0)
+            {
+                const tinygltf::Accessor &tanAccessor = gltf_model.accessors[Key.TanAccess];
+                const tinygltf::BufferView &tanView = gltf_model.bufferViews[tanAccessor.bufferView];
+                // VERIFY(normAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "Normal component type is expected to be float");
+                // VERIFY(normAccessor.type == TINYGLTF_TYPE_VEC3, "Normal type is expected to be vec3");
+
+                bufferTangents = reinterpret_cast<const float *>(&(gltf_model.buffers[tanView.buffer].data[tanAccessor.byteOffset + tanView.byteOffset]));
                 tangentsStride = tanAccessor.ByteStride(tanView) / tinygltf::GetComponentSizeInBytes(tanAccessor.componentType);
-				// VERIFY(normalsStride > 0, "Normal stride is invalid");
-			}
+                // VERIFY(normalsStride > 0, "Normal stride is invalid");
+            }
 
-			if (Key.UV0Access >= 0)
-			{
-				const tinygltf::Accessor& uvAccessor = gltf_model.accessors[Key.UV0Access];
-				const tinygltf::BufferView& uvView = gltf_model.bufferViews[uvAccessor.bufferView];
-				// VERIFY(uvAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "UV0 component type is expected to be float");
-				// VERIFY(uvAccessor.type == TINYGLTF_TYPE_VEC2, "UV0 type is expected to be vec2");
+            if (Key.UV0Access >= 0)
+            {
+                const tinygltf::Accessor &uvAccessor = gltf_model.accessors[Key.UV0Access];
+                const tinygltf::BufferView &uvView = gltf_model.bufferViews[uvAccessor.bufferView];
+                // VERIFY(uvAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "UV0 component type is expected to be float");
+                // VERIFY(uvAccessor.type == TINYGLTF_TYPE_VEC2, "UV0 type is expected to be vec2");
 
-				bufferTexCoordSet0 = reinterpret_cast<const float*>(&(gltf_model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
-				texCoordSet0Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
-				// VERIFY(texCoordSet0Stride > 0, "Texcoord0 stride is invalid");
-			}
+                bufferTexCoordSet0 = reinterpret_cast<const float *>(&(gltf_model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
+                texCoordSet0Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
+                // VERIFY(texCoordSet0Stride > 0, "Texcoord0 stride is invalid");
+            }
 
-			if (Key.UV1Access >= 0)
-			{
-				const tinygltf::Accessor& uvAccessor = gltf_model.accessors[Key.UV1Access];
-				const tinygltf::BufferView& uvView = gltf_model.bufferViews[uvAccessor.bufferView];
-				// VERIFY(uvAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "UV1 component type is expected to be float");
-				// VERIFY(uvAccessor.type == TINYGLTF_TYPE_VEC2, "UV1 type is expected to be vec2");
+            if (Key.UV1Access >= 0)
+            {
+                const tinygltf::Accessor &uvAccessor = gltf_model.accessors[Key.UV1Access];
+                const tinygltf::BufferView &uvView = gltf_model.bufferViews[uvAccessor.bufferView];
+                // VERIFY(uvAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT, "UV1 component type is expected to be float");
+                // VERIFY(uvAccessor.type == TINYGLTF_TYPE_VEC2, "UV1 type is expected to be vec2");
 
-				bufferTexCoordSet1 = reinterpret_cast<const float*>(&(gltf_model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
-				texCoordSet1Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
-				// VERIFY(texCoordSet1Stride > 0, "Texcoord1 stride is invalid");
-			}
-			Data.VertexBasicDataOffset = VertexBasicData.size();
+                bufferTexCoordSet1 = reinterpret_cast<const float *>(&(gltf_model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
+                texCoordSet1Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
+                // VERIFY(texCoordSet1Stride > 0, "Texcoord1 stride is invalid");
+            }
+            Data.VertexBasicDataOffset = VertexBasicData.size();
 
-			for (size_t v = 0; v < vertexCount; v++)
-			{
-				VertexBasicAttribs BasicAttribs{};
+            for (size_t v = 0; v < vertexCount; v++)
+            {
+                VertexBasicAttribs BasicAttribs{};
 
-				BasicAttribs.pos = Vector3f{ bufferPos + v * posStride };
-				BasicAttribs.normal = bufferNormals != nullptr ? normalize(Vector3f{ bufferNormals + v * normalsStride }) : Vector3f{};
-				// BasicAttribs.normal = bufferNormals != nullptr ? Vector3f{ bufferNormals + v * normalsStride } : Vector3f{};
+                BasicAttribs.pos = Vector3f{bufferPos + v * posStride};
+                BasicAttribs.normal = bufferNormals != nullptr ? normalize(Vector3f{bufferNormals + v * normalsStride}) : Vector3f{};
+                // BasicAttribs.normal = bufferNormals != nullptr ? Vector3f{ bufferNormals + v * normalsStride } : Vector3f{};
                 // ?
-                BasicAttribs.tangent = bufferTangents != nullptr ? normalize(Vector3f{ bufferTangents + v * tangentsStride }): Vector3f{};
-				BasicAttribs.uv0 = bufferTexCoordSet0 != nullptr ? Vector2f{ bufferTexCoordSet0 + v * texCoordSet0Stride } : Vector2f{};
+                BasicAttribs.tangent = bufferTangents != nullptr ? normalize(Vector3f{bufferTangents + v * tangentsStride}) : Vector3f{};
+                BasicAttribs.uv0 = bufferTexCoordSet0 != nullptr ? Vector2f{bufferTexCoordSet0 + v * texCoordSet0Stride} : Vector2f{};
 
-				VertexBasicData.push_back(BasicAttribs);
-			}
-		}
+                VertexBasicData.push_back(BasicAttribs);
+            }
+        }
 
         void LoadNode(SceneNode *parent,
                       const tinygltf::Node &gltf_node,
@@ -168,7 +168,7 @@ namespace Corona
                       std::vector<uint32_t> &IndexData,
                       std::vector<VertexBasicAttribs> &VertexBasicData,
                       ConvertedBufferViewMap &ConvertedBuffers,
-                        std::unique_ptr<Scene>& pScene)
+                      std::unique_ptr<Scene> &pScene)
         {
             std::unique_ptr<SceneNode> NewNode{new SceneNode{}};
             NewNode->Index = nodeIndex;
@@ -176,11 +176,11 @@ namespace Corona
             NewNode->Name = gltf_node.name;
             NewNode->Matrix = BuildIdentityMatrix();
 
-			std::unique_ptr<Model>& m_pModel = pScene->pModel;
-			// std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filename} );
-			// std::unique_ptr<Model>& m_pModel = model;
-			auto& m_Cameras = pScene->Cameras;
-			auto& m_Geometries = pScene->Geometries;
+            std::unique_ptr<Model> &m_pModel = pScene->pModel;
+            // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filename} );
+            // std::unique_ptr<Model>& m_pModel = model;
+            auto &m_Cameras = pScene->Cameras;
+            auto &m_Geometries = pScene->Geometries;
 
             // Any node can define a local space transformation either by supplying a matrix property,
             // or any of translation, rotation, and scale properties (also known as TRS properties).
@@ -285,10 +285,10 @@ namespace Corona
                             Key.NormAccess = primitive.attributes.find("NORMAL")->second;
                         }
 
-						if (primitive.attributes.find("TANGENT") != primitive.attributes.end())
-						{
-							Key.TanAccess = primitive.attributes.find("TANGENT")->second;
-						}
+                        if (primitive.attributes.find("TANGENT") != primitive.attributes.end())
+                        {
+                            Key.TanAccess = primitive.attributes.find("TANGENT")->second;
+                        }
 
                         if (primitive.attributes.find("TEXCOORD_0") != primitive.attributes.end())
                         {
@@ -421,7 +421,6 @@ namespace Corona
                     m_Cameras[NewNode->Name] = pNewCamera;
                     NewNode->pCamera = std::move(pNewCamera);
                 }
-
             }
 
             m_pModel->LinearNodes.push_back(NewNode.get());
@@ -435,84 +434,246 @@ namespace Corona
             }
         }
 
-		virtual void Parse(std::unique_ptr<Scene>& pScene) final
-		{
-			if (pScene->name == "")
-				assert("File path must not be empty");
+        void LoadMaterials(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene)
+        {
+            auto &m_Materials = pScene->Materials;
+            for (const tinygltf::Material &gltf_mat : gltf_model.materials)
+            {
+                SceneObjectMaterial Mat;
 
-			const std::string filename{ pScene->name };
+                struct TextureParameterInfo
+                {
+                    const SceneObjectMaterial::TEXTURE_ID TextureId;
+                    float &UVSelector;
+                    Vector4f &UVScaleBias;
+                    float &Slice;
+                    const char *const TextureName;
+                    const tinygltf::ParameterMap &Params;
+                };
+                // clang-format off
+                std::array<TextureParameterInfo, 5> TextureParams =
+                {
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_BASE_COLOR,    Mat.Attribs.BaseColorUVSelector,          Mat.Attribs.BaseColorUVScaleBias,          Mat.Attribs.BaseColorSlice,          "baseColorTexture",         gltf_mat.values},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_PHYSICAL_DESC, Mat.Attribs.PhysicalDescriptorUVSelector, Mat.Attribs.PhysicalDescriptorUVScaleBias, Mat.Attribs.PhysicalDescriptorSlice, "metallicRoughnessTexture", gltf_mat.values},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_NORMAL_MAP,    Mat.Attribs.NormalUVSelector,             Mat.Attribs.NormalUVScaleBias,             Mat.Attribs.NormalSlice,             "normalTexture",            gltf_mat.additionalValues},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_OCCLUSION,     Mat.Attribs.OcclusionUVSelector,          Mat.Attribs.OcclusionUVScaleBias,          Mat.Attribs.OcclusionSlice,          "occlusionTexture",         gltf_mat.additionalValues},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_EMISSIVE,      Mat.Attribs.EmissiveUVSelector,           Mat.Attribs.EmissiveUVScaleBias,           Mat.Attribs.EmissiveSlice,           "emissiveTexture",          gltf_mat.additionalValues}
+                };
+                // clang-format on
 
-			bool binary = false;
-			size_t extpos = filename.rfind('.', filename.length());
-			if (extpos != std::string::npos)
-			{
-				binary = (filename.substr(extpos + 1, filename.length() - extpos) == "glb");
-			}
+                for (const auto &Param : TextureParams)
+                {
+                    auto tex_it = Param.Params.find(Param.TextureName);
+                    if (tex_it != Param.Params.end())
+                    {
+                        Mat.TextureIds[Param.TextureId] = tex_it->second.TextureIndex();
+                        Param.UVSelector = static_cast<float>(tex_it->second.TextureTexCoord());
+                    }
+                }
 
-			std::string error;
-			std::string warning;
-			tinygltf::Model gltf_model;
+                auto ReadFactor = [](float &Factor, const tinygltf::ParameterMap &Params, const char *Name) //
+                {
+                    auto it = Params.find(Name);
+                    if (it != Params.end())
+                    {
+                        Factor = static_cast<float>(it->second.Factor());
+                    }
+                };
+                ReadFactor(Mat.Attribs.RoughnessFactor, gltf_mat.values, "roughnessFactor");
+                ReadFactor(Mat.Attribs.MetallicFactor, gltf_mat.values, "metallicFactor");
 
-			tinygltf::TinyGLTF loader;
-			bool fileLoaded = false;
+                auto ReadColorFactor = [](Vector4f &Factor, const tinygltf::ParameterMap &Params, const char *Name) //
+                {
+                    auto it = Params.find(Name);
+                    if (it != Params.end())
+                    {
+                        Factor = Vector4f::MakeVector(it->second.ColorFactor().data());
+                    }
+                };
+
+                ReadColorFactor(Mat.Attribs.BaseColorFactor, gltf_mat.values, "baseColorFactor");
+                ReadColorFactor(Mat.Attribs.EmissiveFactor, gltf_mat.additionalValues, "emissiveFactor");
+
+                {
+                    auto alpha_mode_it = gltf_mat.additionalValues.find("alphaMode");
+                    if (alpha_mode_it != gltf_mat.additionalValues.end())
+                    {
+                        const tinygltf::Parameter &param = alpha_mode_it->second;
+                        if (param.string_value == "BLEND")
+                        {
+                            Mat.Attribs.AlphaMode = SceneObjectMaterial::ALPHA_MODE_BLEND;
+                        }
+                        if (param.string_value == "MASK")
+                        {
+                            Mat.Attribs.AlphaMode = SceneObjectMaterial::ALPHA_MODE_MASK;
+                            Mat.Attribs.AlphaCutoff = 0.5f;
+                        }
+                    }
+                }
+
+                ReadFactor(Mat.Attribs.AlphaCutoff, gltf_mat.additionalValues, "alphaCutoff");
+
+                {
+                    auto double_sided_it = gltf_mat.additionalValues.find("doubleSided");
+                    if (double_sided_it != gltf_mat.additionalValues.end())
+                    {
+                        Mat.DoubleSided = double_sided_it->second.bool_value;
+                    }
+                }
+
+                Mat.Attribs.Workflow = SceneObjectMaterial::PBR_WORKFLOW_METALL_ROUGH;
+
+                // Extensions
+                // @TODO: Find out if there is a nicer way of reading these properties with recent tinygltf headers
+                {
+                    auto ext_it = gltf_mat.extensions.find("KHR_materials_pbrSpecularGlossiness");
+                    if (ext_it != gltf_mat.extensions.end())
+                    {
+                        if (ext_it->second.Has("specularGlossinessTexture"))
+                        {
+                            auto index = ext_it->second.Get("specularGlossinessTexture").Get("index");
+                            auto texCoordSet = ext_it->second.Get("specularGlossinessTexture").Get("texCoord");
+
+                            Mat.TextureIds[SceneObjectMaterial::TEXTURE_ID_PHYSICAL_DESC] = index.Get<int>();
+                            Mat.Attribs.PhysicalDescriptorUVSelector = static_cast<float>(texCoordSet.Get<int>());
+
+                            Mat.Attribs.Workflow = SceneObjectMaterial::PBR_WORKFLOW_SPEC_GLOSS;
+                        }
+
+                        if (ext_it->second.Has("diffuseTexture"))
+                        {
+                            auto index = ext_it->second.Get("diffuseTexture").Get("index");
+                            auto texCoordSet = ext_it->second.Get("diffuseTexture").Get("texCoord");
+
+                            Mat.TextureIds[SceneObjectMaterial::TEXTURE_ID_BASE_COLOR] = index.Get<int>();
+                            Mat.Attribs.BaseColorUVSelector = static_cast<float>(texCoordSet.Get<int>());
+                        }
+
+                        if (ext_it->second.Has("diffuseFactor"))
+                        {
+                            auto factor = ext_it->second.Get("diffuseFactor");
+                            for (uint32_t i = 0; i < factor.ArrayLen(); i++)
+                            {
+                                const auto val = factor.Get(i);
+                                Mat.Attribs.BaseColorFactor[i] =
+                                    val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
+                            }
+                        }
+
+                        if (ext_it->second.Has("specularFactor"))
+                        {
+                            auto factor = ext_it->second.Get("specularFactor");
+                            for (uint32_t i = 0; i < factor.ArrayLen(); i++)
+                            {
+                                const auto val = factor.Get(i);
+                                Mat.Attribs.SpecularFactor[i] =
+                                    val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
+                            }
+                        }
+                    }
+                }
+
+                // for (const auto &Param : TextureParams)
+                // {
+                //     auto TexIndex = Mat.TextureIds[Param.TextureId];
+                //     if (TexIndex >= 0)
+                //     {
+                //         const auto &TexInfo = Textures[TexIndex];
+                //         if (TexInfo.pAtlasSuballocation)
+                //         {
+                //             Param.UVScaleBias = TexInfo.pAtlasSuballocation->GetUVScaleBias();
+                //             Param.Slice = static_cast<float>(TexInfo.pAtlasSuballocation->GetSlice());
+                //         }
+                //     }
+                // }
+                
+                m_Materials[gltf_mat.name] = std::make_shared<SceneObjectMaterial>(Mat);
+            }
+
+            // Push a default material at the end of the list for meshes with no material assigned
+            m_Materials["default"] = std::make_shared<SceneObjectMaterial>();
+        }
+
+        virtual void Parse(std::unique_ptr<Scene> &pScene) final
+        {
+            if (pScene->name == "")
+                assert("File path must not be empty");
+
+            const std::string filename{pScene->name};
+
+            bool binary = false;
+            size_t extpos = filename.rfind('.', filename.length());
+            if (extpos != std::string::npos)
+            {
+                binary = (filename.substr(extpos + 1, filename.length() - extpos) == "glb");
+            }
+
+            std::string error;
+            std::string warning;
+            tinygltf::Model gltf_model;
+
+            tinygltf::TinyGLTF loader;
+            bool fileLoaded = false;
             if (binary)
                 fileLoaded = loader.LoadBinaryFromFile(&gltf_model, &error, &warning, filename);
             else
                 fileLoaded = loader.LoadASCIIFromFile(&gltf_model, &error, &warning, filename);
 
-			if (!fileLoaded)
-			{
-				printf("Failed to load gltf file");
-			}
-			if (!warning.empty())
-			{
-				printf("Loaded gltf file");
-			}
-			if (!error.empty())
-			{
-				printf("Loaded gltf file");
-			}
+            if (!fileLoaded)
+            {
+                printf("Failed to load gltf file");
+            }
+            if (!warning.empty())
+            {
+                printf("Loaded gltf file");
+            }
+            if (!error.empty())
+            {
+                printf("Loaded gltf file");
+            }
 
-			std::vector<uint32_t> IndexData;
-			std::vector<VertexBasicAttribs> VertexBasicData;
-			ConvertedBufferViewMap ConvertedBuffers;
+            // LoadTextureSamplers(pDevice, gltf_model);
+            // LoadTextures(pDevice, gltf_model, LoaderData.BaseDir, pTextureCache, pResourceMgr);
+            // LoadMaterials(gltf_model, pScene);
+
+            std::vector<uint32_t> IndexData;
+            std::vector<VertexBasicAttribs> VertexBasicData;
+            ConvertedBufferViewMap ConvertedBuffers;
 
             pScene->pModel = std::make_unique<Model>();
-			std::unique_ptr<Model>& m_pModel = pScene->pModel;
-			// std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filename} );
-			// std::unique_ptr<Model>& m_pModel = model;
-			// auto& m_Cameras = pScene->Cameras;
-			// auto& m_Geometries = pScene->Geometries;
+            std::unique_ptr<Model> &m_pModel = pScene->pModel;
+            // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filename} );
+            // std::unique_ptr<Model>& m_pModel = model;
+            // auto& m_Cameras = pScene->Cameras;
+            // auto& m_Geometries = pScene->Geometries;
 
-			// TODO: scene handling with no default scene
-			const tinygltf::Scene& scene = gltf_model.scenes[gltf_model.defaultScene > -1 ? gltf_model.defaultScene : 0];
-			for (size_t i = 0; i < scene.nodes.size(); i++)
-			{
-				const tinygltf::Node node = gltf_model.nodes[scene.nodes[i]];
-				LoadNode(nullptr, node, scene.nodes[i], gltf_model,
-					IndexData, VertexBasicData, ConvertedBuffers, pScene);
-			}
+            // TODO: scene handling with no default scene
+            const tinygltf::Scene &scene = gltf_model.scenes[gltf_model.defaultScene > -1 ? gltf_model.defaultScene : 0];
+            for (size_t i = 0; i < scene.nodes.size(); i++)
+            {
+                const tinygltf::Node node = gltf_model.nodes[scene.nodes[i]];
+                LoadNode(nullptr, node, scene.nodes[i], gltf_model,
+                         IndexData, VertexBasicData, ConvertedBuffers, pScene);
+            }
 
-			// for (auto* node : LinearNodes)
-			// {
-			//     // Assign skins
-			//     if (node->SkinIndex >= 0)
-			//     {
-			//         node->pSkin = Skins[node->SkinIndex].get();
-			//     }
-			// }
+            // for (auto* node : LinearNodes)
+            // {
+            //     // Assign skins
+            //     if (node->SkinIndex >= 0)
+            //     {
+            //         node->pSkin = Skins[node->SkinIndex].get();
+            //     }
+            // }
 
-			// Initial pose
-			for (auto& root_node : m_pModel->Nodes)
-			{
-				root_node->UpdateTransforms();
-			}
-			// TODO: use this function to get boundbox and BVH
-			// CalculateSceneDimensions();
+            // Initial pose
+            for (auto &root_node : m_pModel->Nodes)
+            {
+                root_node->UpdateTransforms();
+            }
+            // TODO: use this function to get boundbox and BVH
+            // CalculateSceneDimensions();
 
-			// UpdatePrimitiveData();
-		}
-
-
+            // UpdatePrimitiveData();
+        }
     };
 }

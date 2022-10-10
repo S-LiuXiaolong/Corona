@@ -37,11 +37,13 @@ namespace Corona
         std::vector<std::unique_ptr<SceneNode>> Nodes;
         std::vector<SceneNode *> LinearNodes;
 
+        std::vector<SceneObjectTexture> Textures;
+        std::vector<SceneObjectMaterial> Materials;
+
         // std::vector<std::unique_ptr<Material>> Materials;
         std::vector<std::string> Extensions;
 
         Model();
         ~Model();
-
     };
 }

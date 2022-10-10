@@ -112,6 +112,16 @@ namespace Corona
         operator T *() { return data; };
         operator const T *() const { return static_cast<const T *>(data); };
 
+        template <typename Y>
+        constexpr static Vector2Type MakeVector(const Y& vals)
+        {
+            return Vector2Type //
+                {
+                    static_cast<T>(vals[0]),
+                    static_cast<T>(vals[1]) //
+                };
+        }
+
     };
 
     typedef Vector2Type<float> Vector2f;
@@ -154,7 +164,16 @@ namespace Corona
         operator T *() { return data; };
         operator const T *() const { return static_cast<const T *>(data); };
 
-
+        template <typename Y>
+        constexpr static Vector3Type MakeVector(const Y& vals)
+        {
+            return Vector3Type //
+                {
+                    static_cast<T>(vals[0]),
+                    static_cast<T>(vals[1]),
+                    static_cast<T>(vals[2]) //
+                };
+        }
     };
 
     typedef Vector3Type<float> Vector3f;
@@ -197,6 +216,18 @@ namespace Corona
             memcpy(data, f, sizeof(T) * 4);
             return *this;
         };
+
+        template <typename Y>
+        constexpr static Vector4Type MakeVector(const Y& vals)
+        {
+            return Vector4Type //
+                {
+                    static_cast<T>(vals[0]),
+                    static_cast<T>(vals[1]),
+                    static_cast<T>(vals[2]),
+                    static_cast<T>(vals[3]) //
+                };
+        }
     };
 
     typedef Vector4Type<float> Vector4f;

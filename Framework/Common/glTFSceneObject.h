@@ -244,7 +244,8 @@ namespace Corona
         }
     };
 
-    class SceneObjectMaterial : public BaseSceneObject
+    // class SceneObjectMaterial : public BaseSceneObject
+    struct SceneObjectMaterial
     {
     public:
         enum PBR_WORKFLOW
@@ -322,7 +323,7 @@ namespace Corona
         // Texture indices in Model.Textures array
         std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds = {};
     public:
-        SceneObjectMaterial() : BaseSceneObject(SceneObjectType::SceneObjectTypeMaterial) {};
+        // SceneObjectMaterial() : BaseSceneObject(SceneObjectType::SceneObjectTypeMaterial) {};
     };
 
     class SceneObjectTexture : public BaseSceneObject
