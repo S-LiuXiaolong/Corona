@@ -29,11 +29,11 @@ int main(int argc, const char** argv)
             buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/BoomBoxWithAxes_baseColor.jpg");
         }
 
-        JfifParser jfif_parser;
+        // JfifParser jfif_parser;
 
-        Image image = jfif_parser.Parse(buf);
+        // Image image = jfif_parser.Parse(buf);
 
-        cout << image;
+        // cout << image;
     }
 
     g_pAssetLoader->Finalize();

@@ -16,7 +16,6 @@ Image::Image(Image&& rhs) noexcept {
     bitdepth = rhs.bitdepth;
     pixel_format = rhs.pixel_format;
     is_signed = rhs.is_signed;
-    mipmaps = std::move(rhs.mipmaps);
     rhs.data = nullptr;
 }
 
@@ -34,7 +33,6 @@ Image& Image::operator=(Image&& rhs) noexcept {
         bitdepth = rhs.bitdepth;
         pixel_format = rhs.pixel_format;
         is_signed = rhs.is_signed;
-        mipmaps = std::move(rhs.mipmaps);
         rhs.data = nullptr;
     }
     return *this;
@@ -190,102 +188,4 @@ ostream& operator<<(ostream& out, const Image& image) {
     return out;
 }
 
-void adjust_image(Image& image) {
-    if (!image.compressed) {
-        if (image.pixel_format == PIXEL_FORMAT::RGB8) {
-            // DXGI does not have 24bit formats so we have to extend it to 32bit
-            auto new_pitch = image.pitch / 3 * 4;
-            auto data_size = (size_t)new_pitch * image.Height;
-            auto* data = new uint8_t[data_size];
-            uint8_t* buf;
-            uint8_t* src;
-            for (decltype(image.Height) row = 0; row < image.Height; row++) {
-                buf = data + (ptrdiff_t)row * new_pitch;
-                src = image.data + (ptrdiff_t)row * image.pitch;
-                for (decltype(image.Width) col = 0; col < image.Width; col++) {
-                    memcpy(buf, src, 3);
-                    memset(buf + 3, 0xFF, 1);  // set alpha to 255
-                    buf += 4;
-                    src += 3;
-                }
-            }
-
-            delete[] image.data;
-            image.data = data;
-            image.data_size = data_size;
-            image.pitch = new_pitch;
-            image.bitcount = 32;
-            image.pixel_format = PIXEL_FORMAT::RGBA8;
-
-            // adjust mipmaps
-            for (auto& mip : image.mipmaps) {
-                mip.pitch = mip.pitch / 3 * 4;
-                mip.offset = mip.offset / 3 * 4;
-                mip.data_size = mip.data_size / 3 * 4;
-            }
-        } else if (image.pixel_format == PIXEL_FORMAT::RGB16) {
-            // DXGI does not have 48bit formats so we have to extend it to 64bit
-            auto new_pitch = image.pitch / 3 * 4;
-            auto data_size = new_pitch * image.Height;
-            auto* data = new uint8_t[data_size];
-            uint8_t* buf;
-            uint8_t* src;
-            for (decltype(image.Height) row = 0; row < image.Height; row++) {
-                buf = data + (ptrdiff_t)row * new_pitch;
-                src = image.data + (ptrdiff_t)row * image.pitch;
-                for (decltype(image.Width) col = 0; col < image.Width; col++) {
-                    memcpy(buf, src, 6);
-                    *reinterpret_cast<int16_t*>(buf + 6) = 0b0000'0100'0000'0000; // set alpha to (fp16)1.0 = 0b 0 00001 0000 0000 00
-                    buf += 8;
-                    src += 6;
-                }
-            }
-
-            delete[] image.data;
-            image.data = data;
-            image.data_size = data_size;
-            image.pitch = new_pitch;
-            image.bitcount = 64;
-            image.pixel_format = PIXEL_FORMAT::RGBA16;
-
-            // adjust mipmaps
-            for (auto& mip : image.mipmaps) {
-                mip.pitch = mip.pitch / 3 * 4;
-                mip.offset = mip.offset / 3 * 4;
-                mip.data_size = mip.data_size / 3 * 4;
-            }
-        } else if (image.pixel_format == PIXEL_FORMAT::RGB32) {
-            // DXGI does not have 48bit formats so we have to extend it to 64bit
-            auto new_pitch = image.pitch / 3 * 4;
-            auto data_size = new_pitch * image.Height;
-            auto* data = new uint8_t[data_size];
-            uint8_t* buf;
-            uint8_t* src;
-            for (decltype(image.Height) row = 0; row < image.Height; row++) {
-                buf = data + (ptrdiff_t)row * new_pitch;
-                src = image.data + (ptrdiff_t)row * image.pitch;
-                for (decltype(image.Width) col = 0; col < image.Width; col++) {
-                    memcpy(buf, src, 12);
-                    *reinterpret_cast<float*>(buf + 12) = 1.0f;
-                    buf += 16;
-                    src += 12;
-                }
-            }
-
-            delete[] image.data;
-            image.data = data;
-            image.data_size = data_size;
-            image.pitch = new_pitch;
-            image.bitcount = 128;
-            image.pixel_format = PIXEL_FORMAT::RGBA32;
-
-            // adjust mipmaps
-            for (auto& mip : image.mipmaps) {
-                mip.pitch = mip.pitch / 3 * 4;
-                mip.offset = mip.offset / 3 * 4;
-                mip.data_size = mip.data_size / 3 * 4;
-            }
-        }
-    }
-}
 }  // namespace Corona

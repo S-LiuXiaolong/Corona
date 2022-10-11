@@ -57,14 +57,14 @@ int TestApplication::Initialize()
         if (m_nArgC > 1) {
             buf = g_pAssetLoader->SyncOpenAndReadBinary(m_ppArgV[1]);
         } else {
-            buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/test.jfif");
+            buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/SciFiHelmet_Normal.png");
         }
 
 		PngParser  png_parser;
-		JfifParser jfif_parser;
+		// JfifParser jfif_parser;
 
-        // m_Image = png_parser.Parse(buf);
-        m_Image = jfif_parser.Parse(buf);
+        m_Image = png_parser.Parse(buf);
+        // m_Image = jfif_parser.Parse(buf);
     }
 
     return result;
@@ -89,7 +89,7 @@ void TestGraphicsManager::DrawBitmap(const Image& image)
     props.dpiY = 72.0f;
     SafeRelease(&m_pBitmap);
     hr = m_pRenderTarget->CreateBitmap(D2D1::SizeU(image.Width, image.Height), 
-                                                    image.data, image.pitch, props, &m_pBitmap);
+                                                    image.data, (UINT32)image.pitch, props, &m_pBitmap);
 
     D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
     D2D1_SIZE_F bmpSize = m_pBitmap->GetSize();

@@ -84,26 +84,9 @@ struct Image {
     bool compressed{false};
     bool is_float{false};
     bool is_signed{false};
-    uint8_t* data{nullptr};
+    uint8_t* data;
     COMPRESSED_FORMAT compress_format{COMPRESSED_FORMAT::NONE};
     PIXEL_FORMAT pixel_format{PIXEL_FORMAT::UNKNOWN};
-    struct Mipmap {
-        uint32_t Width{0};
-        uint32_t Height{0};
-        size_t pitch{0};
-        size_t offset{0};
-        size_t data_size{0};
-
-        Mipmap(uint32_t width, uint32_t height, size_t pitch_, size_t offset_,
-               size_t data_size_) {
-            Width = width;
-            Height = height;
-            pitch = pitch_;
-            offset = offset_;
-            data_size = data_size_;
-        }
-    };
-    std::vector<Mipmap> mipmaps;
 
     Image() = default;
     Image(const Image& rhs) = delete;  // disable copy contruct
@@ -111,7 +94,7 @@ struct Image {
     Image& operator=(const Image& rhs) = delete;  // disable copy assignment
     Image& operator=(Image&& rhs) noexcept;
     ~Image() {
-        if (data) delete[] data;
+        delete[] data;
     }
 
     uint8_t GetR(uint32_t x, uint32_t y) const {
@@ -303,5 +286,4 @@ struct Image {
 
 std::ostream& operator<<(std::ostream& out, const Image& image);
 
-void adjust_image(Image& image);
 }  // namespace My

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "AssetLoader.h"
 #include "MemoryManager.h"
+#include "Image.h"
 
 #include "lodepng/lodepng.h"
 
@@ -59,6 +60,7 @@ void decodeWithState(const char* filename) {
 
     //the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
     //State state contains extra information about the PNG such as text chunks, ...
+
 }
 
 using namespace Corona;

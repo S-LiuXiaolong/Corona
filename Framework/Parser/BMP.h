@@ -62,7 +62,7 @@ class BmpParser : implements ImageParser {
             auto byte_count = img.bitcount >> 3;
             img.pitch = ((img.Width * byte_count) + 3) & ~3;
             img.data_size = (size_t)img.pitch * img.Height;
-            img.data = new uint8_t[img.data_size];
+            // img.data = new uint8_t[img.data_size];
 
             if (img.bitcount < 24) {
                 std::cerr << "Sorry, only true color BMP is supported at now."
@@ -74,7 +74,7 @@ class BmpParser : implements ImageParser {
                 for (int32_t y = img.Height - 1; y >= 0; y--) {
                     for (uint32_t x = 0; x < img.Width; x++) {
                         auto dst = reinterpret_cast<R8G8B8A8Unorm*>(
-                            reinterpret_cast<uint8_t*>(img.data) +
+                            (img.data) +
                             (ptrdiff_t)img.pitch *
                                 ((ptrdiff_t)img.Height - y - 1) +
                             (ptrdiff_t)x * byte_count);
@@ -90,8 +90,6 @@ class BmpParser : implements ImageParser {
             }
         }
 
-        img.mipmaps.emplace_back(img.Width, img.Height, img.pitch, 0,
-                                 img.data_size);
 
         return img;
     }

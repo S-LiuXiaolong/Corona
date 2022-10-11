@@ -441,12 +441,12 @@ namespace Corona
             // duplicated load. This could be done in Asset Loader Manager.
 			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
 			std::string ext = imagePath.substr(imagePath.find_last_of("."));
-			if (ext == ".jpg" || ext == ".jpeg")
-			{
-				JfifParser jfif_parser;
-				pImage = std::make_shared<Image>(jfif_parser.Parse(buf));
-			}
-			else if (ext == ".png")
+// 			if (ext == ".jpg" || ext == ".jpeg")
+// 			{
+// 				JfifParser jfif_parser;
+// 				pImage = std::make_shared<Image>(jfif_parser.Parse(buf));
+// 			}
+			if (ext == ".png")
 			{
 				PngParser png_parser;
 				pImage = std::make_shared<Image>(png_parser.Parse(buf));
