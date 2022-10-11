@@ -1,7 +1,7 @@
 prefix=F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows
 exec_prefix=F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows
 libdir=F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows/lib
-includedir=F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows/include/libjpeg_turbo
+includedir=F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows/include/libjpeg-turbo
 
 Name: libturbojpeg
 Description: A SIMD-accelerated JPEG codec that provides the TurboJPEG API
