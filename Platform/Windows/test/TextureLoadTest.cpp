@@ -6,6 +6,7 @@
 #include "AssetLoader.h"
 #include "utility.h"
 #include "BMP.h"
+#include "JPEG.h"
 
 using namespace Corona;
 using namespace std;
@@ -57,14 +58,15 @@ int TestApplication::Initialize()
         if (m_nArgC > 1) {
             buf = g_pAssetLoader->SyncOpenAndReadBinary(m_ppArgV[1]);
         } else {
-            buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/SciFiHelmet_Normal.png");
+            buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/photo3.jpg");
+            // buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/SciFiHelmet_Normal.png");
         }
 
 		PngParser  png_parser;
-		// JfifParser jfif_parser;
+        JpegParser jpeg_parser;
 
-        m_Image = png_parser.Parse(buf);
-        // m_Image = jfif_parser.Parse(buf);
+        // m_Image = png_parser.Parse(buf);
+        m_Image = jpeg_parser.Parse(buf);
     }
 
     return result;
