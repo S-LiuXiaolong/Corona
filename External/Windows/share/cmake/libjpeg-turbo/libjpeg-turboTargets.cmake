@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget libjpeg-turbo::turbojpeg-static libjpeg-turbo::jpeg-static)
+foreach(_expectedTarget libjpeg-turbo::jpeg-static)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -44,19 +44,8 @@ unset(_expectedTargets)
 # The installation prefix configured by this project.
 set(_IMPORT_PREFIX "F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows")
 
-# Create imported target libjpeg-turbo::turbojpeg-static
-add_library(libjpeg-turbo::turbojpeg-static STATIC IMPORTED)
-
-set_target_properties(libjpeg-turbo::turbojpeg-static PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows/include/libjpeg_turbo"
-)
-
 # Create imported target libjpeg-turbo::jpeg-static
 add_library(libjpeg-turbo::jpeg-static STATIC IMPORTED)
-
-set_target_properties(libjpeg-turbo::jpeg-static PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "F:/work_space/Corona/External/build/libjpeg-turbo/../../Windows/include/libjpeg_turbo"
-)
 
 # Load information for each installed configuration.
 get_filename_component(_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
