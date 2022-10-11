@@ -29,3 +29,7 @@ target_link_libraries(gltfSceneManagerTest
             optimized  ${XG_LIBRARY_RELEASE} 
             optimized  ${TINYGLTF_LIBRARY_RELEASE}
             )
+
+add_executable(JpegParserTest JpegParserTest.cpp)
+target_link_libraries(JpegParserTest Common)
+add_test(NAME TEST_JpegParser COMMAND JpegParserTest)

@@ -20,7 +20,7 @@ int main(int , char** )
     // string shader_pgm = asset_loader.SyncOpenAndReadTextFileToString("Shaders/illum.hs");
     // cout << shader_pgm;
     // string imgPath = g_pAssetLoader->GetFilePath("Scene/BoomBoxWithAxes/BoomBoxWithAxes_emissive.jpg");
-    string imgPath = "Textures/test.jpg";
+    string imgPath = "Scene/FlightHelmet/FlightHelmet_baseColor.jpg";
     std::shared_ptr<Image> img;
     GltfParser gltf_parser;
     gltf_parser.ParseImage(imgPath, img);

@@ -25,20 +25,20 @@ class HuffmanNode : public TreeNode {
     HuffmanNode(HuffmanNode&&) noexcept = default;
     HuffmanNode& operator=(HuffmanNode&) = default;
     HuffmanNode& operator=(HuffmanNode&&) noexcept = default;
-    [[nodiscard]] bool IsLeaf() const { return m_isLeaf; }
+    bool IsLeaf() const { return m_isLeaf; }
     void SetLeft(std::shared_ptr<HuffmanNode> pNode) { m_Children.front() = pNode; }
     void SetRight(std::shared_ptr<HuffmanNode> pNode) { m_Children.back() = pNode; }
-    [[nodiscard]] const std::shared_ptr<HuffmanNode<T>> GetLeft() const {
+    const std::shared_ptr<HuffmanNode<T>> GetLeft() const {
         return std::dynamic_pointer_cast<HuffmanNode>(m_Children.front());
     }
-    [[nodiscard]] const std::shared_ptr<HuffmanNode<T>> GetRight() const {
+    const std::shared_ptr<HuffmanNode<T>> GetRight() const {
         return std::dynamic_pointer_cast<HuffmanNode>(m_Children.back());
     }
     void SetValue(T value) {
         m_Value = value;
         m_isLeaf = true;
     }
-    [[nodiscard]] T GetValue() const { return m_Value; }
+    T GetValue() const { return m_Value; }
 };
 
 template <typename T>
