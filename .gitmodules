@@ -10,9 +10,6 @@
 [submodule "External/src/zlib"]
 	path = External/src/zlib
 	url = https://github.com/S-LiuXiaolong/zlib.git
-[submodule "External/src/libjpeg-turbo"]
-	path = External/src/libjpeg-turbo
-	url = https://github.com/S-LiuXiaolong/libjpeg-turbo.git
 [submodule "External/src/lodepng"]
 	path = External/src/lodepng
 	url = https://github.com/S-LiuXiaolong/lodepng.git
