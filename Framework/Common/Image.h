@@ -94,7 +94,7 @@ struct Image {
     Image& operator=(const Image& rhs) = delete;  // disable copy assignment
     Image& operator=(Image&& rhs) noexcept;
     ~Image() {
-        delete[] data;
+        if (data) delete[] data;
     }
 
     uint8_t GetR(uint32_t x, uint32_t y) const {
