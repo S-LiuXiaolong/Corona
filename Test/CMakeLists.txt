@@ -32,4 +32,10 @@ target_link_libraries(gltfSceneManagerTest
 
 add_executable(JpegParserTest JpegParserTest.cpp)
 target_link_libraries(JpegParserTest Common)
-add_test(NAME TEST_JpegParser COMMAND JpegParserTest)
+
+add_executable(lodepngTest lodepngTest.cpp)
+target_link_libraries(lodepngTest Common)
+target_link_libraries(lodepngTest 
+            debug ${LODEPNG_LIBRARY_DEBUG})
+target_link_libraries(lodepngTest 
+            optimized ${LODEPNG_LIBRARY_RELEASE})

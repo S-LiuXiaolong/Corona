@@ -53,7 +53,9 @@ find_library(TINYGLTF_LIBRARY_RELEASE    tinyglTF PATHS ${MYGE_EXTERNAL_LIBRARY_
 
 find_library(ZLIB_LIBRARY_DEBUG      zlibstaticd PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
 find_library(ZLIB_LIBRARY_RELEASE    zlibstatic PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
-# target_link_libraries(Common ${XG_LIBRARY} ${OPENDDL_LIBRARY} ${OPENGEX_LIBRARY})
+
+find_library(LODEPNG_LIBRARY_DEBUG      lodepng PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
+find_library(LODEPNG_LIBRARY_RELEASE    lodepng PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
 
 if(WIN32)
     add_definitions(-DGUID_WINDOWS)
