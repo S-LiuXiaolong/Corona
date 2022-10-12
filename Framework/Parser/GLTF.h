@@ -441,12 +441,12 @@ namespace Corona
             // duplicated load. This could be done in Asset Loader Manager.
 			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
 			std::string ext = imagePath.substr(imagePath.find_last_of("."));
-// 			if (ext == ".jpg" || ext == ".jpeg")
-// 			{
-// 				JfifParser jfif_parser;
-// 				pImage = std::make_shared<Image>(jfif_parser.Parse(buf));
-// 			}
-			if (ext == ".png")
+			if (ext == ".jpg" || ext == ".jpeg")
+			{
+				JpegParser jpeg_parser;
+				pImage = std::make_shared<Image>(jpeg_parser.Parse(buf));
+			}
+			else if (ext == ".png")
 			{
 				PngParser png_parser;
 				pImage = std::make_shared<Image>(png_parser.Parse(buf));
@@ -649,7 +649,7 @@ namespace Corona
 					 if (!ImageId.empty())
 					 {
 						 std::shared_ptr<Image> m_pImage{};
-						 ParseImage(ImageId, m_pImage);
+						 ParseImage(ImageId, m_pImage); // TODO
                          auto texture = std::make_shared<SceneObjectTexture>(m_pImage);
                          texture->SetName("");
                          Mat.Textures[gltf_tex.source] = texture;

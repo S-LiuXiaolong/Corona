@@ -24,6 +24,10 @@ struct Material
     float Shininess;
 };
 
+SamplerState samp0 : register(s0);
+Texture2D colorMap : register(t0);
+//Texture2D metalRoughnessMap: register(t1);
+
 // ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)
 cbuffer PerFrameConstants : register(b0)
 {
@@ -57,9 +61,9 @@ struct default_vert_output
 {
     float4 Position      : SV_POSITION;
 	float4 WorldPosition : POSITION;
-    //float2 TextureUV     : TEXCOORD0;
-	float3 vNorm		 : TEXCOORD0;
-	float3 vLightDir	 : TEXCOORD1;
+    float2 TextureUV     : TEXCOORD0;
+	float3 vNorm		 : TEXCOORD1;
+	float3 vLightDir	 : TEXCOORD2;
 };
 
 #endif // !__VSOUTPUT_H__

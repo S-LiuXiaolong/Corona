@@ -4,6 +4,7 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include "d3dx12.h"
+#include <map>
 #include "GraphicsManager.h"
 #include "Buffer.h"
 #include "Image.h"
@@ -28,7 +29,7 @@ namespace Corona
         HRESULT CreateDepthStencil();
         HRESULT CreateGraphicsResources();
         HRESULT CreateSamplerBuffer();
-        HRESULT CreateTextureBuffer();
+        HRESULT CreateTextureBuffer(Image& image);
         HRESULT CreateConstantBuffer();
         // HRESULT CreateIndexBuffer(const Buffer& buffer);
         // HRESULT CreateVertexBuffer(const Buffer& buffer);
@@ -50,7 +51,7 @@ namespace Corona
         static const uint32_t           kFrameCount  = 2;
         static const uint32_t           kMaxSceneObjectCount  = 65535;
         static const uint32_t           kMaxTextureCount  = 2048;
-		static const uint32_t		    kTextureDescStartIndex = kFrameCount * (1 + kMaxSceneObjectCount);
+		static const uint32_t		    kTextureDescStartIndex = kFrameCount * kMaxSceneObjectCount * 2;
 
         ID3D12Device*                   m_pDev       = nullptr;             // the pointer to our Direct3D device interface
         D3D12_VIEWPORT                  m_ViewPort;                         // viewport structure
@@ -74,9 +75,10 @@ namespace Corona
         uint32_t                        m_nCbvSrvDescriptorSize;
 
         std::vector<ID3D12Resource*>    m_Buffers;                          // the pointer to the vertex buffer
+        std::vector<ID3D12Resource*>    m_Textures;                          // the pointer to the vertex buffer
+        std::map<std::string, int32_t>  m_TextureIndex;
         std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_VertexBufferView;                 // a view of the vertex buffer
         std::vector<D3D12_INDEX_BUFFER_VIEW>        m_IndexBufferView;                  // a view of the vertex buffer
-        ID3D12Resource*                 m_pTextureBuffer = nullptr;         // the pointer to the texture buffer
 
         struct DrawBatchContext {
             int32_t count;

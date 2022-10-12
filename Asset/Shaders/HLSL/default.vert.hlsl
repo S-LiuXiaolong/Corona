@@ -15,7 +15,7 @@ default_vert_output default_vert_main(a2v_default input)
 
 	output.vNorm = normalize(vN);
 
-	//output.TextureUV = input.TextureUV;
+	output.TextureUV = input.TextureUV;
 
 	return output;
 }

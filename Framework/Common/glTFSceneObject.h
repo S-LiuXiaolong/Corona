@@ -254,7 +254,7 @@ namespace Corona
 		void SetName(std::string&& name) { m_Name = std::move(name); };
 		const std::string& GetName() const { return m_Name; };
 
-		const Image& GetTextureImage()
+		Image& GetTextureImage()
 		{
 			return *m_pImage;
 		};

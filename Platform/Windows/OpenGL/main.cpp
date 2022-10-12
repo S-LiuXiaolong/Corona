@@ -133,7 +133,7 @@ int main()
 	Buffer buf;
 
 	Image m_Image;
-	std::string imagePath = "Textures/photo3.jpg";
+	std::string imagePath = "Scene/DamagedHelmet/Default_albedo.jpg";
 	buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
 
 	std::string ext = imagePath.substr(imagePath.find_last_of("."));

@@ -105,7 +105,7 @@ namespace Corona
         // Unordered Access View (UAV) descriptor heap.
         D3D12_DESCRIPTOR_HEAP_DESC cbvSrvUavHeapDesc = {};
         cbvSrvUavHeapDesc.NumDescriptors =
-            kFrameCount * ( 1 + kMaxSceneObjectCount)           // 1 perFrame and kMaxSceneObjectCount perBatch Cbvs * kFrameCount
+            kFrameCount * (2 * kMaxSceneObjectCount)            // 1 perFrame and 1 per DrawBatch
             + kMaxTextureCount;                                 // + kMaxTextureCount for the SRV(Texture).
         cbvSrvUavHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
         cbvSrvUavHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
@@ -117,7 +117,7 @@ namespace Corona
 
         // Describe and create a sampler descriptor heap.
         D3D12_DESCRIPTOR_HEAP_DESC samplerHeapDesc = {};
-        samplerHeapDesc.NumDescriptors = 2048; // this is the max D3d12 HW support currently
+        samplerHeapDesc.NumDescriptors = kMaxTextureCount; // this is the max D3d12 HW support currently
         samplerHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
         samplerHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         if(FAILED(hr = m_pDev->CreateDescriptorHeap(&samplerHeapDesc, IID_PPV_ARGS(&m_pSamplerHeap)))) {
@@ -377,7 +377,7 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateTextureBuffer()
+    HRESULT D3d12GraphicsManager::CreateTextureBuffer(Image& image)
     {
         // HRESULT hr;
 
@@ -411,7 +411,11 @@ namespace Corona
         // return hr;
 
         // ?
-        HRESULT hr;
+        HRESULT hr = S_OK;
+
+        // auto it = m_TextureIndex.find(texture.GetName());
+        // if (it == m_TextureIndex.end()) {
+        //     auto image = texture.GetTextureImage();
 
         // Describe and create a Texture2D.
         D3D12_HEAP_PROPERTIES prop = {};
@@ -423,40 +427,120 @@ namespace Corona
 
         D3D12_RESOURCE_DESC textureDesc = {};
         textureDesc.MipLevels = 1;
+        // ? only for PNG
         textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        // ? why width and height 1 here
-        textureDesc.Width = 1;
-        textureDesc.Height = 1;
+        textureDesc.Width = image.Width;
+        textureDesc.Height = image.Height;
         textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
         textureDesc.DepthOrArraySize = 1;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;
         textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
+		ID3D12Resource* pTextureBuffer;
+		ID3D12Resource* pTextureUploadHeap;
+
         if (FAILED(hr = m_pDev->CreateCommittedResource(
             &prop,
             D3D12_HEAP_FLAG_NONE,
             &textureDesc,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+            D3D12_RESOURCE_STATE_COPY_DEST,
             nullptr,
-            IID_PPV_ARGS(&m_pTextureBuffer))))
+            IID_PPV_ARGS(&pTextureBuffer))))
         {
             return hr;
         }
 
-        for (int32_t i = 0; i < kMaxTextureCount; i++)
+		const UINT subresourceCount = textureDesc.DepthOrArraySize * textureDesc.MipLevels;
+		const UINT64 uploadBufferSize = GetRequiredIntermediateSize(pTextureBuffer, 0, subresourceCount);
+
+        prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+		D3D12_RESOURCE_DESC resourceDesc = {};
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.Alignment = 0;
+		resourceDesc.Width = uploadBufferSize;
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		if (FAILED(hr = m_pDev->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&pTextureUploadHeap)
+		)))
+		{
+			return hr;
+		}
+
+		// Copy data to the intermediate upload heap and then schedule a copy 
+		// from the upload heap to the Texture2D.
+		D3D12_SUBRESOURCE_DATA textureData = {};
+        if (image.bitcount == 24)
         {
-            // Describe and create a SRV for the texture.
-            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Texture2D.MipLevels = 1;
-            D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
-            srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + i) * m_nCbvSrvDescriptorSize;
-            m_pDev->CreateShaderResourceView(m_pTextureBuffer, &srvDesc, srvHandle);
+            // DXGI does not have 24bit formats so we have to extend it to 32bit
+            uint32_t new_pitch = image.pitch / 3 * 4;
+            size_t data_size = new_pitch * image.Height;
+            void* data = g_pMemoryManager->Allocate(data_size);
+            uint8_t* buf = reinterpret_cast<uint8_t*>(data);
+            uint8_t* src = reinterpret_cast<uint8_t*>(image.data);
+            for (auto row = 0; row < image.Height; row++) {
+                buf = reinterpret_cast<uint8_t*>(data) + row * new_pitch;
+                src = reinterpret_cast<uint8_t*>(image.data) + row * image.pitch;
+                for (auto col = 0; col < image.Width; col++) {
+                    *(uint32_t*)buf = *(uint32_t*)src;
+                    buf[3] = 0;  // set alpha to 0
+                    buf += 4;
+                    src += 3;
+                }
+            }
+            // we do not need to free the old data because the old data is still referenced by the
+            // SceneObject
+            // g_pMemoryManager->Free(image.data, image.data_size);
+            image.data = (uint8_t*)data;
+            image.data_size = data_size;
+            image.pitch = new_pitch;
         }
 
+        textureData.pData = image.data;
+        textureData.RowPitch = image.pitch;
+        textureData.SlicePitch = image.pitch * image.Height;
+
+        UpdateSubresources(m_pCommandList, pTextureBuffer, pTextureUploadHeap, 0, 0, subresourceCount, &textureData);
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = pTextureBuffer;
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_GENERIC_READ;
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        m_pCommandList->ResourceBarrier(1, &barrier);
+
+        // Describe and create a SRV for the texture.
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = -1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
+        // int32_t texture_id = m_TextureIndex.size();
+        int32_t texture_id = 1;
+        srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_id) * m_nCbvSrvDescriptorSize;
+        m_pDev->CreateShaderResourceView(pTextureBuffer, &srvDesc, srvHandle);
+        // m_TextureIndex[texture.GetName()] = texture_id;
+
+        m_Buffers.push_back(pTextureUploadHeap);
+        m_Textures.push_back(pTextureBuffer);
+        
         return hr;
     }
 
@@ -513,25 +597,30 @@ namespace Corona
             return hr;
         }
 
-        for (uint32_t i = 0; i < kFrameCount; i++)
+        // TODO
+        // populate descriptor table
+        D3D12_CPU_DESCRIPTOR_HANDLE cbvHandle;
+        cbvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+        for (auto i = 0; i < kFrameCount; i++)
         {
-            D3D12_CPU_DESCRIPTOR_HANDLE cbvHandle;
-            cbvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + i * (1 + kMaxSceneObjectCount) * m_nCbvSrvDescriptorSize;
-            // Describe and create a per frame constant buffer view.
-            D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-            // ? why BufferLocation not add
-            cbvDesc.BufferLocation = pConstantUploadBuffer->GetGPUVirtualAddress();
-            cbvDesc.SizeInBytes = kSizePerFrameConstantBuffer;
-            m_pDev->CreateConstantBufferView(&cbvDesc, cbvHandle);
-
-            for (uint32_t j = 0; j < kMaxSceneObjectCount; j++)
+            for (auto j = 0; j < kMaxSceneObjectCount; j++)
             {
-                D3D12_CPU_DESCRIPTOR_HANDLE cbvHandle2;
-                cbvHandle2.ptr = cbvHandle.ptr + (j + 1) * m_nCbvSrvDescriptorSize;
-                // Describe and create a per frame constant buffer view.
-                cbvDesc.BufferLocation = pConstantUploadBuffer->GetGPUVirtualAddress() + kSizePerFrameConstantBuffer + j * kSizePerBatchConstantBuffer;
+                // Describe and create constant buffer descriptors.
+                // 1 per frame and 1 per batch descriptor per object
+                D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+
+                // Per frame constant buffer descriptors
+                cbvDesc.BufferLocation = pConstantUploadBuffer->GetGPUVirtualAddress() 
+                                            + i * kSizeConstantBufferPerFrame;
+                cbvDesc.SizeInBytes = kSizePerFrameConstantBuffer;
+                m_pDev->CreateConstantBufferView(&cbvDesc, cbvHandle);
+                cbvHandle.ptr += m_nCbvSrvDescriptorSize;
+
+                // Per batch constant buffer descriptors
+                cbvDesc.BufferLocation += kSizePerFrameConstantBuffer + j * kSizePerBatchConstantBuffer;
                 cbvDesc.SizeInBytes = kSizePerBatchConstantBuffer;
-                m_pDev->CreateConstantBufferView(&cbvDesc, cbvHandle2);
+                m_pDev->CreateConstantBufferView(&cbvDesc, cbvHandle);
+                cbvHandle.ptr += m_nCbvSrvDescriptorSize;
             }
         }
 
@@ -541,6 +630,136 @@ namespace Corona
         m_Buffers.push_back(pConstantUploadBuffer);
 
         return hr;
+    }
+
+    HRESULT D3d12GraphicsManager::CreateGraphicsResources()
+    {
+        HRESULT hr;
+
+#if defined(_DEBUG)
+        // Enable the D3D12 debug layer.
+        {
+            ID3D12Debug* pDebugController;
+            if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&pDebugController))))
+            {
+                pDebugController->EnableDebugLayer();
+            }
+            SafeRelease(&pDebugController);
+        }
+#endif
+
+        IDXGIFactory4* pFactory;
+        if (FAILED(hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory))))
+        {
+            return hr;
+        }
+
+        IDXGIAdapter1* pHardwareAdapter;
+        GetHardwareAdapter(pFactory, &pHardwareAdapter);
+
+        if (FAILED(D3D12CreateDevice(pHardwareAdapter,
+            D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDev))))
+        {
+
+            IDXGIAdapter* pWarpAdapter;
+            if (FAILED(hr = pFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter))))
+            {
+                SafeRelease(&pFactory);
+                return hr;
+            }
+
+            if (FAILED(hr = D3D12CreateDevice(pWarpAdapter, D3D_FEATURE_LEVEL_11_0,
+                IID_PPV_ARGS(&m_pDev))))
+            {
+                SafeRelease(&pFactory);
+                return hr;
+            }
+        }
+
+
+        HWND hWnd = reinterpret_cast<WindowsApplication*>(g_pApp)->GetMainWindow();
+
+        // Describe and create the command queue.
+        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+        if (FAILED(hr = m_pDev->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_pCommandQueue)))) {
+            SafeRelease(&pFactory);
+            return hr;
+        }
+
+        // create a struct to hold information about the swap chain
+        DXGI_SWAP_CHAIN_DESC1 scd;
+
+        // clear out the struct for use
+        ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC1));
+
+        // fill the swap chain description struct
+        scd.Width = g_pApp->GetConfiguration().screenWidth;
+        scd.Height = g_pApp->GetConfiguration().screenHeight;
+        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     	        // use 32-bit color
+        scd.Stereo = FALSE;
+        scd.SampleDesc.Count = 1;                               // multi-samples can not be used when in SwapEffect sets to
+                                                                // DXGI_SWAP_EFFECT_FLOP_DISCARD
+        scd.SampleDesc.Quality = 0;                             // multi-samples can not be used when in SwapEffect sets to
+        scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
+        scd.BufferCount = kFrameCount;                          // back buffer count
+        scd.Scaling = DXGI_SCALING_STRETCH;
+        scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;         // DXGI_SWAP_EFFECT_FLIP_DISCARD only supported after Win10
+                                                                // use DXGI_SWAP_EFFECT_DISCARD on platforms early than Win10
+        scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+        scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;     // allow full-screen transition
+
+        IDXGISwapChain1* pSwapChain;
+        if (FAILED(hr = pFactory->CreateSwapChainForHwnd(
+                    m_pCommandQueue,                            // Swap chain needs the queue so that it can force a flush on it
+                    hWnd,
+                    &scd,
+                    NULL,
+                    NULL,
+                    &pSwapChain
+                )))
+        {
+            SafeRelease(&pFactory);
+            return hr;
+        }
+
+        m_pSwapChain = reinterpret_cast<IDXGISwapChain3*>(pSwapChain);
+
+        m_nFrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
+
+        cout << "Creating Descriptor Heaps ...";
+        if (FAILED(hr = CreateDescriptorHeaps())) {
+            return hr;
+        }
+        cout << "Done!" << endl;
+
+        cout << "Creating Render Targets ...";
+        if (FAILED(hr = CreateRenderTarget())) {
+            return hr;
+        }
+        cout << "Done!" << endl;
+
+        cout << "Creating Root Signatures ...";
+        if (FAILED(hr = CreateRootSignature())) {
+            return hr;
+        }
+        cout << "Done!" << endl;
+
+        cout << "Loading Shaders ...";
+        if (FAILED(hr = InitializeShader("Shaders/HLSL/default.vert.cso", "Shaders/HLSL/default.frag.cso"))) {
+            return hr;
+        }
+        cout << "Done!" << endl;
+
+        cout << "Initialize Buffers ...";
+        if (FAILED(hr = InitializeBuffers())) {
+            return hr;
+        }
+        cout << "Done!" << endl;
+        return hr;
+
     }
 
     // ?
@@ -676,17 +895,22 @@ namespace Corona
         psod.DSVFormat = DXGI_FORMAT_D32_FLOAT;
         psod.SampleDesc.Count = 1;
 
-        // ? TODO: always fail here
         if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState))))
         {
             return hr;
         }
 
-        hr = m_pDev->CreateCommandList(0, 
-                    D3D12_COMMAND_LIST_TYPE_DIRECT, 
-                    m_pCommandAllocator, 
-                    m_pPipelineState, 
-                    IID_PPV_ARGS(&m_pCommandList));
+        if (!m_pCommandList)
+        {
+            if (FAILED(hr = m_pDev->CreateCommandList(0, 
+                        D3D12_COMMAND_LIST_TYPE_DIRECT, 
+                        m_pCommandAllocator, 
+                        m_pPipelineState, 
+                        IID_PPV_ARGS(&m_pCommandList))))
+            {
+                return false;
+            }
+        }
 
         return hr;
     }
@@ -703,15 +927,24 @@ namespace Corona
             return hr;
         }
 
-        if (FAILED(hr = CreateTextureBuffer())) {
-            return hr;
-        }
-
         if (FAILED(hr = CreateSamplerBuffer())) {
             return hr;
         }
-
         auto& scene = g_pSceneManager->GetSceneForRendering();
+        
+        for (auto it : scene.Materials)
+        {
+            auto pMat = it.second;
+            if (pMat)
+            {
+                Image& img = pMat->Textures[0]->GetTextureImage();
+                if (FAILED(hr = CreateTextureBuffer(img))) {
+                    return hr;
+                }
+            }
+        }
+
+        
         auto pGeometry = scene.GetFirstGeometry();
         int32_t n = 0;
         while(pGeometry)
@@ -791,136 +1024,6 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateGraphicsResources()
-    {
-        HRESULT hr;
-
-#if defined(_DEBUG)
-        // Enable the D3D12 debug layer.
-        {
-            ID3D12Debug* pDebugController;
-            if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&pDebugController))))
-            {
-                pDebugController->EnableDebugLayer();
-            }
-            SafeRelease(&pDebugController);
-        }
-#endif
-
-        IDXGIFactory4* pFactory;
-        if (FAILED(hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory))))
-        {
-            return hr;
-        }
-
-        IDXGIAdapter1* pHardwareAdapter;
-        GetHardwareAdapter(pFactory, &pHardwareAdapter);
-
-        if (FAILED(D3D12CreateDevice(pHardwareAdapter,
-            D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDev))))
-        {
-
-            IDXGIAdapter* pWarpAdapter;
-            if (FAILED(hr = pFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter))))
-            {
-                SafeRelease(&pFactory);
-                return hr;
-            }
-
-            if (FAILED(hr = D3D12CreateDevice(pWarpAdapter, D3D_FEATURE_LEVEL_11_0,
-                IID_PPV_ARGS(&m_pDev))))
-            {
-                SafeRelease(&pFactory);
-                return hr;
-            }
-        }
-
-
-        HWND hWnd = reinterpret_cast<WindowsApplication*>(g_pApp)->GetMainWindow();
-
-        // Describe and create the command queue.
-        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-
-        if (FAILED(hr = m_pDev->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_pCommandQueue)))) {
-            SafeRelease(&pFactory);
-            return hr;
-        }
-
-        // create a struct to hold information about the swap chain
-        DXGI_SWAP_CHAIN_DESC1 scd;
-
-        // clear out the struct for use
-        ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC1));
-
-        // fill the swap chain description struct
-        scd.Width = g_pApp->GetConfiguration().screenWidth;
-        scd.Height = g_pApp->GetConfiguration().screenHeight;
-        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     	        // use 32-bit color
-        scd.Stereo = FALSE;
-        scd.SampleDesc.Count = 1;                               // multi-samples can not be used when in SwapEffect sets to
-                                                                // DXGI_SWAP_EFFECT_FLOP_DISCARD
-        scd.SampleDesc.Quality = 0;                             // multi-samples can not be used when in SwapEffect sets to
-        scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
-        scd.BufferCount = kFrameCount;                          // back buffer count
-        scd.Scaling = DXGI_SCALING_STRETCH;
-        scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;         // DXGI_SWAP_EFFECT_FLIP_DISCARD only supported after Win10
-                                                                // use DXGI_SWAP_EFFECT_DISCARD on platforms early than Win10
-        scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-        scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;     // allow full-screen transition
-
-        IDXGISwapChain1* pSwapChain;
-        if (FAILED(hr = pFactory->CreateSwapChainForHwnd(
-                    m_pCommandQueue,                            // Swap chain needs the queue so that it can force a flush on it
-                    hWnd,
-                    &scd,
-                    NULL,
-                    NULL,
-                    &pSwapChain
-                )))
-        {
-            SafeRelease(&pFactory);
-            return hr;
-        }
-
-        m_pSwapChain = reinterpret_cast<IDXGISwapChain3*>(pSwapChain);
-
-        m_nFrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
-
-        cout << "Creating Descriptor Heaps ...";
-        if (FAILED(hr = CreateDescriptorHeaps())) {
-            return hr;
-        }
-        cout << "Done!" << endl;
-
-        cout << "Creating Render Targets ...";
-        if (FAILED(hr = CreateRenderTarget())) {
-            return hr;
-        }
-        cout << "Done!" << endl;
-
-        cout << "Creating Root Signatures ...";
-        if (FAILED(hr = CreateRootSignature())) {
-            return hr;
-        }
-        cout << "Done!" << endl;
-
-        cout << "Loading Shaders ...";
-        if (FAILED(hr = InitializeShader("Shaders/HLSL/default.vert.cso", "Shaders/HLSL/default.frag.cso"))) {
-            return hr;
-        }
-        cout << "Done!" << endl;
-
-        cout << "Initialize Buffers ...";
-        if (FAILED(hr = InitializeBuffers())) {
-            return hr;
-        }
-        cout << "Done!" << endl;
-        return hr;
-
-    }
-
     int D3d12GraphicsManager::Initialize()
     {
         int result = GraphicsManager::Initialize();
@@ -955,7 +1058,9 @@ namespace Corona
         SafeRelease(&m_pCommandQueue);
         SafeRelease(&m_pCommandAllocator);
         SafeRelease(&m_pDepthStencilBuffer);
-        SafeRelease(&m_pTextureBuffer);
+		for (auto p : m_Textures) {
+			SafeRelease(&p);
+		}
         for (uint32_t i = 0; i < kFrameCount; i++) {
             SafeRelease(&m_pRenderTargets[i]);
         }
@@ -1023,18 +1128,8 @@ namespace Corona
         ID3D12DescriptorHeap* ppHeaps[] = { m_pCbvHeap, m_pSamplerHeap };
         m_pCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-        // CBV Per Frame
-        D3D12_GPU_DESCRIPTOR_HANDLE cbvSrvHandle[2];
-        uint32_t nFrameResourceDescriptorOffset = m_nFrameIndex * (1 + kMaxSceneObjectCount);
-        cbvSrvHandle[0].ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + nFrameResourceDescriptorOffset * m_nCbvSrvDescriptorSize;
-
         // Sampler
         m_pCommandList->SetGraphicsRootDescriptorTable(1, m_pSamplerHeap->GetGPUDescriptorHandleForHeapStart());
-
-        // SRV
-        D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
-        srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + kTextureDescStartIndex * m_nCbvSrvDescriptorSize;
-        m_pCommandList->SetGraphicsRootDescriptorTable(2, srvHandle);
 
         m_pCommandList->RSSetViewports(1, &m_ViewPort);
         m_pCommandList->RSSetScissorRects(1, &m_ScissorRect);
@@ -1043,7 +1138,6 @@ namespace Corona
         SetPerFrameShaderParameters();
 
         // do 3D rendering on the back buffer here
-        cbvSrvHandle[1].ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + nFrameResourceDescriptorOffset * m_nCbvSrvDescriptorSize;
         int32_t i = 0;
         //for (auto dbc : m_DrawBatchContext)
         //{
@@ -1066,13 +1160,24 @@ namespace Corona
 		{
 
 		    // CBV Per Batch
-		    cbvSrvHandle[1].ptr = m_nCbvSrvDescriptorSize;
-		    m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle[0]);
+            D3D12_GPU_DESCRIPTOR_HANDLE cbvSrvHandle;
+            uint32_t nFrameResourceDescriptorOffset = m_nFrameIndex * (2 * kMaxSceneObjectCount); // 2 descriptors for each draw call
+            cbvSrvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr 
+                                    + (nFrameResourceDescriptorOffset + i * 2 /* 2 descriptors for each batch */) * m_nCbvSrvDescriptorSize;
+            m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle);
 
 		    // select which vertex buffer(s) to use
 		    m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView[i]);
 		    // select which index buffer to use
 		    m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
+
+            // Texture
+            {
+                auto texture_index = 1;
+                D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                m_pCommandList->SetGraphicsRootDescriptorTable(2, srvHandle);
+            }
 
 		    // draw the vertex buffer to the back buffer
 		    m_pCommandList->DrawIndexedInstanced(dbc.count, 1, 0, 0, 0);

@@ -87,9 +87,9 @@ namespace Corona
     {
         int ret;
 
-        string scene_file_name = "Scene/Suzanne/Suzanne.gltf";
+        // string scene_file_name = "Scene/Suzanne/Suzanne.gltf";
         // string scene_file_name = "Scene/BoomBoxWithAxes/BoomBoxWithAxes.gltf";
-        // string scene_file_name = "Scene/FlightHelmet/FlightHelmet.gltf";
+        string scene_file_name = "Scene/DamagedHelmet/DamagedHelmet.gltf";
         if (m_nArgC > 1) {
             scene_file_name = m_ppArgV[1];
         }
