@@ -58,7 +58,7 @@ int TestApplication::Initialize()
         if (m_nArgC > 1) {
             buf = g_pAssetLoader->SyncOpenAndReadBinary(m_ppArgV[1]);
         } else {
-            buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/photo3.jpg");
+            buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/test.jpg");
             // buf = g_pAssetLoader->SyncOpenAndReadBinary("Textures/SciFiHelmet_Normal.png");
         }
 

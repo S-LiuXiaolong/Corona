@@ -41,13 +41,15 @@ namespace Corona {
 
 int main(int argc, char **argv)
 {
-    Buffer buffer;
-	if (argc >= 2) {
-        buffer = g_pAssetLoader->SyncOpenAndReadBinary(argv[1]);
-	}
-	else {
-        buffer = g_pAssetLoader->SyncOpenAndReadBinary("Textures/test.jpg");
-	}
+//     Buffer buffer;
+// 	if (argc >= 2) {
+//         buffer = g_pAssetLoader->SyncOpenAndReadBinary(argv[1]);
+// 	}
+// 	else {
+//         buffer = g_pAssetLoader->SyncOpenAndReadBinary("Textures/test.jpg");
+// 	}
+	std::string FileName = g_pAssetLoader->GetFilePath("Textures/test.jpg");
+	FILE* file = fopen(FileName.c_str(), "rb");  //open the file
 
 	// This struct contains the JPEG decompression parameters and pointers to
 	// working space (which is allocated as needed by the JPEG library).
@@ -76,9 +78,10 @@ int main(int argc, char **argv)
 	jpeg_create_decompress(&cinfo);
 
 	// Step 2: specify data source
-	unsigned char* pSrcPtr = buffer.GetData();
-	unsigned long  SrcSize = (unsigned long)buffer.GetDataSize();
-	jpeg_mem_src(&cinfo, pSrcPtr, SrcSize);
+// 	unsigned char* pSrcPtr = buffer.GetData();
+// 	unsigned long  SrcSize = (unsigned long)buffer.GetDataSize();
+// 	jpeg_mem_src(&cinfo, pSrcPtr, SrcSize);
+	jpeg_stdio_src(&cinfo, file);
 
 	// Step 3: read file parameters with jpeg_read_header()
 	jpeg_read_header(&cinfo, TRUE);

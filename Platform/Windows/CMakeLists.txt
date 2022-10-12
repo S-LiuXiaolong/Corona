@@ -10,3 +10,4 @@ add_dependencies(CoronaEngineD3d12 Engine_Asset)
 target_link_libraries(CoronaEngineD3d12 WindowsApplication Common D3dRHI d3d12 dxgi d3dcompiler)
 
 add_subdirectory(test)
+add_subdirectory(OpenGL)

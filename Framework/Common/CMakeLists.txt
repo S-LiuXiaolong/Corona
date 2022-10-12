@@ -31,6 +31,9 @@ find_library(JPEG_LIBRARY_RELEASE    jpeg-static PATHS ${MYGE_EXTERNAL_LIBRARY_P
 find_library(TURBOJPEG_LIBRARY_DEBUG      turbojpeg-static PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
 find_library(TURBOJPEG_LIBRARY_RELEASE    turbojpeg-static PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
 
+find_library(GLFW_LIBRARY_DEBUG      glfw3 PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)
+find_library(GLFW_LIBRARY_RELEASE    glfw3 PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Release)
+
 target_link_libraries(Common GeomMath)
 target_link_libraries(Common 
             debug ${XG_LIBRARY_DEBUG}

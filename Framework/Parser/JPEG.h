@@ -39,6 +39,8 @@ namespace Corona
     public:
         Image Parse(Buffer& buf) override 
         {
+            // https://stackoverflow.com/questions/5616216/need-help-in-reading-jpeg-file-using-libjpeg
+            
             // This struct contains the JPEG decompression parameters and pointers to
             // working space (which is allocated as needed by the JPEG library).
             jpeg_decompress_struct cinfo;
@@ -97,6 +99,7 @@ namespace Corona
             Image m_Img;
             m_Img.Width = cinfo.output_width;
             m_Img.Height = cinfo.output_height;
+            // TODO
             m_Img.pixel_format = PIXEL_FORMAT::RGB8;
             m_Img.bitcount = (size_t)PIXEL_FORMAT::RGB8 * 8;
             m_Img.bitdepth = 8;
@@ -114,9 +117,8 @@ namespace Corona
                 // jpeg_read_scanlines expects an array of pointers to scanlines.
                 // Here the array is only one element long, but you could ask for
                 // more than one scanline at a time if that's more convenient.
-
                 uint8_t* pScanline0 = data;
-                uint8_t* pDstScanline = pScanline0 + cinfo.output_scanline * (size_t)m_Img.pitch;
+                uint8_t* pDstScanline = pScanline0 + cinfo.output_scanline * ((size_t)m_Img.pitch);
                 JSAMPROW RowPtrs[1];
                 RowPtrs[0] = (JSAMPROW)pDstScanline;
                 jpeg_read_scanlines(&cinfo, RowPtrs, 1);
