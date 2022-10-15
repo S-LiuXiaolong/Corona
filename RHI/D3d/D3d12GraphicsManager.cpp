@@ -308,7 +308,7 @@ namespace Corona
         D3D12_RESOURCE_DESC resourceDesc = {};
         resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
         resourceDesc.Alignment = 0;
-        // ?
+        // TODO
         resourceDesc.Width = index_array.size() * 4;
         resourceDesc.Height = 1;
         resourceDesc.DepthOrArraySize = 1;
@@ -364,6 +364,7 @@ namespace Corona
         D3D12_INDEX_BUFFER_VIEW indexBufferView;
         indexBufferView.BufferLocation = pIndexBuffer->GetGPUVirtualAddress();
         indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+        // TODO
         indexBufferView.SizeInBytes = (UINT)index_array.size() * 4;
         m_IndexBufferView.push_back(indexBufferView);
 
@@ -377,170 +378,156 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateTextureBuffer(Image& image)
+    HRESULT D3d12GraphicsManager::CreateTextureBuffer()
     {
-        // HRESULT hr;
-
-        // // Describe and create a Texture2D.
-        // D3D12_HEAP_PROPERTIES prop = {};
-        // prop.Type = D3D12_HEAP_TYPE_DEFAULT;
-        // prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        // prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        // prop.CreationNodeMask = 1;
-        // prop.VisibleNodeMask = 1;
-
-        // D3D12_RESOURCE_DESC textureDesc = {};
-        // textureDesc.MipLevels = 1;
-        // textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        // textureDesc.Width = image.Width;
-        // textureDesc.Height = image.Height;
-        // textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-        // textureDesc.DepthOrArraySize = 1;
-        // textureDesc.SampleDesc.Count = 1;
-        // textureDesc.SampleDesc.Quality = 0;
-        // textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-        // hr = m_pDev->CreateCommittedResource(
-        //     &prop,
-        //     D3D12_HEAP_FLAG_NONE,
-        //     &textureDesc,
-        //     D3D12_RESOURCE_STATE_COPY_DEST,
-        //     nullptr,
-        //     IID_PPV_ARGS(&m_pTextureBuffer));
-
-        // return hr;
-
-        // ?
         HRESULT hr = S_OK;
 
-        // auto it = m_TextureIndex.find(texture.GetName());
-        // if (it == m_TextureIndex.end()) {
-        //     auto image = texture.GetTextureImage();
+        auto& scene = g_pSceneManager->GetSceneForRendering();
 
-        // Describe and create a Texture2D.
-        D3D12_HEAP_PROPERTIES prop = {};
-        prop.Type = D3D12_HEAP_TYPE_DEFAULT;
-        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        prop.CreationNodeMask = 1;
-        prop.VisibleNodeMask = 1;
-
-        D3D12_RESOURCE_DESC textureDesc = {};
-        textureDesc.MipLevels = 1;
-        // ? only for PNG
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        textureDesc.Width = image.Width;
-        textureDesc.Height = image.Height;
-        textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-        textureDesc.DepthOrArraySize = 1;
-        textureDesc.SampleDesc.Count = 1;
-        textureDesc.SampleDesc.Quality = 0;
-        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-		ID3D12Resource* pTextureBuffer;
-		ID3D12Resource* pTextureUploadHeap;
-
-        if (FAILED(hr = m_pDev->CreateCommittedResource(
-            &prop,
-            D3D12_HEAP_FLAG_NONE,
-            &textureDesc,
-            D3D12_RESOURCE_STATE_COPY_DEST,
-            nullptr,
-            IID_PPV_ARGS(&pTextureBuffer))))
+        for (auto it : scene.Materials)
         {
-            return hr;
-        }
+            auto pMat = it.second;
+            if (pMat)
+            {
+				// Image& image = pMat->Textures[0]->GetTextureImage();
+                for (auto index : pMat->TextureIds)
+                {
+                    Image& image = pMat->Textures[index]->GetTextureImage();
 
-		const UINT subresourceCount = textureDesc.DepthOrArraySize * textureDesc.MipLevels;
-		const UINT64 uploadBufferSize = GetRequiredIntermediateSize(pTextureBuffer, 0, subresourceCount);
+					// TODO
+                    // auto it = m_TextureIndex.find(texture.GetName());
+                    // if (it == m_TextureIndex.end()) {
+                    //     auto image = texture.GetTextureImage();
 
-        prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+                    // Describe and create a Texture2D.
+					D3D12_HEAP_PROPERTIES prop = {};
+					prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+					prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+					prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+					prop.CreationNodeMask = 1;
+					prop.VisibleNodeMask = 1;
 
-		D3D12_RESOURCE_DESC resourceDesc = {};
-		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		resourceDesc.Alignment = 0;
-		resourceDesc.Width = uploadBufferSize;
-		resourceDesc.Height = 1;
-		resourceDesc.DepthOrArraySize = 1;
-		resourceDesc.MipLevels = 1;
-		resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-		resourceDesc.SampleDesc.Count = 1;
-		resourceDesc.SampleDesc.Quality = 0;
-		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+					D3D12_RESOURCE_DESC textureDesc = {};
+					textureDesc.MipLevels = 1;
+					// ? only for PNG
+					textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+					textureDesc.Width = image.Width;
+					textureDesc.Height = image.Height;
+					textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+					textureDesc.DepthOrArraySize = 1;
+					textureDesc.SampleDesc.Count = 1;
+					textureDesc.SampleDesc.Quality = 0;
+					textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		if (FAILED(hr = m_pDev->CreateCommittedResource(
-			&prop,
-			D3D12_HEAP_FLAG_NONE,
-			&resourceDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(&pTextureUploadHeap)
-		)))
-		{
-			return hr;
-		}
+					ID3D12Resource* pTextureBuffer;
+					ID3D12Resource* pTextureUploadHeap;
 
-		// Copy data to the intermediate upload heap and then schedule a copy 
-		// from the upload heap to the Texture2D.
-		D3D12_SUBRESOURCE_DATA textureData = {};
-        if (image.bitcount == 24)
-        {
-            // DXGI does not have 24bit formats so we have to extend it to 32bit
-            uint32_t new_pitch = image.pitch / 3 * 4;
-            size_t data_size = new_pitch * image.Height;
-            void* data = g_pMemoryManager->Allocate(data_size);
-            uint8_t* buf = reinterpret_cast<uint8_t*>(data);
-            uint8_t* src = reinterpret_cast<uint8_t*>(image.data);
-            for (auto row = 0; row < image.Height; row++) {
-                buf = reinterpret_cast<uint8_t*>(data) + row * new_pitch;
-                src = reinterpret_cast<uint8_t*>(image.data) + row * image.pitch;
-                for (auto col = 0; col < image.Width; col++) {
-                    *(uint32_t*)buf = *(uint32_t*)src;
-                    buf[3] = 0;  // set alpha to 0
-                    buf += 4;
-                    src += 3;
+					if (FAILED(hr = m_pDev->CreateCommittedResource(
+						&prop,
+						D3D12_HEAP_FLAG_NONE,
+						&textureDesc,
+						D3D12_RESOURCE_STATE_COPY_DEST,
+						nullptr,
+						IID_PPV_ARGS(&pTextureBuffer))))
+					{
+						return hr;
+					}
+
+					const UINT subresourceCount = textureDesc.DepthOrArraySize * textureDesc.MipLevels;
+					const UINT64 uploadBufferSize = GetRequiredIntermediateSize(pTextureBuffer, 0, subresourceCount);
+
+					prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+					D3D12_RESOURCE_DESC resourceDesc = {};
+					resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+					resourceDesc.Alignment = 0;
+					resourceDesc.Width = uploadBufferSize;
+					resourceDesc.Height = 1;
+					resourceDesc.DepthOrArraySize = 1;
+					resourceDesc.MipLevels = 1;
+					resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+					resourceDesc.SampleDesc.Count = 1;
+					resourceDesc.SampleDesc.Quality = 0;
+					resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+					resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+					if (FAILED(hr = m_pDev->CreateCommittedResource(
+						&prop,
+						D3D12_HEAP_FLAG_NONE,
+						&resourceDesc,
+						D3D12_RESOURCE_STATE_GENERIC_READ,
+						nullptr,
+						IID_PPV_ARGS(&pTextureUploadHeap)
+					)))
+					{
+						return hr;
+					}
+
+					// Copy data to the intermediate upload heap and then schedule a copy 
+					// from the upload heap to the Texture2D.
+					D3D12_SUBRESOURCE_DATA textureData = {};
+					if (image.bitcount == 24)
+					{
+						// DXGI does not have 24bit formats so we have to extend it to 32bit
+						uint32_t new_pitch = image.pitch / 3 * 4;
+						size_t data_size = new_pitch * image.Height;
+						void* data = g_pMemoryManager->Allocate(data_size);
+						uint8_t* buf = reinterpret_cast<uint8_t*>(data);
+						uint8_t* src = reinterpret_cast<uint8_t*>(image.data);
+						for (auto row = 0; row < image.Height; row++) {
+							buf = reinterpret_cast<uint8_t*>(data) + row * new_pitch;
+							src = reinterpret_cast<uint8_t*>(image.data) + row * image.pitch;
+							for (auto col = 0; col < image.Width; col++) {
+								*(uint32_t*)buf = *(uint32_t*)src;
+								buf[3] = 0;  // set alpha to 0
+								buf += 4;
+								src += 3;
+							}
+						}
+						// we do not need to free the old data because the old data is still referenced by the
+						// SceneObject
+						// g_pMemoryManager->Free(image.data, image.data_size);
+						image.data = (uint8_t*)data;
+						image.data_size = data_size;
+						image.pitch = new_pitch;
+					}
+
+					textureData.pData = image.data;
+					textureData.RowPitch = image.pitch;
+					textureData.SlicePitch = image.pitch * image.Height;
+
+					UpdateSubresources(m_pCommandList, pTextureBuffer, pTextureUploadHeap, 0, 0, subresourceCount, &textureData);
+					D3D12_RESOURCE_BARRIER barrier = {};
+					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+					barrier.Transition.pResource = pTextureBuffer;
+					barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+					barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+					m_pCommandList->ResourceBarrier(1, &barrier);
+
+					// Describe and create a SRV for the texture.
+					D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+					srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+					srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+					srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+					srvDesc.Texture2D.MipLevels = -1;
+					srvDesc.Texture2D.MostDetailedMip = 0;
+					D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
+					// TODO
+					int32_t texture_id = index + 1;
+					// int32_t texture_id = 1;
+					srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_id) * m_nCbvSrvDescriptorSize;
+					m_pDev->CreateShaderResourceView(pTextureBuffer, &srvDesc, srvHandle);
+					// m_TextureIndex[texture.GetName()] = texture_id;
+
+					m_Buffers.push_back(pTextureUploadHeap);
+					m_Textures.push_back(pTextureBuffer);
                 }
             }
-            // we do not need to free the old data because the old data is still referenced by the
-            // SceneObject
-            // g_pMemoryManager->Free(image.data, image.data_size);
-            image.data = (uint8_t*)data;
-            image.data_size = data_size;
-            image.pitch = new_pitch;
         }
 
-        textureData.pData = image.data;
-        textureData.RowPitch = image.pitch;
-        textureData.SlicePitch = image.pitch * image.Height;
 
-        UpdateSubresources(m_pCommandList, pTextureBuffer, pTextureUploadHeap, 0, 0, subresourceCount, &textureData);
-        D3D12_RESOURCE_BARRIER barrier = {};
-        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource = pTextureBuffer;
-        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-        barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_GENERIC_READ;
-        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        m_pCommandList->ResourceBarrier(1, &barrier);
-
-        // Describe and create a SRV for the texture.
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = -1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
-        // int32_t texture_id = m_TextureIndex.size();
-        int32_t texture_id = 1;
-        srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_id) * m_nCbvSrvDescriptorSize;
-        m_pDev->CreateShaderResourceView(pTextureBuffer, &srvDesc, srvHandle);
-        // m_TextureIndex[texture.GetName()] = texture_id;
-
-        m_Buffers.push_back(pTextureUploadHeap);
-        m_Textures.push_back(pTextureBuffer);
-        
         return hr;
     }
 
@@ -747,8 +734,9 @@ namespace Corona
         }
         cout << "Done!" << endl;
 
+        // TODO
         cout << "Loading Shaders ...";
-        if (FAILED(hr = InitializeShader("Shaders/HLSL/default.vert.cso", "Shaders/HLSL/default.frag.cso"))) {
+        if (FAILED(hr = InitializeShader("Shaders/HLSL/pbr.vert.cso", "Shaders/HLSL/pbr.frag.cso"))) {
             return hr;
         }
         cout << "Done!" << endl;
@@ -777,16 +765,24 @@ namespace Corona
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
 
-        D3D12_DESCRIPTOR_RANGE1 ranges[3] = {
+        D3D12_DESCRIPTOR_RANGE1 ranges[7] = {
             { D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC },
             { D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 },
-            { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0,D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC }
+            { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0,D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC },
+            { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, 0,D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC },
+            { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, 0,D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC },
+            { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3, 0,D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC },
+            { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 4, 0,D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC }
         };
 
-        D3D12_ROOT_PARAMETER1 rootParameters[3] = {
+        D3D12_ROOT_PARAMETER1 rootParameters[7] = {
             { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[0] }, D3D12_SHADER_VISIBILITY_ALL },
             { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[1] }, D3D12_SHADER_VISIBILITY_PIXEL },
-            { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[2] }, D3D12_SHADER_VISIBILITY_PIXEL }
+            { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[2] }, D3D12_SHADER_VISIBILITY_PIXEL },
+            { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[3] }, D3D12_SHADER_VISIBILITY_PIXEL },
+            { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[4] }, D3D12_SHADER_VISIBILITY_PIXEL },
+            { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[5] }, D3D12_SHADER_VISIBILITY_PIXEL },
+            { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, { 1, &ranges[6] }, D3D12_SHADER_VISIBILITY_PIXEL }
         };
 
         // Allow input layout and deny uneccessary access to certain pipeline stages.
@@ -930,17 +926,27 @@ namespace Corona
         if (FAILED(hr = CreateSamplerBuffer())) {
             return hr;
         }
+
+        if (FAILED(hr = CreateTextureBuffer())) {
+            return hr;
+        }
+        
         auto& scene = g_pSceneManager->GetSceneForRendering();
         
+        // TODO
         for (auto it : scene.Materials)
         {
             auto pMat = it.second;
             if (pMat)
             {
-                Image& img = pMat->Textures[0]->GetTextureImage();
-                if (FAILED(hr = CreateTextureBuffer(img))) {
-                    return hr;
-                }
+                // Image& img = pMat->Textures[0]->GetTextureImage();
+                // if (FAILED(hr = CreateTextureBuffer(img))) {
+                //     return hr;
+                // }
+                // Image& img1 = pMat->Textures[1]->GetTextureImage();
+                // if (FAILED(hr = CreateTextureBuffer(img1))) {
+                //     return hr;
+                // }
             }
         }
 
@@ -984,6 +990,7 @@ namespace Corona
             //     n++;
             // }
 
+            // TODO
             for (auto& pPrimitive : pGeometry->Primitives)
             {
                 auto& m_VertexData = pPrimitive->VertexData;
@@ -1171,12 +1178,25 @@ namespace Corona
 		    // select which index buffer to use
 		    m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
 
+			auto& scene = g_pSceneManager->GetSceneForRendering();
             // Texture
-            {
-                auto texture_index = 1;
-                D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
-                srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
-                m_pCommandList->SetGraphicsRootDescriptorTable(2, srvHandle);
+			for (auto it : scene.Materials)
+			{
+				auto pMat = it.second;
+                if (pMat)
+                {
+                    int j = 0;
+                    for (auto index : pMat->TextureIds)
+                    {
+                        // TODO
+                        auto texture_index = index + 1;
+                        D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                        srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                        // TODO
+                        m_pCommandList->SetGraphicsRootDescriptorTable(j + 2, srvHandle);
+                        j++;
+                    }
+                }
             }
 
 		    // draw the vertex buffer to the back buffer

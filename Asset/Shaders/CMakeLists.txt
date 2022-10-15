@@ -5,6 +5,7 @@ COMMAND echo "Start processing Engine Shaders"
 
 set(HLSL_SHADER_SOURCES 
             default.vert default.frag
+            pbr.vert pbr.frag
         )
 
 IF(WIN32)

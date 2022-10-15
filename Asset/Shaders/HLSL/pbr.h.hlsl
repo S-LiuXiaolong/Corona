@@ -3,7 +3,7 @@
 
 #define MaxLights 16
 
-struct a2v_default
+struct a2v_pbr
 {
 	float3 Position		: POSITION;
 	float3 Normal		: NORMAL;
@@ -60,7 +60,7 @@ cbuffer PerFrameConstants : register(b0)
 #ifndef __VSOUTPUT_H__
 #define __VSOUTPUT_H__
 
-struct default_vert_output
+struct pbr_vert_output
 {
     float4 Position      : SV_POSITION;
 	float4 WorldPosition : POSITION;

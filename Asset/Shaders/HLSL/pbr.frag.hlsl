@@ -1,7 +1,7 @@
-#include "default.h.hlsl"
+#include "pbr.h.hlsl"
 #include "LightingUtil.h.hlsl"
 
-float4 default_frag_main(default_vert_output input) : SV_Target
+float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 {
     // 颜色对应三个坐标轴：朝上为绿色，朝右为蓝色，朝屏幕里面为蓝色（所以只有红绿两色没有蓝色）
     // return float4(input.vNorm, 1.0f);

@@ -468,25 +468,6 @@ namespace Corona
 			}
         }
 
-        // the BaseDir here is path of Texture's folder
-        void LoadTextures(const tinygltf::Model& gltf_model, std::unique_ptr<Scene>& pScene, std::string& BaseDir)
-        {
-            auto& m_Materials = pScene->Materials;
-            for (const tinygltf::Texture& gltf_tex : gltf_model.textures)
-            {
-                const tinygltf::Image& gltf_image = gltf_model.images[gltf_tex.source];
-
-                auto& ImageId = !gltf_image.uri.empty() ? (BaseDir + gltf_image.uri) : "";
-
-                if (!ImageId.empty())
-                {
-                    std::shared_ptr<Image> m_pImage{};
-                    ParseImage(ImageId, m_pImage);
-                }
-            }
-
-        }
-
         void LoadMaterialsAndTextures(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene, std::string& BaseDir)
         {
             auto &m_Materials = pScene->Materials;
@@ -651,7 +632,7 @@ namespace Corona
 						 std::shared_ptr<Image> m_pImage{};
 						 ParseImage(ImageId, m_pImage); // TODO
                          auto texture = std::make_shared<SceneObjectTexture>(m_pImage);
-                         texture->SetName("");
+                         texture->SetName(gltf_image.uri);
                          Mat.Textures[gltf_tex.source] = texture;
 					 }
 				 }

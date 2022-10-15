@@ -29,7 +29,7 @@ namespace Corona
         HRESULT CreateDepthStencil();
         HRESULT CreateGraphicsResources();
         HRESULT CreateSamplerBuffer();
-        HRESULT CreateTextureBuffer(Image& image);
+        HRESULT CreateTextureBuffer();
         HRESULT CreateConstantBuffer();
         // HRESULT CreateIndexBuffer(const Buffer& buffer);
         // HRESULT CreateVertexBuffer(const Buffer& buffer);

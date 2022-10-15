@@ -25,8 +25,6 @@ namespace tinygltf
 // You have to rename the two SceneObject namespace to GLTF and OGEX
 namespace Corona
 {
-
-
     // use ascii to get id of SceneObjectTypes
     enum SceneObjectType
     {
@@ -101,7 +99,6 @@ namespace Corona
 
         // const BoundBox BB;
 
-        // TODO: These two are for test and can be changes to void* when used to add into buffers.
         std::vector<VertexBasicAttribs> VertexData;
         std::vector<uint32_t> IndexData;
 
