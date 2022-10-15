@@ -1,12 +1,14 @@
 #pragma once
 #include "IApplication.h"
-// #include "GfxConfiguration.h"
 #include "GraphicsManager.h"
 #include "MemoryManager.h"
 #include "AssetLoader.h"
 #include "SceneManager.h"
 #include "InputManager.h"
-
+#include "IPhysicsManager.h"
+#include "IGameLogic.h"
+#include "DebugManager.h"
+#include "AnimationManager.h"
 namespace Corona
 {
     class BaseApplication : implements IApplication
@@ -20,13 +22,15 @@ namespace Corona
         
         virtual bool IsQuit();
 
+        virtual void SetCommandLineParameters(int argc, char** argv);
+        int  GetCommandLineArgumentsCount() const;
+        const char* GetCommandLineArgument(int index) const;
+
         inline GfxConfiguration& GetConfiguration() { return m_Config; };
 
-        virtual void SetCommandLineParameters(int argc, char** argv);
+        // virtual int LoadScene();
 
-        virtual int LoadScene();
-
-        virtual void OnDraw() {};
+        // virtual void OnDraw() {};
     
     protected:
         // Flag is need quit the main loop of the application

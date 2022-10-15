@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include "Interface.h"
-#include "glTFSceneNode.h"
+#include "SceneNode.h"
 #include "AssetLoader.h"
 #include "Scene.h"
 

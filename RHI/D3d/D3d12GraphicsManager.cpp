@@ -740,7 +740,7 @@ namespace Corona
 
         // TODO
         cout << "Loading Shaders ...";
-        if (FAILED(hr = InitializeShader("Shaders/HLSL/pbr.vert.cso", "Shaders/HLSL/pbr.frag.cso"))) {
+        if (FAILED(hr = InitializeShader("Shaders/HLSL/default.vert.cso", "Shaders/HLSL/default.frag.cso"))) {
             return hr;
         }
         cout << "Done!" << endl;
@@ -931,9 +931,9 @@ namespace Corona
             return hr;
         }
 
-        if (FAILED(hr = CreateTextureBuffer())) {
-            return hr;
-        }
+//         if (FAILED(hr = CreateTextureBuffer())) {
+//             return hr;
+//         }
         
         auto& scene = g_pSceneManager->GetSceneForRendering();
         

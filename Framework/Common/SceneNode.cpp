@@ -1,4 +1,4 @@
-#include "glTFSceneNode.h"
+#include "SceneNode.h"
 
 namespace Corona
 {

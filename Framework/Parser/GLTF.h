@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "glTFSceneNode.h"
+#include "SceneNode.h"
 #include "tinyglTF/tiny_gltf.h"
 #include "SceneParser.h"
 
@@ -294,6 +294,7 @@ namespace Corona
                         {
                             Key.UV0Access = primitive.attributes.find("TEXCOORD_0")->second;
                         }
+                        
                         if (primitive.attributes.find("TEXCOORD_1") != primitive.attributes.end())
                         {
                             Key.UV1Access = primitive.attributes.find("TEXCOORD_1")->second;
@@ -437,35 +438,35 @@ namespace Corona
         void ParseImage(std::string& imagePath, std::shared_ptr<Image>& pImage)
         {
             
-			// we should lookup if the texture has been loaded already to prevent
-            // duplicated load. This could be done in Asset Loader Manager.
-			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
-			std::string ext = imagePath.substr(imagePath.find_last_of("."));
-			if (ext == ".jpg" || ext == ".jpeg")
-			{
-				JpegParser jpeg_parser;
-				pImage = std::make_shared<Image>(jpeg_parser.Parse(buf));
-			}
-			else if (ext == ".png")
-			{
-				PngParser png_parser;
-				pImage = std::make_shared<Image>(png_parser.Parse(buf));
-			}
-			// else if (ext == ".bmp")
-			// {
-			//     BmpParser bmp_parser;
-			//     pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
-			// }
-			// else if (ext == ".tga")
-			// {
-			//     TgaParser tga_parser;
-			//     pImage = std::make_shared<Image>(tga_parser.Parse(buf));
-			// }
-			else if (ext == ".bmp")
-			{
-				BmpParser bmp_parser;
-				pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
-			}
+// 			// we should lookup if the texture has been loaded already to prevent
+//             // duplicated load. This could be done in Asset Loader Manager.
+// 			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
+// 			std::string ext = imagePath.substr(imagePath.find_last_of("."));
+// 			if (ext == ".jpg" || ext == ".jpeg")
+// 			{
+// 				JpegParser jpeg_parser;
+// 				pImage = std::make_shared<Image>(jpeg_parser.Parse(buf));
+// 			}
+// 			else if (ext == ".png")
+// 			{
+// 				PngParser png_parser;
+// 				pImage = std::make_shared<Image>(png_parser.Parse(buf));
+// 			}
+// 			// else if (ext == ".bmp")
+// 			// {
+// 			//     BmpParser bmp_parser;
+// 			//     pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+// 			// }
+// 			// else if (ext == ".tga")
+// 			// {
+// 			//     TgaParser tga_parser;
+// 			//     pImage = std::make_shared<Image>(tga_parser.Parse(buf));
+// 			// }
+// 			else if (ext == ".bmp")
+// 			{
+// 				BmpParser bmp_parser;
+// 				pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+// 			}
         }
 
         void LoadMaterialsAndTextures(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene, std::string& BaseDir)

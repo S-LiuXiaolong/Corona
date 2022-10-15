@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include "glTFSceneNode.h"
+#include "SceneNode.h"
 
 namespace Corona
 {

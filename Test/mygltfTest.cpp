@@ -1,6 +1,6 @@
 #include "AssetLoader.h"
 #include "MemoryManager.h"
-#include "glTFSceneNode.h"
+#include "SceneNode.h"
 
 using namespace Corona;
 

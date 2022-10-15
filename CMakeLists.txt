@@ -9,6 +9,7 @@ include_directories("${PROJECT_SOURCE_DIR}/Framework/Parser")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Common")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Interface")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/GeomMath")
+include_directories("${PROJECT_SOURCE_DIR}/Framework/Geometries")
 include_directories("${PROJECT_SOURCE_DIR}/RHI")
 
 IF(${UNIX})
