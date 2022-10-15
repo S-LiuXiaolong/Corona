@@ -16,3 +16,6 @@
 [submodule "External/src/libjpeg-turbo"]
 	path = External/src/libjpeg-turbo
 	url = https://github.com/S-LiuXiaolong/libjpeg-turbo.git
+[submodule "External/src/stb"]
+	path = External/src/stb
+	url = https://github.com/nothings/stb.git

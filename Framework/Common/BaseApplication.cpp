@@ -90,6 +90,7 @@ namespace Corona
         // string scene_file_name = "Scene/Suzanne/Suzanne.gltf";
         // string scene_file_name = "Scene/ABeautifulGame/ABeautifulGame.gltf";
         string scene_file_name = "Scene/DamagedHelmet/DamagedHelmet.gltf";
+        // string scene_file_name = "Scene/Box.glb";
         if (m_nArgC > 1) {
             scene_file_name = m_ppArgV[1];
         }

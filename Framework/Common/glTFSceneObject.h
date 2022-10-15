@@ -253,7 +253,7 @@ namespace Corona
 
 		Image& GetTextureImage()
 		{
-			return *m_pImage;
+            return *m_pImage;
 		};
 
 		friend std::ostream& operator<<(std::ostream& out, const SceneObjectTexture& obj);
