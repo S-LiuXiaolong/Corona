@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include "geommath.h"
-#include "SceneObject.h"
 #include "Tree.h"
 
 namespace Corona
@@ -27,31 +26,36 @@ namespace Corona
     //     Matrix4X4f GetMatrix() const;
     //     void UpdateTransforms();
     // };
-
-    class BaseSceneNode 
+    
+    template <typename T>
+    class SceneNode 
     {
     protected:
         std::string m_strName;
 
-        BaseSceneNode *Parent = nullptr;
+        SceneNode *Parent = nullptr;
+        // ? index
         uint32_t Index;
 
-        std::vector<std::unique_ptr<BaseSceneNode>> Children;
+        std::vector<std::unique_ptr<SceneNode>> m_Children;
 
         // std::map<int, std::shared_ptr<SceneObjectAnimationClip>> m_AnimationClips;
         Matrix4X4f Matrix;
         Vector3f Translation;
         Vector3f Scale;
         Quaternion Rotation;
-        Matrix4X4f m_RuntimeTransform;
+        Matrix4X4f m_Transform;
+
+    protected:
+        virtual void dump(std::ostream& out) const {};
     
     public:
         // typedef std::map<int, std::shared_ptr<SceneObjectAnimationClip>>::const_iterator animation_clip_iterator;
 
     public:
-        BaseSceneNode() { BuildIdentityMatrix(m_RuntimeTransform); };
-        BaseSceneNode(const std::string& name) { m_strName = name; BuildIdentityMatrix(m_RuntimeTransform); };
-        virtual ~BaseSceneNode() {};
+        SceneNode() { BuildIdentityMatrix(m_Transform); };
+        SceneNode(const std::string& name) { m_strName = name; BuildIdentityMatrix(m_Transform); };
+        virtual ~SceneNode() {};
 
         const std::string GetName() const { return m_strName; };
 
@@ -125,7 +129,7 @@ namespace Corona
             //     pCamera->matrix = NodeTransform;
             // }
 
-            for (auto &child : Children)
+            for (auto &child : m_Children)
             {
                 child->UpdateTransforms();
             }
@@ -135,14 +139,14 @@ namespace Corona
         {
             Matrix4X4f rotate;
             MatrixRotationYawPitchRoll(rotate, rotation_angle_x, rotation_angle_y, rotation_angle_z);
-            m_RuntimeTransform = m_RuntimeTransform * rotate;
+            m_Transform = m_Transform * rotate;
         }
 
         void MoveBy(float distance_x, float distance_y, float distance_z)
         {
             Matrix4X4f translation;
             MatrixTranslation(translation, distance_x, distance_y, distance_z);
-            m_RuntimeTransform = m_RuntimeTransform * translation;
+            m_Transform = m_Transform * translation;
         }
 
         void MoveBy(const Vector3f& distance)
@@ -150,16 +154,15 @@ namespace Corona
             MoveBy(distance[0], distance[1], distance[2]);
         }
 
+        // TODO
         virtual Matrix3X3f GetLocalAxis()
         {
-            return {{
-                        {1.0f, 0.0f, 0.0f},
-                        {0.0f, 1.0f, 0.0f},
-                        {0.0f, 0.0f, 1.0f}
-                    }};
+            return {1.0f, 0.0f, 0.0f,
+                    0.0f, 1.0f, 0.0f,
+                    0.0f, 0.0f, 1.0f};
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const BaseSceneNode& node)
+        friend std::ostream& operator<<(std::ostream& out, const SceneNode& node)
         {
             static thread_local int32_t indent = 0;
             indent++;
@@ -170,17 +173,15 @@ namespace Corona
             node.dump(out);
             out << std::endl;
 
-            for (auto sub_node : node.m_Children) {
+            for (auto& sub_node : node.m_Children) {
                 out << *sub_node << std::endl;
             }
 
-            for (auto trans : node.m_Transforms) {
-                out << *trans << std::endl;
-            }
+            out << *node.m_Transform << std::endl;
 
-            for (auto anim_clip : node.m_AnimationClips) {
-                out << *anim_clip.second << std::endl;
-            }
+            // for (auto anim_clip : node.m_AnimationClips) {
+            //     out << *anim_clip.second << std::endl;
+            // }
 
             indent--;
 
@@ -188,27 +189,30 @@ namespace Corona
         }
     };
 
-    struct Model
-    {
-        /// Model create information
-        struct CreateInfo
-        {
-            std::string FileName = "";
+    // turn Model to Scene class
 
-            CreateInfo() = default;
-            explicit CreateInfo(std::string _FileName) : FileName(_FileName){};
-        };
+    // struct Model
+    // {
+    //     /// Model create information
+    //     struct CreateInfo
+    //     {
+    //         std::string FileName = "";
 
-        std::vector<std::unique_ptr<SceneNode>> Nodes;
-        std::vector<SceneNode *> LinearNodes;
+    //         CreateInfo() = default;
+    //         explicit CreateInfo(std::string _FileName) : FileName(_FileName){};
+    //     };
 
-        std::vector<SceneObjectTexture> Textures;
-        std::vector<SceneObjectMaterial> Materials;
+    //     std::vector<std::unique_ptr<SceneNode>> Nodes;
+    //     std::vector<SceneNode *> LinearNodes;
 
-        // std::vector<std::unique_ptr<Material>> Materials;
-        std::vector<std::string> Extensions;
+    //     std::vector<SceneObjectTexture> Textures;
+    //     std::vector<SceneObjectMaterial> Materials;
 
-        Model();
-        ~Model();
-    };
+    //     // std::vector<std::unique_ptr<Material>> Materials;
+    //     std::vector<std::string> Extensions;
+
+    //     Model();
+    //     ~Model();
+    // };
+
 }

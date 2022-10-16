@@ -45,18 +45,18 @@ namespace Corona
         }
         float r_sqrtSum = 1 / sqrt(sum);
         TT<T> result{};
-		for (int i = 0; i < size; i++)
-		{
+        for (int i = 0; i < size; i++)
+        {
             result[i] = v[i] * r_sqrtSum;
-		}
+        }
         return result;
     }
 
-    template<typename T>
-	static T Clamp(const T& x, const T& low, const T& high)
-	{
-		return x < low ? low : (x > high ? high : x); 
-	}
+    template <typename T>
+    static T Clamp(const T &x, const T &low, const T &high)
+    {
+        return x < low ? low : (x > high ? high : x);
+    }
 
     template <template <typename> class TT, typename T, int... Indexes>
     class swizzle
@@ -107,13 +107,13 @@ namespace Corona
         Vector2Type<T>(const T &_x, const T &_y) : x(_x), y(_y){};
 
         template <typename Y>
-        Vector2Type<T>(const Y &vals) : x(static_cast<T>(vals[0])), y(static_cast<T>(vals[1])) {};
+        Vector2Type<T>(const Y &vals) : x(static_cast<T>(vals[0])), y(static_cast<T>(vals[1])){};
 
         operator T *() { return data; };
         operator const T *() const { return static_cast<const T *>(data); };
 
         template <typename Y>
-        constexpr static Vector2Type MakeVector(const Y& vals)
+        constexpr static Vector2Type MakeVector(const Y &vals)
         {
             return Vector2Type //
                 {
@@ -121,7 +121,6 @@ namespace Corona
                     static_cast<T>(vals[1]) //
                 };
         }
-
     };
 
     typedef Vector2Type<float> Vector2f;
@@ -159,13 +158,13 @@ namespace Corona
         Vector3Type<T>(const T &_x, const T &_y, const T &_z) : x(_x), y(_y), z(_z){};
 
         template <typename Y>
-        Vector3Type<T>(const Y &vals) : x(static_cast<T>(vals[0])), y(static_cast<T>(vals[1])), z(static_cast<T>(vals[2])) {};
+        Vector3Type<T>(const Y &vals) : x(static_cast<T>(vals[0])), y(static_cast<T>(vals[1])), z(static_cast<T>(vals[2])){};
 
         operator T *() { return data; };
         operator const T *() const { return static_cast<const T *>(data); };
 
         template <typename Y>
-        constexpr static Vector3Type MakeVector(const Y& vals)
+        constexpr static Vector3Type MakeVector(const Y &vals)
         {
             return Vector3Type //
                 {
@@ -207,7 +206,7 @@ namespace Corona
         Vector4Type<T>(const Vector3Type<T> &v3, const T &_w) : x(v3.x), y(v3.y), z(v3.z), w(_w){};
 
         template <typename Y>
-        Vector4Type<T>(const Y &vals) : x(static_cast<T>(vals[0])), y(static_cast<T>(vals[1])), z(static_cast<T>(vals[2])), w(static_cast<T>(vals[3])) {};
+        Vector4Type<T>(const Y &vals) : x(static_cast<T>(vals[0])), y(static_cast<T>(vals[1])), z(static_cast<T>(vals[2])), w(static_cast<T>(vals[3])){};
 
         operator T *() { return data; };
         operator const T *() const { return static_cast<const T *>(data); };
@@ -218,7 +217,7 @@ namespace Corona
         };
 
         template <typename Y>
-        constexpr static Vector4Type MakeVector(const Y& vals)
+        constexpr static Vector4Type MakeVector(const Y &vals)
         {
             return Vector4Type //
                 {
@@ -324,6 +323,12 @@ namespace Corona
             memcpy(data, _data, ROWS * COLS * sizeof(T));
             return *this;
         }
+
+        Matrix &operator=(const Matrix &rhs)
+        {
+            std::memcpy(data, rhs, sizeof(Matrix));
+            return *this;
+        }
     };
 
     typedef Matrix<float, 3, 3> Matrix3X3f;
@@ -403,7 +408,7 @@ namespace Corona
     }
 
     template <typename T, int ROWS, int COLS>
-    void MatrixMulByElement(Matrix<T, ROWS, COLS>& result, const Matrix<T, ROWS, COLS>& matrix1, const Matrix<T, ROWS, COLS>& matrix2)
+    void MatrixMulByElement(Matrix<T, ROWS, COLS> &result, const Matrix<T, ROWS, COLS> &matrix1, const Matrix<T, ROWS, COLS> &matrix2)
     {
         ispc::MulByElement(matrix1, matrix2, result, (uint32_t)countof(result.data));
     }
@@ -414,12 +419,12 @@ namespace Corona
         ispc::Transpose(matrix1, result, ROWS, COLS);
     }
 
-	template <template <typename, int, int> class TT, typename T, int ROWS, int COLS>
-	inline void Transpose(TT<T, ROWS, COLS>& matrix)
-	{
+    template <template <typename, int, int> class TT, typename T, int ROWS, int COLS>
+    inline void Transpose(TT<T, ROWS, COLS> &matrix)
+    {
         auto tempMatrix = matrix;
-		ispc::Transpose(tempMatrix, matrix, ROWS, COLS);
-	}
+        ispc::Transpose(tempMatrix, matrix, ROWS, COLS);
+    }
 
     template <typename T>
     inline void Normalize(T &result)
@@ -528,14 +533,12 @@ namespace Corona
         return;
     }
 
-    inline void BuildPerspectiveFovRHMatrix(Matrix4X4f& matrix, const float fieldOfView, const float screenAspect, const float screenNear, const float screenDepth)
+    inline void BuildPerspectiveFovRHMatrix(Matrix4X4f &matrix, const float fieldOfView, const float screenAspect, const float screenNear, const float screenDepth)
     {
-        Matrix4X4f perspective = {{{
-            { 1.0f / (screenAspect * tanf(fieldOfView * 0.5f)), 0.0f, 0.0f, 0.0f },
-            { 0.0f, 1.0f / tanf(fieldOfView * 0.5f), 0.0f, 0.0f },
-            { 0.0f, 0.0f, screenDepth / (screenNear - screenDepth), -1.0f },
-            { 0.0f, 0.0f, (-screenNear * screenDepth) / (screenDepth - screenNear), 0.0f }
-        }}};
+        Matrix4X4f perspective = {{{{1.0f / (screenAspect * tanf(fieldOfView * 0.5f)), 0.0f, 0.0f, 0.0f},
+                                    {0.0f, 1.0f / tanf(fieldOfView * 0.5f), 0.0f, 0.0f},
+                                    {0.0f, 0.0f, screenDepth / (screenNear - screenDepth), -1.0f},
+                                    {0.0f, 0.0f, (-screenNear * screenDepth) / (screenDepth - screenNear), 0.0f}}}};
 
         matrix = perspective;
 
@@ -636,19 +639,19 @@ namespace Corona
         matrix = rotation;
     }
 
-    inline bool InverseMatrix4X4f(Matrix4X4f& matrix)
+    inline bool InverseMatrix4X4f(Matrix4X4f &matrix)
     {
         return ispc::InverseMatrix4X4f(matrix);
     }
 
-    inline Matrix8X8f DCT8X8(const Matrix8X8f& matrix)
+    inline Matrix8X8f DCT8X8(const Matrix8X8f &matrix)
     {
         Matrix8X8f result;
         ispc::DCT8X8(matrix, result);
         return result;
     }
 
-    inline Matrix8X8f IDCT8X8(const Matrix8X8f& matrix)
+    inline Matrix8X8f IDCT8X8(const Matrix8X8f &matrix)
     {
         Matrix8X8f result;
         ispc::IDCT8X8(matrix, result);
