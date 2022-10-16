@@ -7,7 +7,7 @@
 using namespace Corona;
 using namespace std;
 
-#ifdef _DEBUG
+#ifdef DEBUG
 int DebugManager::Initialize()
 {
     return 0;

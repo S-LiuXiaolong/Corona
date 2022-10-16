@@ -1,259 +1,173 @@
 #include <iostream>
 #include "InputManager.h"
-#include "GraphicsManager.h"
+#include "IGameLogic.h"
 #include "geommath.h"
 
 using namespace std;
 
 namespace Corona
 {
-    int InputManager::Initialize()
-    {
-        return 0;
-    }
+	int InputManager::Initialize()
+	{
+		return 0;
+	}
 
-    void InputManager::Finalize()
-    {
-    }
+	void InputManager::Finalize()
+	{
+	}
 
-    void InputManager::Tick()
-    {
-    }
+	void InputManager::Tick()
+	{
+	}
 
-    void InputManager::UpArrowKeyDown()
-    {
-#ifdef _DEBUG
+	void InputManager::UpArrowKeyDown()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Up Arrow Key Down!" << endl;
-#endif
-        g_pGraphicsManager->WorldRotateX(PI / 60.0f);
-    }
+	#endif
+		g_pGameLogic->OnUpKeyDown();
+		if (!m_bUpKeyPressed)
+		{
+			g_pGameLogic->OnUpKey();
+			m_bUpKeyPressed = true;
+		}
+	}
 
-    void InputManager::UpArrowKeyUp()
-    {
-#ifdef _DEBUG
+	void InputManager::UpArrowKeyUp()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Up Arrow Key Up!" << endl;
-#endif
-    }
+	#endif
+		g_pGameLogic->OnUpKeyUp();
+		m_bUpKeyPressed = false;
+	}
 
-    void InputManager::DownArrowKeyDown()
-    {
-#ifdef _DEBUG
+	void InputManager::DownArrowKeyDown()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Down Arrow Key Down!" << endl;
-#endif
-        g_pGraphicsManager->WorldRotateX(-PI / 60.0f);
-    }
+	#endif
+		g_pGameLogic->OnDownKeyDown();
+		if (!m_bDownKeyPressed)
+		{
+			g_pGameLogic->OnDownKey();
+			m_bDownKeyPressed = true;
+		}
+	}
 
-    void InputManager::DownArrowKeyUp()
-    {
-#ifdef _DEBUG
+	void InputManager::DownArrowKeyUp()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Down Arrow Key Up!" << endl;
-#endif
-    }
+	#endif
+		g_pGameLogic->OnDownKeyUp();
+		m_bDownKeyPressed = false;
+	}
 
-    void InputManager::LeftArrowKeyDown()
-    {
-#ifdef _DEBUG
+	void InputManager::LeftArrowKeyDown()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Left Arrow Key Down!" << endl;
-#endif
-        g_pGraphicsManager->WorldRotateY(-PI / 60.0f);
-    }
+	#endif
+		g_pGameLogic->OnLeftKeyDown();
+		if (!m_bLeftKeyPressed)
+		{
+			g_pGameLogic->OnLeftKey();
+			m_bLeftKeyPressed = true;
+		}
+	}
 
-    void InputManager::LeftArrowKeyUp()
-    {
-#ifdef _DEBUG
+	void InputManager::LeftArrowKeyUp()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Left Arrow Key Up!" << endl;
-#endif
-    }
+	#endif
+		g_pGameLogic->OnLeftKeyUp();
+		m_bLeftKeyPressed = false;
+	}
 
-    void InputManager::RightArrowKeyDown()
-    {
-#ifdef _DEBUG
+	void InputManager::RightArrowKeyDown()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Right Arrow Key Down!" << endl;
-#endif
-        g_pGraphicsManager->WorldRotateY(PI / 60.0f);
-    }
+	#endif
+		g_pGameLogic->OnRightKeyDown();
+		if(!m_bRightKeyPressed)
+		{
+			g_pGameLogic->OnRightKey();
+			m_bRightKeyPressed = true;
+		}
+	}
 
-    void InputManager::RightArrowKeyUp()
-    {
-#ifdef _DEBUG
+	void InputManager::RightArrowKeyUp()
+	{
+	#ifdef DEBUG
 		cerr << "[InputManager] Right Arrow Key Up!" << endl;
-#endif
-    }
-
-	void InputManager::WKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] W Key Down!" << endl;
-#endif
-		g_pGraphicsManager->WorldRotateX(PI / 60.0f);
+	#endif
+		g_pGameLogic->OnRightKeyUp();
+		m_bRightKeyPressed = false;
 	}
 
-	void InputManager::WKeyUp()
+	void InputManager::AsciiKeyDown(char keycode)
 	{
-#ifdef _DEBUG
-		cerr << "[InputManager] W Key Up!" << endl;
-#endif
+	#ifdef DEBUG
+		cerr << "[InputManager] ASCII Key Down! (" << keycode << ")" << endl;
+	#endif
+		switch (keycode)
+		{
+			case 'd':
+	#ifdef DEBUG
+				g_pDebugManager->ToggleDebugInfo();
+	#endif
+				break;
+			// case 'r':
+			// 	g_pSceneManager->ResetScene();
+			// 	break;
+			case 'u':
+				g_pGameLogic->OnButton1Down();
+				break;
+			default:
+				cerr << "[InputManager] unhandled key." << endl;
+		}
 	}
 
-	void InputManager::SKeyDown()
+	void InputManager::AsciiKeyUp(char keycode)
 	{
-#ifdef _DEBUG
-		cerr << "[InputManager] S Key Down!" << endl;
-#endif
-		g_pGraphicsManager->WorldRotateX(-PI / 60.0f);
+	#ifdef DEBUG
+		cerr << "[InputManager] ASCII Key Up! (" << keycode << ")" << endl;
+	#endif
+		switch (keycode)
+		{
+			case 'd':
+				break;
+			case 'r':
+				break;
+			case 'u':
+				g_pGameLogic->OnButton1Up();
+				break;
+			default:
+				cerr << "[InputManager] unhandled key." << endl;
+		}
 	}
 
-	void InputManager::SKeyUp()
+	void InputManager::LeftMouseButtonDown()
 	{
-#ifdef _DEBUG
-		cerr << "[InputManager] S Key Up!" << endl;
-#endif
+		cerr << "[InputManager] Left Mouse Button Down!" << endl;
 	}
 
-	void InputManager::AKeyDown()
+	void InputManager::LeftMouseButtonUp()
 	{
-#ifdef _DEBUG
-		cerr << "[InputManager] A Key Down!" << endl;
-#endif
-		g_pGraphicsManager->WorldRotateY(-PI / 60.0f);
+		cerr << "[InputManager] Left Mouse Button Up!" << endl;
 	}
 
-	void InputManager::AKeyUp()
+	void InputManager::LeftMouseDrag(int deltaX, int deltaY)
 	{
-#ifdef _DEBUG
-		cerr << "[InputManager] A Key Up!" << endl;
-#endif
+		cerr << "[InputManager] Left Mouse Dragged! (" 
+			<< deltaX << ","
+			<< deltaY << ")"
+			<< endl;
+		g_pGameLogic->OnAnalogStick(0, (float)deltaX, (float)deltaY);
 	}
-
-	void InputManager::DKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] D Key Down!" << endl;
-#endif
-		g_pGraphicsManager->WorldRotateY(PI / 60.0f);
-	}
-
-	void InputManager::DKeyUp()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] D Key Up!" << endl;
-#endif
-	}
-
-	void InputManager::QKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] Q Key Down!" << endl;
-#endif
-		g_pGraphicsManager->WorldRotateZ(PI / 60.0f);
-	}
-
-	void InputManager::QKeyUp()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] Q Key Up!" << endl;
-#endif
-	}
-
-	void InputManager::EKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] E Key Down!" << endl;
-#endif
-		g_pGraphicsManager->WorldRotateZ(-PI / 60.0f);
-	}
-
-	void InputManager::EKeyUp()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] E Key Up!" << endl;
-#endif
-	}
-
-	void InputManager::IKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] I Key Down!" << endl;
-#endif
-		g_pGraphicsManager->CameraRotateZ(0.2f);
-	}
-
-	void InputManager::IKeyUp()
-	{
-
-	}
-
-	void InputManager::KKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] K Key Down!" << endl;
-#endif
-		g_pGraphicsManager->CameraRotateZ(-0.2f);
-	}
-
-	void InputManager::KKeyUp()
-	{
-
-	}
-
-	void InputManager::JKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] J Key Down!" << endl;
-#endif
-		g_pGraphicsManager->CameraRotateX(0.2f);
-	}
-
-	void InputManager::JKeyUp()
-	{
-
-	}
-
-	void InputManager::LKeyDown()
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] L Key Down!" << endl;
-#endif
-		g_pGraphicsManager->CameraRotateX(-0.2f);
-	}
-
-	void InputManager::LKeyUp()
-	{
-
-	}
-
-	void InputManager::OnMouseDown(int x, int y)
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] Mouse Down!" << endl;
-#endif
-		g_pGraphicsManager->OnMouseDown(x, y);
-	}
-
-	void InputManager::OnMouseMoveL(int x, int y)
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] Move While Mouse L Button Down!" << endl;
-#endif
-		g_pGraphicsManager->OnMouseMoveL(x, y);
-	}
-
-	void InputManager::OnMouseMoveR(int x, int y)
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] Move While Mouse R Button Down!" << endl;
-#endif
-		g_pGraphicsManager->OnMouseMoveR(x, y);
-	}
-
-	void InputManager::OnMouseWheel(int delta)
-	{
-#ifdef _DEBUG
-		cerr << "[InputManager] Mouse Wheel Action!" << endl;
-#endif
-		g_pGraphicsManager->OnMouseWheel(delta);
-	}
-
 }
 
 

@@ -1,110 +1,87 @@
 #include "Scene.h"
 
+using namespace std;
+
 namespace Corona
 {
-    const std::shared_ptr<SceneObjectCamera> Scene::GetCamera(const std::string& key) const
+    const shared_ptr<SceneObjectCamera> Scene::GetCamera(const std::string& key) const
     {
         auto i = Cameras.find(key);
         if (i == Cameras.end())
             return nullptr;
         else
+        {
             return i->second;
+        }
     }
 
-    // const std::shared_ptr<SceneObjectLight> Scene::GetLight(const std::string& key) const
-    // {
-    //     auto i = Lights.find(key);
-    //     if (i == Lights.end())
-    //         return nullptr;
-    //     else
-    //         return i->second;
-    // }
+    const shared_ptr<SceneObjectLight> Scene::GetLight(const std::string& key) const
+    {
+        auto i = Lights.find(key);
+        if (i == Lights.end())
+            return nullptr;
+        else
+        {
+            return i->second;
+        }
+    }
 
-    const std::shared_ptr<SceneObjectMesh> Scene::GetGeometry(const std::string& key) const
+    const shared_ptr<SceneObjectMesh> Scene::GetGeometry(const std::string& key) const
     {
         auto i = Geometries.find(key);
         if (i == Geometries.end())
             return nullptr;
         else
+        {
             return i->second;
+        }
     }
 
-    // const std::shared_ptr<SceneObjectMaterial> Scene::GetMaterial(const std::string& key) const
-    // {
-    //     auto i = Materials.find(key);
-    //     if (i == Materials.end())
-    //         return m_pDefaultMaterial;
-    //     else
-    //         return i->second;
-    // }
-
-    // const std::shared_ptr<SceneObjectMaterial> Scene::GetFirstMaterial() const
-    // {
-    //     return (Materials.empty()? nullptr : Materials.cbegin()->second);
-    // }
-
-    // const std::shared_ptr<SceneObjectMaterial> Scene::GetNextMaterial() const
-    // {
-    //     static thread_local auto _it = Materials.cbegin();
-    //     if (_it == Materials.cend()) return nullptr;
-    //     return ((++_it == Materials.cend()) ? nullptr : _it->second);
-    // }
-
-    const std::shared_ptr<SceneObjectMesh> Scene::GetFirstGeometry() const
+    const shared_ptr<SceneObjectMaterial> Scene::GetMaterial(const std::string& key) const
     {
-        return (Geometries.empty()? 
-                nullptr 
-                : Geometries.cbegin()->second);
+        auto i = Materials.find(key);
+        if (i == Materials.end())
+            return m_pDefaultMaterial;
+        else
+        {
+            return i->second;
+        }
     }
 
-    const std::shared_ptr<SceneObjectMesh> Scene::GetNextGeometry() const
+    const shared_ptr<SceneObjectMaterial> Scene::GetFirstMaterial() const
     {
-        static thread_local auto _it = Geometries.cbegin();
-        if (_it == Geometries.cend()) return nullptr;
-        return ((++_it == Geometries.cend()) ? 
-                nullptr 
-                : _it->second);
+        return (Materials.empty()? nullptr : Materials.cbegin()->second);
     }
 
-    // const std::shared_ptr<SceneLightNode> Scene::GetFirstLightNode() const
-    // {
-    //     return (LightNodes.empty()? 
-    //             nullptr 
-    //             : LightNodes.cbegin()->second);
-    // }
-
-    // const std::shared_ptr<SceneLightNode> Scene::GetNextLightNode() const
-    // {
-    //     static thread_local auto _it = LightNodes.cbegin();
-    //     if (_it == LightNodes.cend()) return nullptr;
-    //     return ((++_it == LightNodes.cend()) ? 
-    //             nullptr 
-    //             : _it->second);
-    // }
-
-    const std::shared_ptr<SceneObjectCamera> Scene::GetFirstCamera() const
+    const shared_ptr<SceneGeometryNode> Scene::GetFirstGeometryNode() const
     {
-        return (Cameras.empty()? 
+        return (GeometryNodes.empty()? 
                 nullptr 
-                : Cameras.cbegin()->second);
+                : GeometryNodes.cbegin()->second.lock());
     }
 
-    const std::shared_ptr<SceneObjectCamera> Scene::GetNextCamera() const
+    const shared_ptr<SceneLightNode> Scene::GetFirstLightNode() const
     {
-        static thread_local auto _it = Cameras.cbegin();
-        if (_it == Cameras.cend()) return nullptr;
-        return ((++_it == Cameras.cend()) ? 
+        return (LightNodes.empty()? 
                 nullptr 
-                : _it->second);
+                : LightNodes.cbegin()->second.lock());
     }
 
-    // void Scene::LoadResource()
-    // {
-    //     for (auto material : Materials)
-    //     {
-    //         material.second->LoadTextures();
-    //     }
-    // }
+    const shared_ptr<SceneCameraNode> Scene::GetFirstCameraNode() const
+    {
+        return (CameraNodes.empty()? 
+                nullptr 
+                : CameraNodes.cbegin()->second.lock());
+    }
+
+    void Scene::LoadResource()
+    {
+        for (auto material : Materials)
+        {
+            if (auto ptr = material.second)
+                ptr->LoadMaterial();
+        }
+    }
 
 }
 

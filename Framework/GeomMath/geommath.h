@@ -329,6 +329,7 @@ namespace Corona
             std::memcpy(data, rhs, sizeof(Matrix));
             return *this;
         }
+
     };
 
     typedef Matrix<float, 3, 3> Matrix3X3f;

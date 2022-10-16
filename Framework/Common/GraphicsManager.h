@@ -31,7 +31,7 @@ namespace Corona
         // void OnMouseMoveR(int x, int y);
         // void OnMouseWheel(int delta);
 
-#ifdef _DEBUG
+#ifdef DEBUG
         virtual void DrawPoint(const Point& point, const Vector3f& color);
         virtual void DrawPointSet(const PointSet& point_set, const Vector3f& color);
         virtual void DrawPointSet(const PointSet& point_set, const Matrix4X4f& trans, const Vector3f& color);

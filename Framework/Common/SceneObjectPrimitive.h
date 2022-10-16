@@ -12,7 +12,7 @@ namespace Corona
     class SceneObjectPrimitive : public BaseSceneObject
     {
     protected:
-        // TODO: unique or shared ?
+        // TODO: maybe unique or shared ?
         SceneObjectVertexArray m_VertexArray;
         SceneObjectIndexArray m_IndexArray;
         // TODO: use types to draw different styles to draw primitives in one mesh(/geometry)
@@ -31,10 +31,12 @@ namespace Corona
 
         // void SetPrimitiveType(PrimitiveType type) { m_PrimitiveType = type;  };
 
-        size_t GetIndexCount(const size_t index) const { return m_IndexArray.GetIndexCount(); };
+        size_t GetIndexCount() const { return m_IndexArray.GetIndexCount(); };
         size_t GetVertexCount() const { return m_VertexArray.GetVertexCount(); };
         // const PrimitiveType& GetPrimitiveType() { return m_PrimitiveType; };
         // BoundingBox GetBoundingBox() const;
         // ConvexHull GetConvexHull() const;
+
+        friend std::ostream& operator<<(std::ostream& out, const SceneObjectMesh& obj);
     };
 }

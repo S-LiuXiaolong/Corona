@@ -3,6 +3,15 @@
 
 namespace Corona
 {
+    // TODO
+    struct VertexBasicAttribs
+    {
+        Vector3f pos;
+        Vector3f normal;
+        Vector2f uv0;
+        Vector3f tangent;
+    };
+
     class SceneObjectVertexArray 
     {
     protected:
@@ -17,15 +26,13 @@ namespace Corona
         size_t GetDataSize() const 
         { 
             size_t size = m_szData * sizeof(float);
-
             return size;
         }; 
         const void* GetData() const { return m_pData; };
         size_t GetVertexCount() const
         {
             // TODO
-            size_t size = m_szData / sizeof(BasicVertexAttrib);
-
+            size_t size = m_szData / sizeof(VertexBasicAttribs);
             return size;
         }
 

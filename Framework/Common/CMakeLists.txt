@@ -2,13 +2,13 @@ add_library(Common
 Allocator.cpp
 AssetLoader.cpp
 BaseApplication.cpp
-GraphicsManager.cpp
 Image.cpp
+GraphicsManager.cpp
 MemoryManager.cpp
 SceneManager.cpp
 InputManager.cpp
-glTFSceneObject.cpp
-glTFSceneNode.cpp
+SceneObject.cpp
+SceneNode.cpp
 Scene.cpp
 main.cpp
 )

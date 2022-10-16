@@ -84,7 +84,7 @@ namespace Corona
         // Texture indices in Model.Textures array
         std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds;
         std::unordered_map<int, std::shared_ptr<SceneObjectTexture>> Textures;
-
+        std::shared_ptr<SceneObjectTexture> ColorMap, PhysicsDescriptorMap, NormalMap, AOMap, Emissivemap;
     public:
         SceneObjectMaterial(void) : BaseSceneObject(SceneObjectType::kSceneObjectTypeMaterial),
                                     m_Name(""),
@@ -110,13 +110,9 @@ namespace Corona
         // TODO
         void LoadMaterial()
         {
-
+            
         }
 
-        std::shared_ptr<SceneObjectTexture> GetColorMap();
-        std::shared_ptr<SceneObjectTexture> GetPhysicsDescriptorMap();
-        std::shared_ptr<SceneObjectTexture> GetNormalMap();
-        std::shared_ptr<SceneObjectTexture> GetAOMap();
-        std::shared_ptr<SceneObjectTexture> GetEmissiveMap();
+        friend std::ostream& operator<<(std::ostream& out, const SceneObjectMaterial& obj);
     };
 }

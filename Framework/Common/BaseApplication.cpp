@@ -54,11 +54,11 @@ namespace Corona
             return ret;
         }
 
-        if ((ret = g_pAnimationManager->Initialize()) != 0)
-        {
-            cerr << "Failed. err =" << ret;
-            return ret;
-        }
+        // if ((ret = g_pAnimationManager->Initialize()) != 0)
+        // {
+        //     cerr << "Failed. err =" << ret;
+        //     return ret;
+        // }
 
         if ((ret = g_pGameLogic->Initialize()) != 0)
         {
@@ -66,7 +66,7 @@ namespace Corona
             return ret;
         }
 
-#ifdef DEBUG
+#ifdef _DEBUG
         if ((ret = g_pDebugManager->Initialize()) != 0)
         {
             cerr << "Failed. err =" << ret;
@@ -84,7 +84,7 @@ namespace Corona
         g_pDebugManager->Finalize();
 #endif
         g_pGameLogic->Finalize();
-        g_pAnimationManager->Finalize();
+        // g_pAnimationManager->Finalize();
         g_pInputManager->Finalize();
         g_pGraphicsManager->Finalize();
         g_pPhysicsManager->Finalize();
@@ -101,7 +101,7 @@ namespace Corona
         g_pSceneManager->Tick();
         g_pInputManager->Tick();
         g_pPhysicsManager->Tick();
-        g_pAnimationManager->Tick();
+        // g_pAnimationManager->Tick();
         g_pGraphicsManager->Tick();
         g_pGameLogic->Tick();
 #ifdef _DEBUG

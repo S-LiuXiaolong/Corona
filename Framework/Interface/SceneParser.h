@@ -11,6 +11,6 @@ namespace Corona
     Interface SceneParser
     {
     public:
-        virtual void Parse(std::unique_ptr<Scene>& pScene) = 0;
+        virtual std::unique_ptr<Scene> Parse(const std::string& FilePath) = 0;
     };
 }

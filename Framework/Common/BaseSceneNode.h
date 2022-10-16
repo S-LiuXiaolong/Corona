@@ -4,6 +4,7 @@
 #include <vector>
 #include "geommath.h"
 #include "Tree.h"
+#include "SceneObject.h"
 
 namespace Corona
 {
@@ -27,24 +28,22 @@ namespace Corona
     //     void UpdateTransforms();
     // };
     
-    template <typename T>
-    class SceneNode 
+    class BaseSceneNode 
     {
     protected:
         std::string m_strName;
 
-        SceneNode *Parent = nullptr;
+        BaseSceneNode *Parent = nullptr;
         // ? index
         uint32_t Index;
 
-        std::vector<std::unique_ptr<SceneNode>> m_Children;
+        std::vector<std::unique_ptr<BaseSceneNode>> m_Children;
 
         // std::map<int, std::shared_ptr<SceneObjectAnimationClip>> m_AnimationClips;
         Matrix4X4f Matrix;
         Vector3f Translation;
         Vector3f Scale;
         Quaternion Rotation;
-        Matrix4X4f m_Transform;
 
     protected:
         virtual void dump(std::ostream& out) const {};
@@ -53,9 +52,9 @@ namespace Corona
         // typedef std::map<int, std::shared_ptr<SceneObjectAnimationClip>>::const_iterator animation_clip_iterator;
 
     public:
-        SceneNode() { BuildIdentityMatrix(m_Transform); };
-        SceneNode(const std::string& name) { m_strName = name; BuildIdentityMatrix(m_Transform); };
-        virtual ~SceneNode() {};
+        BaseSceneNode() { BuildIdentityMatrix(Matrix); };
+        BaseSceneNode(const std::string& name) { m_strName = name; };
+        virtual ~BaseSceneNode() {};
 
         const std::string GetName() const { return m_strName; };
 
@@ -76,11 +75,12 @@ namespace Corona
         //     return it != m_AnimationClips.cend();
         // }
 
-        Matrix4X4f LocalMatrix() const
+        Matrix4X4f GetLocalTransform() const
         {
             // Translation, rotation, and scale properties and local space transformation are
             // mutually exclusive in GLTF.
             // We, however, may use non-trivial Matrix with TRS to apply transform to a model.
+
             Matrix4X4f mat = Matrix;
 
             MatrixTranslation(mat, Translation.x, Translation.y, Translation.z);
@@ -91,13 +91,13 @@ namespace Corona
         }
 
         // get matrix from child node to parent iteratively
-        Matrix4X4f GetMatrix() const
+        Matrix4X4f GetGlobalTransform() const
         {
-            auto mat = LocalMatrix();
+            auto mat = GetLocalTransform();
 
             for (auto *p = Parent; p != nullptr; p = p->Parent)
             {
-                mat = mat * p->LocalMatrix();
+                mat = mat * p->GetLocalTransform();
             }
             return mat;
         }
@@ -135,18 +135,19 @@ namespace Corona
             }
         }
 
+        // TODO
         void RotateBy(float rotation_angle_x, float rotation_angle_y, float rotation_angle_z)
         {
             Matrix4X4f rotate;
             MatrixRotationYawPitchRoll(rotate, rotation_angle_x, rotation_angle_y, rotation_angle_z);
-            m_Transform = m_Transform * rotate;
+            Matrix = Matrix * rotate;
         }
 
         void MoveBy(float distance_x, float distance_y, float distance_z)
         {
             Matrix4X4f translation;
             MatrixTranslation(translation, distance_x, distance_y, distance_z);
-            m_Transform = m_Transform * translation;
+            Matrix = Matrix * translation;
         }
 
         void MoveBy(const Vector3f& distance)
@@ -162,7 +163,7 @@ namespace Corona
                     0.0f, 0.0f, 1.0f};
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const SceneNode& node)
+        friend std::ostream& operator<<(std::ostream& out, const BaseSceneNode& node)
         {
             static thread_local int32_t indent = 0;
             indent++;
@@ -177,7 +178,7 @@ namespace Corona
                 out << *sub_node << std::endl;
             }
 
-            out << *node.m_Transform << std::endl;
+            out << node.Matrix << std::endl;
 
             // for (auto anim_clip : node.m_AnimationClips) {
             //     out << *anim_clip.second << std::endl;
@@ -214,5 +215,26 @@ namespace Corona
     //     Model();
     //     ~Model();
     // };
+    template <typename T>
+    class SceneNode : public BaseSceneNode {
+        protected:
+            std::string m_keySceneObject;
+
+        protected:
+            virtual void dump(std::ostream& out) const 
+            { 
+                out << m_keySceneObject << std::endl;
+            };
+
+        public:
+            using BaseSceneNode::BaseSceneNode;
+            SceneNode() = default;
+
+            void AddSceneObjectRef(const std::string& key) { m_keySceneObject = key; };
+
+            const std::string& GetSceneObjectRef() { return m_keySceneObject; };
+    };
+
+    typedef BaseSceneNode SceneEmptyNode;
 
 }

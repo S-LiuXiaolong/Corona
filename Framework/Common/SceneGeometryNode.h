@@ -10,6 +10,14 @@ namespace Corona
             std::vector<std::string> m_Materials;
             void*       m_pRigidBody = nullptr;
 
+            // TODO
+            // struct TransformData
+            // {
+            //     Matrix4X4f              transform;
+            //     std::vector<Matrix4X4f> jointMatrices;
+            // };
+            Matrix4X4f m_fTransform = BuildIdentityMatrix();
+
         protected:
             virtual void dump(std::ostream& out) const 
             { 
@@ -47,5 +55,16 @@ namespace Corona
             // }
 
             // void* RigidBody() { return m_pRigidBody; }
+            virtual void UpdateTransforms() override
+            {
+                // Add these in derivative classed
+                const auto NodeTransform = GetGlobalTransform();
+                m_fTransform = NodeTransform;
+
+                for (auto &child : m_Children)
+                {
+                    child->UpdateTransforms();
+                }
+            }
     };
 }
