@@ -11,6 +11,7 @@ namespace Corona
     class SceneObjectTexture : public BaseSceneObject
     {
     protected:
+        // m_Name here is the path of image (like "Scene/DamagedHelmet/DamagedHelmet_albedo.jpg")
         std::string m_Name;
         std::shared_ptr<Image> m_pImage;
 
