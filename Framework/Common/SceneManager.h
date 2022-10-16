@@ -29,9 +29,9 @@ namespace Corona
 
         void ResetScene();
 
-        std::weak_ptr<BaseSceneNode> GetRootNode();
-        std::weak_ptr<SceneGeometryNode> GetSceneGeometryNode(std::string name);
-        std::weak_ptr<SceneObjectMesh> GetSceneGeometryObject(std::string key);
+        // std::weak_ptr<BaseSceneNode> GetRootNode();
+        // std::weak_ptr<SceneGeometryNode> GetSceneNode(std::string name);
+        // std::weak_ptr<SceneObjectMesh> GetSceneGeometryObject(std::string key);
 
     protected:
         bool LoadGltfScene(std::string gltf_scene_file_name);

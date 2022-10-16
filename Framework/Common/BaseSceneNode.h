@@ -30,14 +30,15 @@ namespace Corona
     
     class BaseSceneNode 
     {
-    protected:
+    // TODO: public or protected ?
+    public:
         std::string m_strName;
 
-        BaseSceneNode *Parent = nullptr;
+        BaseSceneNode *m_Parent = nullptr;
         // ? index
         uint32_t Index;
 
-        std::vector<std::unique_ptr<BaseSceneNode>> m_Children;
+        std::vector<std::shared_ptr<BaseSceneNode>> m_Children;
 
         // std::map<int, std::shared_ptr<SceneObjectAnimationClip>> m_AnimationClips;
         Matrix4X4f Matrix;
@@ -75,6 +76,12 @@ namespace Corona
         //     return it != m_AnimationClips.cend();
         // }
 
+        void AppendChild(std::shared_ptr<BaseSceneNode>&& sub_node)
+        {
+            sub_node->m_Parent = this;
+            m_Children.push_back(std::move(sub_node));
+        }
+
         Matrix4X4f GetLocalTransform() const
         {
             // Translation, rotation, and scale properties and local space transformation are
@@ -95,7 +102,7 @@ namespace Corona
         {
             auto mat = GetLocalTransform();
 
-            for (auto *p = Parent; p != nullptr; p = p->Parent)
+            for (auto *p = m_Parent; p != nullptr; p = p->m_Parent)
             {
                 mat = mat * p->GetLocalTransform();
             }

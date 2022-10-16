@@ -161,7 +161,7 @@ namespace Corona
             }
         }
 
-        void LoadNode(BaseSceneNode *parent,
+        void LoadNode(SceneNode *parent,
                       const tinygltf::Node &gltf_node,
                       uint32_t nodeIndex,
                       const tinygltf::Model &gltf_model,
@@ -170,13 +170,14 @@ namespace Corona
                       ConvertedBufferViewMap &ConvertedBuffers,
                       std::unique_ptr<Scene> &pScene)
         {
-            std::unique_ptr<BaseSceneNode> NewNode;
+            std::unique_ptr<SceneNode> NewNode{new SceneNode{}};
             NewNode->Index = nodeIndex;
-            NewNode->m_Parent = parent;
-            NewNode->m_strName = gltf_node.name;
+            NewNode->Parent = parent;
+            NewNode->Name = gltf_node.name;
             NewNode->Matrix = BuildIdentityMatrix();
 
-            // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filePath} );
+            std::unique_ptr<Model> &m_pModel = pScene->pModel;
+            // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filename} );
             // std::unique_ptr<Model>& m_pModel = model;
             auto &m_Cameras = pScene->Cameras;
             auto &m_Geometries = pScene->Geometries;
@@ -234,9 +235,6 @@ namespace Corona
 
             if (gltf_node.mesh >= 0)
             {
-                // TODO: Attention
-                NewNode = std::make_unique<SceneGeometryNode>(NewNode);
-
                 const tinygltf::Mesh &gltf_mesh = gltf_model.meshes[gltf_node.mesh];
                 std::shared_ptr<SceneObjectMesh> pNewMesh{new SceneObjectMesh{NewNode->Matrix}};
 
@@ -296,7 +294,7 @@ namespace Corona
                         {
                             Key.UV0Access = primitive.attributes.find("TEXCOORD_0")->second;
                         }
-
+                        
                         if (primitive.attributes.find("TEXCOORD_1") != primitive.attributes.end())
                         {
                             Key.UV1Access = primitive.attributes.find("TEXCOORD_1")->second;
@@ -437,41 +435,41 @@ namespace Corona
             }
         }
 
-        void ParseImage(std::string &imagePath, std::shared_ptr<Image> &pImage)
+        void ParseImage(std::string& imagePath, std::shared_ptr<Image>& pImage)
         {
-
-            // 			// we should lookup if the texture has been loaded already to prevent
-            //             // duplicated load. This could be done in Asset Loader Manager.
-            // 			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
-            // 			std::string ext = imagePath.substr(imagePath.find_last_of("."));
-            // 			if (ext == ".jpg" || ext == ".jpeg")
-            // 			{
-            // 				JpegParser jpeg_parser;
-            // 				pImage = std::make_shared<Image>(jpeg_parser.Parse(buf));
-            // 			}
-            // 			else if (ext == ".png")
-            // 			{
-            // 				PngParser png_parser;
-            // 				pImage = std::make_shared<Image>(png_parser.Parse(buf));
-            // 			}
-            // 			// else if (ext == ".bmp")
-            // 			// {
-            // 			//     BmpParser bmp_parser;
-            // 			//     pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
-            // 			// }
-            // 			// else if (ext == ".tga")
-            // 			// {
-            // 			//     TgaParser tga_parser;
-            // 			//     pImage = std::make_shared<Image>(tga_parser.Parse(buf));
-            // 			// }
-            // 			else if (ext == ".bmp")
-            // 			{
-            // 				BmpParser bmp_parser;
-            // 				pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
-            // 			}
+            
+// 			// we should lookup if the texture has been loaded already to prevent
+//             // duplicated load. This could be done in Asset Loader Manager.
+// 			Buffer buf = g_pAssetLoader->SyncOpenAndReadBinary(imagePath.c_str());
+// 			std::string ext = imagePath.substr(imagePath.find_last_of("."));
+// 			if (ext == ".jpg" || ext == ".jpeg")
+// 			{
+// 				JpegParser jpeg_parser;
+// 				pImage = std::make_shared<Image>(jpeg_parser.Parse(buf));
+// 			}
+// 			else if (ext == ".png")
+// 			{
+// 				PngParser png_parser;
+// 				pImage = std::make_shared<Image>(png_parser.Parse(buf));
+// 			}
+// 			// else if (ext == ".bmp")
+// 			// {
+// 			//     BmpParser bmp_parser;
+// 			//     pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+// 			// }
+// 			// else if (ext == ".tga")
+// 			// {
+// 			//     TgaParser tga_parser;
+// 			//     pImage = std::make_shared<Image>(tga_parser.Parse(buf));
+// 			// }
+// 			else if (ext == ".bmp")
+// 			{
+// 				BmpParser bmp_parser;
+// 				pImage = std::make_shared<Image>(bmp_parser.Parse(buf));
+// 			}
         }
 
-        void LoadMaterialsAndTextures(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene, std::string &BasePath)
+        void LoadMaterialsAndTextures(const tinygltf::Model &gltf_model, std::unique_ptr<Scene> &pScene, std::string& BaseDir)
         {
             auto &m_Materials = pScene->Materials;
             for (const tinygltf::Material &gltf_mat : gltf_model.materials)
@@ -480,23 +478,23 @@ namespace Corona
 
                 struct TextureParameterInfo
                 {
-                    const TEXTURE_ID TextureId;
+                    const SceneObjectMaterial::TEXTURE_ID TextureId;
                     float &UVSelector;
                     Vector4f &UVScaleBias;
                     float &Slice;
                     const char *const TextureName;
                     const tinygltf::ParameterMap &Params;
                 };
-
-                ShaderAttribs &attribs = Mat.GetShaderAttribs();
-
+                // clang-format off
                 std::array<TextureParameterInfo, 5> TextureParams =
-                    {
-                        TextureParameterInfo{TEXTURE_ID::TEXTURE_ID_BASE_COLOR, attribs.BaseColorUVSelector, attribs.BaseColorUVScaleBias, attribs.BaseColorSlice, "baseColorTexture", gltf_mat.values},
-                        TextureParameterInfo{TEXTURE_ID::TEXTURE_ID_PHYSICAL_DESC, attribs.PhysicalDescriptorUVSelector, attribs.PhysicalDescriptorUVScaleBias, attribs.PhysicalDescriptorSlice, "metallicRoughnessTexture", gltf_mat.values},
-                        TextureParameterInfo{TEXTURE_ID::TEXTURE_ID_NORMAL_MAP, attribs.NormalUVSelector, attribs.NormalUVScaleBias, attribs.NormalSlice, "normalTexture", gltf_mat.additionalValues},
-                        TextureParameterInfo{TEXTURE_ID::TEXTURE_ID_OCCLUSION, attribs.OcclusionUVSelector, attribs.OcclusionUVScaleBias, attribs.OcclusionSlice, "occlusionTexture", gltf_mat.additionalValues},
-                        TextureParameterInfo{TEXTURE_ID::TEXTURE_ID_EMISSIVE, attribs.EmissiveUVSelector, attribs.EmissiveUVScaleBias, attribs.EmissiveSlice, "emissiveTexture", gltf_mat.additionalValues}};
+                {
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_BASE_COLOR,    Mat.Attribs.BaseColorUVSelector,          Mat.Attribs.BaseColorUVScaleBias,          Mat.Attribs.BaseColorSlice,          "baseColorTexture",         gltf_mat.values},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_PHYSICAL_DESC, Mat.Attribs.PhysicalDescriptorUVSelector, Mat.Attribs.PhysicalDescriptorUVScaleBias, Mat.Attribs.PhysicalDescriptorSlice, "metallicRoughnessTexture", gltf_mat.values},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_NORMAL_MAP,    Mat.Attribs.NormalUVSelector,             Mat.Attribs.NormalUVScaleBias,             Mat.Attribs.NormalSlice,             "normalTexture",            gltf_mat.additionalValues},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_OCCLUSION,     Mat.Attribs.OcclusionUVSelector,          Mat.Attribs.OcclusionUVScaleBias,          Mat.Attribs.OcclusionSlice,          "occlusionTexture",         gltf_mat.additionalValues},
+                    TextureParameterInfo{SceneObjectMaterial::TEXTURE_ID_EMISSIVE,      Mat.Attribs.EmissiveUVSelector,           Mat.Attribs.EmissiveUVScaleBias,           Mat.Attribs.EmissiveSlice,           "emissiveTexture",          gltf_mat.additionalValues}
+                };
+                // clang-format on
 
                 for (const auto &Param : TextureParams)
                 {
@@ -516,8 +514,8 @@ namespace Corona
                         Factor = static_cast<float>(it->second.Factor());
                     }
                 };
-                ReadFactor(attribs.RoughnessFactor, gltf_mat.values, "roughnessFactor");
-                ReadFactor(attribs.MetallicFactor, gltf_mat.values, "metallicFactor");
+                ReadFactor(Mat.Attribs.RoughnessFactor, gltf_mat.values, "roughnessFactor");
+                ReadFactor(Mat.Attribs.MetallicFactor, gltf_mat.values, "metallicFactor");
 
                 auto ReadColorFactor = [](Vector4f &Factor, const tinygltf::ParameterMap &Params, const char *Name) //
                 {
@@ -528,8 +526,8 @@ namespace Corona
                     }
                 };
 
-                ReadColorFactor(attribs.BaseColorFactor, gltf_mat.values, "baseColorFactor");
-                ReadColorFactor(attribs.EmissiveFactor, gltf_mat.additionalValues, "emissiveFactor");
+                ReadColorFactor(Mat.Attribs.BaseColorFactor, gltf_mat.values, "baseColorFactor");
+                ReadColorFactor(Mat.Attribs.EmissiveFactor, gltf_mat.additionalValues, "emissiveFactor");
 
                 {
                     auto alpha_mode_it = gltf_mat.additionalValues.find("alphaMode");
@@ -538,27 +536,27 @@ namespace Corona
                         const tinygltf::Parameter &param = alpha_mode_it->second;
                         if (param.string_value == "BLEND")
                         {
-                            attribs.AlphaMode = ALPHA_MODE::ALPHA_MODE_BLEND;
+                            Mat.Attribs.AlphaMode = SceneObjectMaterial::ALPHA_MODE_BLEND;
                         }
                         if (param.string_value == "MASK")
                         {
-                            attribs.AlphaMode = ALPHA_MODE::ALPHA_MODE_MASK;
-                            attribs.AlphaCutoff = 0.5f;
+                            Mat.Attribs.AlphaMode = SceneObjectMaterial::ALPHA_MODE_MASK;
+                            Mat.Attribs.AlphaCutoff = 0.5f;
                         }
                     }
                 }
 
-                ReadFactor(attribs.AlphaCutoff, gltf_mat.additionalValues, "alphaCutoff");
+                ReadFactor(Mat.Attribs.AlphaCutoff, gltf_mat.additionalValues, "alphaCutoff");
 
                 {
                     auto double_sided_it = gltf_mat.additionalValues.find("doubleSided");
                     if (double_sided_it != gltf_mat.additionalValues.end())
                     {
-                        Mat.SetDoubleSided(double_sided_it->second.bool_value);
+                        Mat.DoubleSided = double_sided_it->second.bool_value;
                     }
                 }
 
-                attribs.Workflow = PBR_WORKFLOW::PBR_WORKFLOW_METALL_ROUGH;
+                Mat.Attribs.Workflow = SceneObjectMaterial::PBR_WORKFLOW_METALL_ROUGH;
 
                 // Extensions
                 // @TODO: Find out if there is a nicer way of reading these properties with recent tinygltf headers
@@ -568,81 +566,79 @@ namespace Corona
                     {
                         if (ext_it->second.Has("specularGlossinessTexture"))
                         {
-                            auto &index = ext_it->second.Get("specularGlossinessTexture").Get("index");
-                            auto &texCoordSet = ext_it->second.Get("specularGlossinessTexture").Get("texCoord");
+                            auto& index = ext_it->second.Get("specularGlossinessTexture").Get("index");
+                            auto& texCoordSet = ext_it->second.Get("specularGlossinessTexture").Get("texCoord");
 
-                            Mat.TextureIds[TEXTURE_ID::TEXTURE_ID_PHYSICAL_DESC] = index.Get<int>();
-                            attribs.PhysicalDescriptorUVSelector = static_cast<float>(texCoordSet.Get<int>());
+                            Mat.TextureIds[SceneObjectMaterial::TEXTURE_ID_PHYSICAL_DESC] = index.Get<int>();
+                            Mat.Attribs.PhysicalDescriptorUVSelector = static_cast<float>(texCoordSet.Get<int>());
 
-                            attribs.Workflow = PBR_WORKFLOW::PBR_WORKFLOW_SPEC_GLOSS;
+                            Mat.Attribs.Workflow = SceneObjectMaterial::PBR_WORKFLOW_SPEC_GLOSS;
                         }
 
                         if (ext_it->second.Has("diffuseTexture"))
                         {
-                            auto &index = ext_it->second.Get("diffuseTexture").Get("index");
-                            auto &texCoordSet = ext_it->second.Get("diffuseTexture").Get("texCoord");
+                            auto& index = ext_it->second.Get("diffuseTexture").Get("index");
+                            auto& texCoordSet = ext_it->second.Get("diffuseTexture").Get("texCoord");
 
-                            Mat.TextureIds[TEXTURE_ID::TEXTURE_ID_BASE_COLOR] = index.Get<int>();
-                            attribs.BaseColorUVSelector = static_cast<float>(texCoordSet.Get<int>());
+                            Mat.TextureIds[SceneObjectMaterial::TEXTURE_ID_BASE_COLOR] = index.Get<int>();
+                            Mat.Attribs.BaseColorUVSelector = static_cast<float>(texCoordSet.Get<int>());
                         }
 
                         if (ext_it->second.Has("diffuseFactor"))
                         {
-                            auto &factor = ext_it->second.Get("diffuseFactor");
+                            auto& factor = ext_it->second.Get("diffuseFactor");
                             for (uint32_t i = 0; i < factor.ArrayLen(); i++)
                             {
-                                const auto &val = factor.Get(i);
-                                attribs.BaseColorFactor[i] =
+                                const auto& val = factor.Get(i);
+                                Mat.Attribs.BaseColorFactor[i] =
                                     val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
                             }
                         }
 
                         if (ext_it->second.Has("specularFactor"))
                         {
-                            auto &factor = ext_it->second.Get("specularFactor");
+                            auto& factor = ext_it->second.Get("specularFactor");
                             for (uint32_t i = 0; i < factor.ArrayLen(); i++)
                             {
-                                const auto &val = factor.Get(i);
-                                attribs.SpecularFactor[i] =
+                                const auto& val = factor.Get(i);
+                                Mat.Attribs.SpecularFactor[i] =
                                     val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
                             }
                         }
                     }
                 }
 
-                for (const auto &Param : TextureParams)
-                {
-                    auto TexIndex = Mat.TextureIds[Param.TextureId];
-                    if (TexIndex >= 0)
-                    {
-                        // const auto &TexInfo = Textures[TexIndex];
-                        // if (TexInfo.pAtlasSuballocation)
-                        // {
-                        //     Param.UVScaleBias = TexInfo.pAtlasSuballocation->GetUVScaleBias();
-                        //     Param.Slice = static_cast<float>(TexInfo.pAtlasSuballocation->GetSlice());
-                        // }
-                    }
-                }
+                 for (const auto &Param : TextureParams)
+                 {
+                     auto TexIndex = Mat.TextureIds[Param.TextureId];
+                     if (TexIndex >= 0)
+                     {
+						 // const auto &TexInfo = Textures[TexIndex];
+						 // if (TexInfo.pAtlasSuballocation)
+						 // {
+						 //     Param.UVScaleBias = TexInfo.pAtlasSuballocation->GetUVScaleBias();
+						 //     Param.Slice = static_cast<float>(TexInfo.pAtlasSuballocation->GetSlice());
+						 // }
+                     }
+                 }
 
-                // TODO: put every map on its own position
-                for (const tinygltf::Texture &gltf_tex : gltf_model.textures)
-                {
-                    const tinygltf::Image &gltf_image = gltf_model.images[gltf_tex.source];
-                    auto &ImageId = !gltf_image.uri.empty() ? (BasePath + gltf_image.uri) : "";
+				 for (const tinygltf::Texture& gltf_tex : gltf_model.textures)
+				 {
+					 const tinygltf::Image& gltf_image = gltf_model.images[gltf_tex.source];
+					 auto& ImageId = !gltf_image.uri.empty() ? (BaseDir + gltf_image.uri) : "";
 
-                    if (!ImageId.empty())
-                    {
-                        std::shared_ptr<Image> m_pImage{};
-                        ParseImage(ImageId, m_pImage); // TODO
-                        auto texture = std::make_shared<SceneObjectTexture>(m_pImage);
-                        texture->SetName(gltf_image.uri);
-                        // TODO
-                        // Mat.Textures[TextureParams[Mat.TextureIds[gltf_tex.source]].TextureName] = texture;
-                        Mat.Textures[gltf_tex.source] = texture;
-                    }
-                }
-
-                m_Materials[gltf_mat.name] = std::make_shared<SceneObjectMaterial>(Mat);
+                     
+					 if (!ImageId.empty())
+					 {
+						 std::shared_ptr<Image> m_pImage{};
+						 ParseImage(ImageId, m_pImage); // TODO
+                         auto texture = std::make_shared<SceneObjectTexture>(m_pImage);
+                         texture->SetName(gltf_image.uri);
+                         Mat.Textures[gltf_tex.source] = texture;
+					 }
+				 }
+                
+                 m_Materials[gltf_mat.name] = std::make_shared<SceneObjectMaterial>(Mat);
             }
 
             // Push a default material at the end of the list for meshes with no material assigned
@@ -652,20 +648,18 @@ namespace Corona
             }
         }
 
-        virtual std::unique_ptr<Scene> Parse(const std::string &FileName) final
+        virtual std::unique_ptr<Scene> Parse(const std::string& FilePath) final
         {
-            std::unique_ptr<Scene> pScene(new Scene(FileName));
-            // TODO: delete here after debug passes
             if (pScene->name == "")
                 assert("File path must not be empty");
 
-            std::string filePath{pScene->name};
+            std::string filename{pScene->name};
 
             bool binary = false;
-            size_t extpos = filePath.rfind('.', filePath.length());
+            size_t extpos = filename.rfind('.', filename.length());
             if (extpos != std::string::npos)
             {
-                binary = (filePath.substr(extpos + 1, filePath.length() - extpos) == "glb");
+                binary = (filename.substr(extpos + 1, filename.length() - extpos) == "glb");
             }
 
             std::string error;
@@ -675,9 +669,9 @@ namespace Corona
             tinygltf::TinyGLTF loader;
             bool fileLoaded = false;
             if (binary)
-                fileLoaded = loader.LoadBinaryFromFile(&gltf_model, &error, &warning, filePath);
+                fileLoaded = loader.LoadBinaryFromFile(&gltf_model, &error, &warning, filename);
             else
-                fileLoaded = loader.LoadASCIIFromFile(&gltf_model, &error, &warning, filePath);
+                fileLoaded = loader.LoadASCIIFromFile(&gltf_model, &error, &warning, filename);
 
             if (!fileLoaded)
             {
@@ -692,23 +686,23 @@ namespace Corona
                 printf("Loaded gltf file");
             }
 
-            std::string basePath;
-            extpos = filePath.rfind('/', filePath.length());
-            if (extpos != std::string::npos)
-            {
-                basePath = filePath.substr(0, extpos + 1);
-            }
+            std::string baseDir;
+			extpos = filename.rfind('/', filename.length());
+			if (extpos != std::string::npos)
+			{
+                baseDir = filename.substr(0, extpos + 1);
+			}
 
             // LoadTextureSamplers(pDevice, gltf_model);
-            LoadMaterialsAndTextures(gltf_model, pScene, basePath);
+            LoadMaterialsAndTextures(gltf_model, pScene, baseDir);
 
             std::vector<uint32_t> IndexData;
             std::vector<VertexBasicAttribs> VertexBasicData;
             ConvertedBufferViewMap ConvertedBuffers;
 
-            // pScene->pModel = std::make_unique<Model>();
-            // std::unique_ptr<Model> &m_pModel = pScene->pModel;
-            // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filePath} );
+            pScene->pModel = std::make_unique<Model>();
+            std::unique_ptr<Model> &m_pModel = pScene->pModel;
+            // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filename} );
             // std::unique_ptr<Model>& m_pModel = model;
             // auto& m_Cameras = pScene->Cameras;
             // auto& m_Geometries = pScene->Geometries;
@@ -732,7 +726,7 @@ namespace Corona
             // }
 
             // Initial pose
-            for (auto &root_node : pScene->RootNodes)
+            for (auto &root_node : m_pModel->Nodes)
             {
                 root_node->UpdateTransforms();
             }

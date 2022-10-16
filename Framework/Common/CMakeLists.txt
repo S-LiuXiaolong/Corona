@@ -2,15 +2,15 @@ add_library(Common
 Allocator.cpp
 AssetLoader.cpp
 BaseApplication.cpp
-Image.cpp
+DebugManager.cpp
 GraphicsManager.cpp
-MemoryManager.cpp
-SceneManager.cpp
+Image.cpp
 InputManager.cpp
-SceneObject.cpp
-SceneNode.cpp
-Scene.cpp
 main.cpp
+MemoryManager.cpp
+Scene.cpp
+SceneManager.cpp
+SceneObject.cpp
 )
 
 find_library(XG_LIBRARY_DEBUG           xg PATHS ${MYGE_EXTERNAL_LIBRARY_PATH}/Debug)

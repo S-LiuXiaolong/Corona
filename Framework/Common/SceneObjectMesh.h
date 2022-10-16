@@ -23,7 +23,7 @@ namespace Corona
         // }
         // const float* CollisionParameters() const { return m_CollisionParameters; }
 
-        void AddMesh(std::shared_ptr<SceneObjectPrimitive>& mesh) { m_Primitive.push_back(std::move(mesh)); }
+        void AddPrimitive(std::shared_ptr<SceneObjectPrimitive>& primitive) { m_Primitive.push_back(std::move(primitive)); }
         // TODO
         // const std::weak_ptr<SceneObjectPrimitive> GetMesh() { return (m_Primitive.empty()? nullptr : m_Primitive[0]); }
         // const std::weak_ptr<SceneObjectPrimitive> GetMeshLOD(size_t lod) { return (lod < m_Primitive.size()? m_Primitive[lod] : nullptr); }

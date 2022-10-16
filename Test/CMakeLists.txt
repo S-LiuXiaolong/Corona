@@ -18,3 +18,9 @@ target_link_libraries(LodePngTest Common)
 
 add_executable(LibJpegTest LibJpegTest.cpp)
 target_link_libraries(LibJpegTest Common)
+
+add_executable(SceneObjectTest SceneObjectTest.cpp)
+target_link_libraries(SceneObjectTest Common)
+
+add_executable(SceneLoadingTest SceneLoadingTest.cpp)
+target_link_libraries(SceneLoadingTest Common)

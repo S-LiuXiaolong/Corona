@@ -80,9 +80,12 @@ namespace Corona
     protected:
         std::string m_Name;
         ShaderAttribs m_Attribs;
+        bool DoubleSided;
 
+    public:
         // Texture indices in Model.Textures array
         std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds;
+        // TODO: use std::string instead of int
         std::unordered_map<int, std::shared_ptr<SceneObjectTexture>> Textures;
         std::shared_ptr<SceneObjectTexture> ColorMap, PhysicsDescriptorMap, NormalMap, AOMap, Emissivemap;
     public:
@@ -106,12 +109,7 @@ namespace Corona
         void SetName(const std::string& name) { m_Name = name; };
         void SetName(std::string&& name) { m_Name = std::move(name); };
         ShaderAttribs& GetShaderAttribs() { return m_Attribs; };
-
-        // TODO
-        void LoadMaterial()
-        {
-            
-        }
+        void SetDoubleSided(bool isDoubleSided) { DoubleSided = isDoubleSided; };
 
         friend std::ostream& operator<<(std::ostream& out, const SceneObjectMaterial& obj);
     };

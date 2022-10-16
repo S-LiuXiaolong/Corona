@@ -87,7 +87,7 @@ namespace Corona
         // g_pAnimationManager->Finalize();
         g_pInputManager->Finalize();
         g_pGraphicsManager->Finalize();
-        g_pPhysicsManager->Finalize();
+        // g_pPhysicsManager->Finalize();
         g_pSceneManager->Finalize();
         g_pAssetLoader->Finalize();
         g_pMemoryManager->Finalize();
@@ -100,7 +100,7 @@ namespace Corona
         g_pAssetLoader->Tick();
         g_pSceneManager->Tick();
         g_pInputManager->Tick();
-        g_pPhysicsManager->Tick();
+        // g_pPhysicsManager->Tick();
         // g_pAnimationManager->Tick();
         g_pGraphicsManager->Tick();
         g_pGameLogic->Tick();

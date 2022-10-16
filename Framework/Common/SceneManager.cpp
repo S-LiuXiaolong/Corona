@@ -50,11 +50,9 @@ namespace Corona
 
     bool SceneManager::LoadGltfScene(std::string gltf_scene_file_name)
     {
-        std::string gltf_text = g_pAssetLoader->GetFilePath(gltf_scene_file_name.c_str());
-
         // m_pScene = std::make_shared<Scene>(gltf_text);
         GltfParser gltf_parser;
-        m_pScene = gltf_parser.Parse(gltf_text);
+        m_pScene = gltf_parser.Parse(gltf_scene_file_name);
 
         if (!m_pScene) {
             return false;
@@ -95,23 +93,23 @@ namespace Corona
         m_bAnimationQueued = true;
     }
 
-    std::weak_ptr<BaseSceneNode> SceneManager::GetRootNode()
-    {
-        return m_pScene->SceneGraph;
-    }
+    // std::weak_ptr<BaseSceneNode> SceneManager::GetRootNode()
+    // {
+    //     return m_pScene->SceneGraph;
+    // }
 
-    std::weak_ptr<SceneGeometryNode> SceneManager::GetSceneGeometryNode(std::string name)
-    {
-        auto it = m_pScene->LUT_Name_GeometryNode.find(name);
-        if (it != m_pScene->LUT_Name_GeometryNode.end())
-            return it->second;
-        else
-            return std::weak_ptr<SceneGeometryNode>();
-    }
+    // std::weak_ptr<SceneGeometryNode> SceneManager::GetSceneNode(std::string name)
+    // {
+    //     auto it = m_pScene->LUT_Name_LinearNodes.find(name);
+    //     if (it != m_pScene->LUT_Name_LinearNodes.end())
+    //         return it->second;
+    //     else
+    //         return std::weak_ptr<SceneGeometryNode>();
+    // }
 
-    std::weak_ptr<SceneObjectMesh> SceneManager::GetSceneGeometryObject(std::string key)
-    {
-        return m_pScene->Geometries.find(key)->second;
-    }
+    // std::weak_ptr<SceneObjectMesh> SceneManager::GetSceneGeometryObject(std::string key)
+    // {
+    //     return m_pScene->Geometries.find(key)->second;
+    // }
 
 }

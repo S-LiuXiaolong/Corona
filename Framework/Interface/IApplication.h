@@ -13,6 +13,8 @@ namespace Corona
         virtual void Tick() = 0;
 
         virtual void SetCommandLineParameters(int argc, char** argv) = 0;
+        virtual int  GetCommandLineArgumentsCount() const = 0;
+        virtual const char* GetCommandLineArgument(int index) const = 0;
 
         virtual bool IsQuit() = 0;
 
