@@ -23,10 +23,23 @@ namespace Corona
     {
         if (g_pSceneManager->IsSceneChanged())
         {
-            cout << "Detected Scene Change, reinitialize Graphics Manager..." << endl;
-            Finalize();
-            Initialize();
+            cout << "[GraphicsManager] Detected Scene Change, reinitialize buffers ..." << endl;
+            ClearBuffers();
+            ClearShaders();
+            const Scene& scene = g_pSceneManager->GetSceneForRendering();
+            InitializeShaders();
+            InitializeBuffers(scene);
+            g_pSceneManager->NotifySceneIsRenderingQueued();
         }
+
+        UpdateConstants();
+
+        Clear();
+        Draw();
+    }
+
+    void GraphicsManager::UpdateConstants()
+    {
         // Generate the view matrix based on the camera's position.
         CalculateCameraMatrix();
         CalculateLights();
@@ -38,71 +51,48 @@ namespace Corona
 
     void GraphicsManager::Draw()
     {
+        UpdateConstants();
+
+        RenderBuffers();
+#ifdef DEBUG
+        RenderDebugBuffers();
+#endif
     }
 
-    bool GraphicsManager::SetPerFrameShaderParameters()
-    {
-        cout << "[RHI] GraphicsManager::SetPerFrameShaderParameters(void)" << endl;
-        return true;
-    }
-    
-    bool GraphicsManager::SetPerBatchShaderParameters(const char* paramName, const Matrix4X4f& param)
-    {
-        cout << "[RHI] GraphicsManager::SetPerFrameShaderParameters(const char* paramName, const Matrix4X4f& param)" << endl;
-        cout << "paramName = " << paramName << endl;
-        cout << "param = " << param << endl;
-        return true;
-    }
+    // void GraphicsManager::InitConstants()
+    // {
+    //     // Initialize the world/model matrix to the identity matrix.
+    //     BuildIdentityMatrix(m_worldMatrix);
+	// 	// use default build-in camera
+    //     position.x = mRadius*sinf(mPhi)*cosf(mTheta);
+    //     position.z = mRadius*sinf(mPhi)*sinf(mTheta);
+    //     position.y = mRadius*cosf(mPhi);
+    //     lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
 
-    bool GraphicsManager::SetPerBatchShaderParameters(const char* paramName, const Vector3f& param)
-    {
-        cout << "[RHI] GraphicsManager::SetPerFrameShaderParameters(const char* paramName, const Vector3f& param)" << endl;
-        cout << "paramName = " << paramName << endl;
-        cout << "param = " << param << endl;
-        return true;
-    }
+	// 	fieldOfView = PI / 2.0f;
+	// 	nearClipDistance = 0.1f;
+	// 	farClipDistance = 100.0f;
 
-    bool GraphicsManager::SetPerBatchShaderParameters(const char* paramName, const float param)
-    {
-        cout << "[RHI] GraphicsManager::SetPerFrameShaderParameters(const char* paramName, const float param)" << endl;
-        cout << "paramName = " << paramName << endl;
-        cout << "param = " << param << endl;
-        return true;
-    }
+	// 	const GfxConfiguration& conf = g_pApp->GetConfiguration();
 
-    bool GraphicsManager::SetPerBatchShaderParameters(const char* paramName, const int param)
-    {
-        cout << "[RHI] GraphicsManager::SetPerFrameShaderParameters(const char* paramName, const int param)" << endl;
-        cout << "paramName = " << paramName << endl;
-        cout << "param = " << param << endl;
-        return true;
-    }
+	// 	screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
+    // }
 
     void GraphicsManager::InitConstants()
     {
         // Initialize the world/model matrix to the identity matrix.
         BuildIdentityMatrix(m_worldMatrix);
-		// use default build-in camera
-        position.x = mRadius*sinf(mPhi)*cosf(mTheta);
-        position.z = mRadius*sinf(mPhi)*sinf(mTheta);
-        position.y = mRadius*cosf(mPhi);
-        lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
-
-		fieldOfView = PI / 2.0f;
-		nearClipDistance = 0.1f;
-		farClipDistance = 100.0f;
-
-		const GfxConfiguration& conf = g_pApp->GetConfiguration();
-
-		screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
     }
 
-    bool GraphicsManager::InitializeShader(const char* vsFilename, const char* fsFilename)
+    bool GraphicsManager::InitializeShaders()
     {
-        cout << "[RHI] GraphicsManager::InitializeShader(const char* vsFilename, const char* fsFilename)" << endl;
-        cout << "VS Filename: " << vsFilename << endl;
-        cout << "PS Filename: " << fsFilename << endl;
+        cout << "[GraphicsManager] GraphicsManager::InitializeShader()" << endl;
         return true;
+    }
+
+    void GraphicsManager::ClearShaders()
+    {
+        cout << "[GraphicsManager] GraphicsManager::ClearShaders()" << endl;
     }
 
     void GraphicsManager::CalculateCameraMatrix()
@@ -122,13 +112,13 @@ namespace Corona
         //     BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
         // }
 
-        // // use default build-in camera
-        // Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
-        // BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+        // use default build-in camera
+        Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+        BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 
-        // float fieldOfView = PI / 2.0f;
-        // float nearClipDistance = 0.1f;
-        // float farClipDistance = 100.0f;
+        float fieldOfView = PI / 2.0f;
+        float nearClipDistance = 0.1f;
+        float farClipDistance = 100.0f;
 
         // // if (pCameraNode) 
         // // {
@@ -139,9 +129,9 @@ namespace Corona
         // //     farClipDistance = pCamera->GetFarClipDistance();
         // // }
 
-        // const GfxConfiguration& conf = g_pApp->GetConfiguration();
+        const GfxConfiguration& conf = g_pApp->GetConfiguration();
 
-        // float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
+        float screenAspect = (float)conf.screenWidth / (float)conf.screenHeight;
 
         // // Build the perspective projection matrix.
         // BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
@@ -158,9 +148,9 @@ namespace Corona
         //            /
         //           /
         //          Z
-		position.x = mRadius * sinf(mPhi) * cosf(mTheta);
-		position.z = mRadius * sinf(mPhi) * sinf(mTheta);
-		position.y = mRadius * cosf(mPhi);
+		// position.x = mRadius * sinf(mPhi) * cosf(mTheta);
+		// position.z = mRadius * sinf(mPhi) * sinf(mTheta);
+		// position.y = mRadius * cosf(mPhi);
 
         m_DrawFrameContext.m_cameraPosition = Vector4f(position, 1.0f);
 		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
@@ -211,90 +201,100 @@ namespace Corona
         m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
 
-    void GraphicsManager::InitializeBuffers()
+    bool GraphicsManager::InitializeBuffers(const Scene& scene)
     {
+        cout << "[GraphicsManager] GraphicsManager::InitializeBuffers()" << endl;
+        return 0;
+    }
+
+    void GraphicsManager::ClearBuffers()
+    {
+        cout << "[GraphicsManager] GraphicsManager::ClearBuffers()" << endl;
     }
 
     void GraphicsManager::RenderBuffers()
     {
-        cout << "[RHI] GraphicsManager::RenderBuffers()" << endl;
+        cout << "[GraphicsManager] GraphicsManager::RenderBuffers()" << endl;
     }
 
-    // temporary. should be moved to scene manager and script engine (policy engine)
-    void GraphicsManager::WorldRotateX(float radians)
-    {
-        Matrix4X4f rotationMatrix;
-        MatrixRotationX(rotationMatrix, radians);
-        m_worldMatrix = m_worldMatrix * rotationMatrix;
-    }
+#ifdef DEBUG
+    // add debug manager operations
+#endif
+//     // temporary. should be moved to scene manager and script engine (policy engine)
+//     void GraphicsManager::WorldRotateX(float radians)
+//     {
+//         Matrix4X4f rotationMatrix;
+//         MatrixRotationX(rotationMatrix, radians);
+//         m_worldMatrix = m_worldMatrix * rotationMatrix;
+//     }
 
-    void GraphicsManager::WorldRotateY(float radians)
-    {
-        Matrix4X4f rotationMatrix;
-        MatrixRotationY(rotationMatrix, radians);
-        m_worldMatrix = m_worldMatrix * rotationMatrix;
-    }
+//     void GraphicsManager::WorldRotateY(float radians)
+//     {
+//         Matrix4X4f rotationMatrix;
+//         MatrixRotationY(rotationMatrix, radians);
+//         m_worldMatrix = m_worldMatrix * rotationMatrix;
+//     }
 
-	void GraphicsManager::WorldRotateZ(float radians)
-	{
-		Matrix4X4f rotationMatrix;
-		MatrixRotationZ(rotationMatrix, radians);
-		m_worldMatrix = m_worldMatrix * rotationMatrix;
-	}
+// 	void GraphicsManager::WorldRotateZ(float radians)
+// 	{
+// 		Matrix4X4f rotationMatrix;
+// 		MatrixRotationZ(rotationMatrix, radians);
+// 		m_worldMatrix = m_worldMatrix * rotationMatrix;
+// 	}
 
-	void GraphicsManager::CameraRotateX(float radians)
-	{
-        mPhi += radians;
-        // mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
-	}
+// 	void GraphicsManager::CameraRotateX(float radians)
+// 	{
+//         mPhi += radians;
+//         // mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
+// 	}
 
-	void GraphicsManager::CameraRotateZ(float radians)
-	{
-        mTheta += radians;
-	}
+// 	void GraphicsManager::CameraRotateZ(float radians)
+// 	{
+//         mTheta += radians;
+// 	}
 
-    void GraphicsManager::CameraTranslationX(float distance)
-	{
-		position = position + Vector3f(distance, 0, 0);
-        lookAt = lookAt + Vector3f(distance, 0, 0);
-	}
+//     void GraphicsManager::CameraTranslationX(float distance)
+// 	{
+// 		position = position + Vector3f(distance, 0, 0);
+//         lookAt = lookAt + Vector3f(distance, 0, 0);
+// 	}
 
-	void GraphicsManager::CameraTranslationY(float distance)
-	{
-        position = position + Vector3f(0, distance, 0);
-        lookAt = lookAt + Vector3f(0, distance, 0);
-	}
+// 	void GraphicsManager::CameraTranslationY(float distance)
+// 	{
+//         position = position + Vector3f(0, distance, 0);
+//         lookAt = lookAt + Vector3f(0, distance, 0);
+// 	}
 
 
-	void GraphicsManager::OnMouseDown(int x, int y)
-	{
-		mLastMousePos_x = x;
-		mLastMousePos_y = y;
-	}
+// 	void GraphicsManager::OnMouseDown(int x, int y)
+// 	{
+// 		mLastMousePos_x = x;
+// 		mLastMousePos_y = y;
+// 	}
 
-	void GraphicsManager::OnMouseMoveL(int x, int y)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = (0.05f * static_cast<float>(x - mLastMousePos_x)) * PI / 180;
-		float dy = (0.05f * static_cast<float>(y - mLastMousePos_y)) * PI / 180;
-        mTheta -= dx;
-		mPhi -= dy;
+// 	void GraphicsManager::OnMouseMoveL(int x, int y)
+// 	{
+// 		// Make each pixel correspond to a quarter of a degree.
+// 		float dx = (0.05f * static_cast<float>(x - mLastMousePos_x)) * PI / 180;
+// 		float dy = (0.05f * static_cast<float>(y - mLastMousePos_y)) * PI / 180;
+//         mTheta -= dx;
+// 		mPhi -= dy;
 
-        mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
-	}
+//         mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
+// 	}
 
-	void GraphicsManager::OnMouseMoveR(int x, int y)
-	{
-// 		float dx = 0.0005f * static_cast<float>(x - mLastMousePos_x);
-// 		float dy = 0.0005f * static_cast<float>(y - mLastMousePos_y);
-// 
-// 		position = position + Vector3f(-dy, dx, 0.0f);
-// 		lookAt = lookAt + Vector3f(-dy, dx, 0.0f);
-	}
+// 	void GraphicsManager::OnMouseMoveR(int x, int y)
+// 	{
+// // 		float dx = 0.0005f * static_cast<float>(x - mLastMousePos_x);
+// // 		float dy = 0.0005f * static_cast<float>(y - mLastMousePos_y);
+// // 
+// // 		position = position + Vector3f(-dy, dx, 0.0f);
+// // 		lookAt = lookAt + Vector3f(-dy, dx, 0.0f);
+// 	}
 
-	void GraphicsManager::OnMouseWheel(int delta)
-	{
-         fieldOfView += 0.05f * delta * PI / 180;
-	}
+// 	void GraphicsManager::OnMouseWheel(int delta)
+// 	{
+//          fieldOfView += 0.05f * delta * PI / 180;
+// 	}
 
 }

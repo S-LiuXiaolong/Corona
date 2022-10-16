@@ -23,6 +23,17 @@ namespace Corona
         virtual void Clear();
         virtual void Draw();
 
+    protected:
+        bool SetPerFrameShaderParameters();
+        bool SetPerBatchShaderParameters(int32_t index);
+
+        void UpdateConstants();
+        bool InitializeBuffers(const Scene& scene);
+        void ClearBuffers();
+        bool InitializeShaders();
+        void ClearShaders();
+        void RenderBuffers();
+
     private:
         HRESULT CreateDescriptorHeaps();
         HRESULT CreateRenderTarget();
@@ -38,14 +49,6 @@ namespace Corona
         HRESULT CreateRootSignature();
         HRESULT WaitForPreviousFrame();
         HRESULT PopulateCommandList();
-
-    protected:
-        bool SetPerFrameShaderParameters();
-        bool SetPerBatchShaderParameters(int32_t index);
-
-        HRESULT InitializeBuffers();
-        HRESULT InitializeShader(const char* vsFileName, const char* fsFileName);
-        HRESULT RenderBuffers();
 
     private:
         static const uint32_t           kFrameCount  = 2;

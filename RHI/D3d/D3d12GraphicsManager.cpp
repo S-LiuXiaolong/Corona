@@ -1,7 +1,8 @@
 #include <objbase.h>
-#include <d3dcompiler.h>
 #include "D3d12GraphicsManager.h"
 #include "WindowsApplication.h"
+#include "SceneManager.h"
+#include "AssetLoader.h"
 
 using namespace std;
 namespace Corona
@@ -716,6 +717,8 @@ namespace Corona
             return hr;
         }
 
+        SafeRelease(&pFactory);
+
         m_pSwapChain = reinterpret_cast<IDXGISwapChain3*>(pSwapChain);
 
         m_nFrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
@@ -738,18 +741,18 @@ namespace Corona
         }
         cout << "Done!" << endl;
 
-        // TODO
-        cout << "Loading Shaders ...";
-        if (FAILED(hr = InitializeShader("Shaders/HLSL/default.vert.cso", "Shaders/HLSL/default.frag.cso"))) {
-            return hr;
-        }
-        cout << "Done!" << endl;
-
-        cout << "Initialize Buffers ...";
-        if (FAILED(hr = InitializeBuffers())) {
-            return hr;
-        }
-        cout << "Done!" << endl;
+		// // TODO
+		// cout << "Loading Shaders ...";
+		// if (FAILED(hr = InitializeShader("Shaders/HLSL/default.vert.cso", "Shaders/HLSL/default.frag.cso"))) {
+		//     return hr;
+		// }
+		// cout << "Done!" << endl;
+		// 
+		// cout << "Initialize Buffers ...";
+		// if (FAILED(hr = InitializeBuffers())) {
+		//     return hr;
+		// }
+		// cout << "Done!" << endl;
         return hr;
 
     }
@@ -820,8 +823,10 @@ namespace Corona
     }
 
     // this is the function that loads and prepares the shaders
-    HRESULT D3d12GraphicsManager::InitializeShader(const char* vsFilename, const char* fsFilename) {
+    bool D3d12GraphicsManager::InitializeShaders() {
         HRESULT hr = S_OK;
+		const char* vsFilename = "Shaders/default.vert.cso";
+		const char* fsFilename = "Shaders/default.frag.cso";
 
         // load the shaders
         Buffer vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
@@ -915,7 +920,13 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::InitializeBuffers()
+	void D3d12GraphicsManager::ClearShaders()
+	{
+		SafeRelease(&m_pCommandList);
+		SafeRelease(&m_pPipelineState);
+	}
+
+    bool D3d12GraphicsManager::InitializeBuffers(const Scene& scene)
     {
         HRESULT hr = S_OK;
 
@@ -955,59 +966,59 @@ namespace Corona
         }
 
         
-        auto pGeometry = scene.GetFirstGeometry();
+        auto pGeometryNode = scene.GetFirstGeometryNode();
         int32_t n = 0;
-        while(pGeometry)
-        {
-            // if (pGeometryNode->Visible())
-            // {
-            //     auto pGeometry = scene.GetGeometry(pGeometryNode->GetSceneObjectRef());
-            //     assert(pGeometry);
-            //     auto pMesh = pGeometry->GetMesh().lock();
-            //     if(!pMesh) continue;
-                
-            //     // Set the number of vertex properties.
-            //     auto vertexPropertiesCount = pMesh->GetVertexPropertiesCount();
-                
-            //     // Set the number of vertices in the vertex array.
-            //     auto vertexCount = pMesh->GetVertexCount();
-
-            //     Buffer buff;
-
-            //     for (decltype(vertexPropertiesCount) i = 0; i < vertexPropertiesCount; i++)
-            //     {
-            //         const SceneObjectVertexArray& v_property_array = pMesh->GetVertexPropertyArray(i);
-
-            //         CreateVertexBuffer(v_property_array);
-            //     }
-
-            //     auto indexGroupCount = pMesh->GetIndexGroupCount();
-
-            //     for (decltype(indexGroupCount) i = 0; i < indexGroupCount; i++)
-            //     {
-            //         const SceneObjectIndexArray& index_array      = pMesh->GetIndexArray(i);
-
-            //         CreateIndexBuffer(index_array);
-            //     }
-
-            //     SetPerBatchShaderParameters(n);
-            //     n++;
-            // }
-
-            // TODO
-            for (auto& pPrimitive : pGeometry->Primitives)
-            {
-                auto& m_VertexData = pPrimitive->VertexData;
-                CreateVertexBuffer(m_VertexData);
-                auto& m_IndexData = pPrimitive->IndexData;
-                CreateIndexBuffer(m_IndexData);
-
-				// SetPerBatchShaderParameters(n);
-				// n++;
-            }
-
-            pGeometry = scene.GetNextGeometry();
-       }
+//         while(pGeometry)
+//         {
+//             // if (pGeometryNode->Visible())
+//             // {
+//             //     auto pGeometry = scene.GetGeometry(pGeometryNode->GetSceneObjectRef());
+//             //     assert(pGeometry);
+//             //     auto pMesh = pGeometry->GetMesh().lock();
+//             //     if(!pMesh) continue;
+//                 
+//             //     // Set the number of vertex properties.
+//             //     auto vertexPropertiesCount = pMesh->GetVertexPropertiesCount();
+//                 
+//             //     // Set the number of vertices in the vertex array.
+//             //     auto vertexCount = pMesh->GetVertexCount();
+// 
+//             //     Buffer buff;
+// 
+//             //     for (decltype(vertexPropertiesCount) i = 0; i < vertexPropertiesCount; i++)
+//             //     {
+//             //         const SceneObjectVertexArray& v_property_array = pMesh->GetVertexPropertyArray(i);
+// 
+//             //         CreateVertexBuffer(v_property_array);
+//             //     }
+// 
+//             //     auto indexGroupCount = pMesh->GetIndexGroupCount();
+// 
+//             //     for (decltype(indexGroupCount) i = 0; i < indexGroupCount; i++)
+//             //     {
+//             //         const SceneObjectIndexArray& index_array      = pMesh->GetIndexArray(i);
+// 
+//             //         CreateIndexBuffer(index_array);
+//             //     }
+// 
+//             //     SetPerBatchShaderParameters(n);
+//             //     n++;
+//             // }
+// 
+//             // TODO
+//             for (auto& pPrimitive : pGeometry->Primitives)
+//             {
+//                 auto& m_VertexData = pPrimitive->VertexData;
+//                 CreateVertexBuffer(m_VertexData);
+//                 auto& m_IndexData = pPrimitive->IndexData;
+//                 CreateIndexBuffer(m_IndexData);
+// 
+// 				// SetPerBatchShaderParameters(n);
+// 				// n++;
+//             }
+// 
+//             pGeometry = scene.GetNextGeometry();
+//        }
 
         if (SUCCEEDED(hr = m_pCommandList->Close()))
         {
@@ -1032,6 +1043,8 @@ namespace Corona
             WaitForPreviousFrame();
         }
 
+        hr = PopulateCommandList();
+
         return hr;
     }
 
@@ -1050,44 +1063,67 @@ namespace Corona
         return result;
     }
 
-    void D3d12GraphicsManager::Finalize()
-    {
-        WaitForPreviousFrame();
-
-        SafeRelease(&m_pFence);
-        for (auto p : m_Buffers) {
-            SafeRelease(&p);
-        }
-        m_Buffers.clear();
-        SafeRelease(&m_pCommandList);
-        SafeRelease(&m_pPipelineState);
-        SafeRelease(&m_pRtvHeap);
-        SafeRelease(&m_pDsvHeap);
-        SafeRelease(&m_pCbvHeap);
-        SafeRelease(&m_pSamplerHeap);
-        SafeRelease(&m_pRootSignature);
-        SafeRelease(&m_pCommandQueue);
-        SafeRelease(&m_pCommandAllocator);
-        SafeRelease(&m_pDepthStencilBuffer);
+	void D3d12GraphicsManager::ClearBuffers()
+	{
+		SafeRelease(&m_pFence);
+		for (auto p : m_Buffers) {
+			SafeRelease(&p);
+		}
+		m_Buffers.clear();
 		for (auto p : m_Textures) {
 			SafeRelease(&p);
 		}
-        for (uint32_t i = 0; i < kFrameCount; i++) {
-            SafeRelease(&m_pRenderTargets[i]);
-        }
-        SafeRelease(&m_pSwapChain);
-        SafeRelease(&m_pDev);
-    }
+		m_Textures.clear();
+		m_TextureIndex.clear();
+		m_VertexBufferView.clear();
+		m_IndexBufferView.clear();
+		m_DrawBatchContext.clear();
+	}
 
-    void D3d12GraphicsManager::Clear()
-    {
+
+	void D3d12GraphicsManager::Finalize()
+	{
+        WaitForPreviousFrame();
+		GraphicsManager::Finalize();
+
+		SafeRelease(&m_pRtvHeap);
+		SafeRelease(&m_pDsvHeap);
+		SafeRelease(&m_pCbvHeap);
+		SafeRelease(&m_pSamplerHeap);
+		SafeRelease(&m_pRootSignature);
+		SafeRelease(&m_pCommandQueue);
+		SafeRelease(&m_pCommandAllocator);
+		SafeRelease(&m_pDepthStencilBuffer);
+		for (uint32_t i = 0; i < kFrameCount; i++) {
+			SafeRelease(&m_pRenderTargets[i]);
+		}
+		SafeRelease(&m_pSwapChain);
+		SafeRelease(&m_pDev);
+	}
+
+	void D3d12GraphicsManager::Clear()
+	{
+		GraphicsManager::Clear();
+	}
+
+	void D3d12GraphicsManager::Draw()
+	{
+		PopulateCommandList();
+
+        GraphicsManager::Draw();
+
+		WaitForPreviousFrame();
+	}
+
+	HRESULT D3d12GraphicsManager::PopulateCommandList()
+	{
         HRESULT hr;
         // command list allocators can only be reset when the associated 
         // command lists have finished execution on the GPU; apps should use 
         // fences to determine GPU execution progress.
         if (FAILED(hr = m_pCommandAllocator->Reset()))
         {
-            return;
+            return hr;
         }
 
         // however, when ExecuteCommandList() is called on a particular command 
@@ -1095,7 +1131,7 @@ namespace Corona
         // re-recording.
         if (FAILED(hr = m_pCommandList->Reset(m_pCommandAllocator, m_pPipelineState)))
         {
-            return;
+            return hr;
         }
 
         // Indicate that the back buffer will be used as a render target.
@@ -1118,20 +1154,7 @@ namespace Corona
         const FLOAT clearColor[] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
         m_pCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
         m_pCommandList->ClearDepthStencilView(m_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    }
-
-    void D3d12GraphicsManager::Draw()
-    {
-        PopulateCommandList();
-
-        RenderBuffers();
-
-        WaitForPreviousFrame();
-    }
-
-    HRESULT D3d12GraphicsManager::PopulateCommandList()
-    {
-        HRESULT hr;
+    
 
         // Set necessary state.
         m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
@@ -1222,7 +1245,21 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::RenderBuffers()
+	void D3d12GraphicsManager::UpdateConstants()
+	{
+		GraphicsManager::UpdateConstants();
+
+        // TODO
+// 		// CBV Per Frame
+// 		SetPerFrameShaderParameters();
+// 		int32_t i = 0;
+// 		for (auto dbc : m_DrawBatchContext)
+// 		{
+// 			SetPerBatchShaderParameters(i++);
+// 		}
+	}
+
+    void D3d12GraphicsManager::RenderBuffers()
     {
         HRESULT hr;
 
@@ -1233,7 +1270,7 @@ namespace Corona
         // swap the back buffer and the front buffer
         hr = m_pSwapChain->Present(1, 0);
 
-        return hr;
+        return;
     }
 
     bool D3d12GraphicsManager::SetPerFrameShaderParameters()

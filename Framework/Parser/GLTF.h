@@ -165,21 +165,26 @@ namespace Corona
                       const tinygltf::Node &gltf_node,
                       uint32_t nodeIndex,
                       const tinygltf::Model &gltf_model,
+                      std::vector<VertexBasicAttribs> &VertexData,
                       std::vector<uint32_t> &IndexData,
-                      std::vector<VertexBasicAttribs> &VertexBasicData,
                       ConvertedBufferViewMap &ConvertedBuffers,
                       std::unique_ptr<Scene> &pScene)
         {
-            std::unique_ptr<BaseSceneNode> NewNode;
-            NewNode->Index = nodeIndex;
-            NewNode->m_Parent = parent;
-            NewNode->m_strName = gltf_node.name;
-            NewNode->Matrix = BuildIdentityMatrix();
+            std::shared_ptr<BaseSceneNode> pNewNode;
+            pNewNode->Index = nodeIndex;
+            pNewNode->m_Parent = parent;
+            pNewNode->m_strName = gltf_node.name;
+            pNewNode->Matrix = BuildIdentityMatrix();
 
             // std::unique_ptr<Model> model = std::make_unique<Model>( Model::CreateInfo{filePath} );
             // std::unique_ptr<Model>& m_pModel = model;
             auto &m_Cameras = pScene->Cameras;
+            auto &m_Lights = pScene->Lights;
             auto &m_Geometries = pScene->Geometries;
+
+            auto &m_CameraNodes = pScene->CameraNodes;
+            auto &m_LightNodes = pScene->LightNodes;
+            auto &m_GeometryNodes = pScene->GeometryNodes;
 
             // Any node can define a local space transformation either by supplying a matrix property,
             // or any of translation, rotation, and scale properties (also known as TRS properties).
@@ -188,7 +193,7 @@ namespace Corona
             // float3 Translation;
             if (gltf_node.translation.size() == 3)
             {
-                NewNode->Translation = Vector3f{
+                pNewNode->Translation = Vector3f{
                     static_cast<float>(gltf_node.translation[0]),
                     static_cast<float>(gltf_node.translation[1]),
                     static_cast<float>(gltf_node.translation[2])};
@@ -196,7 +201,7 @@ namespace Corona
 
             if (gltf_node.rotation.size() == 4)
             {
-                NewNode->Rotation = Vector4f{
+                pNewNode->Rotation = Vector4f{
                     static_cast<float>(gltf_node.rotation[0]),
                     static_cast<float>(gltf_node.rotation[1]),
                     static_cast<float>(gltf_node.rotation[2]),
@@ -205,7 +210,7 @@ namespace Corona
 
             if (gltf_node.scale.size() == 3)
             {
-                NewNode->Scale = Vector3f{
+                pNewNode->Scale = Vector3f{
                     static_cast<float>(gltf_node.scale[0]),
                     static_cast<float>(gltf_node.scale[1]),
                     static_cast<float>(gltf_node.scale[2])};
@@ -214,7 +219,7 @@ namespace Corona
             if (gltf_node.matrix.size() == 16)
             {
                 std::vector<double> vals = gltf_node.matrix;
-                NewNode->Matrix = Matrix4X4f //
+                pNewNode->Matrix = Matrix4X4f //
                     {
                         static_cast<float>(vals[0]), static_cast<float>(vals[1]), static_cast<float>(vals[2]), static_cast<float>(vals[3]),
                         static_cast<float>(vals[4]), static_cast<float>(vals[5]), static_cast<float>(vals[6]), static_cast<float>(vals[7]),
@@ -227,18 +232,18 @@ namespace Corona
             {
                 for (size_t i = 0; i < gltf_node.children.size(); i++)
                 {
-                    LoadNode(NewNode.get(), gltf_model.nodes[gltf_node.children[i]], gltf_node.children[i],
-                             gltf_model, IndexData, VertexBasicData, ConvertedBuffers, pScene);
+                    LoadNode(pNewNode.get(), gltf_model.nodes[gltf_node.children[i]], gltf_node.children[i],
+                             gltf_model, VertexData, IndexData, ConvertedBuffers, pScene);
                 }
             }
 
             if (gltf_node.mesh >= 0)
             {
                 // TODO: Attention
-                NewNode = std::make_unique<SceneGeometryNode>(NewNode);
+                pNewNode = std::make_shared<SceneGeometryNode>(pNewNode);
 
                 const tinygltf::Mesh &gltf_mesh = gltf_model.meshes[gltf_node.mesh];
-                std::shared_ptr<SceneObjectMesh> pNewMesh{new SceneObjectMesh{NewNode->Matrix}};
+                std::shared_ptr<SceneObjectMesh> pNewMesh(new SceneObjectMesh);
 
                 for (size_t j = 0; j < gltf_mesh.primitives.size(); j++)
                 {
@@ -305,7 +310,7 @@ namespace Corona
                         auto &Data = ConvertedBuffers[Key];
                         if (!Data.IsInitialized())
                         {
-                            ConvertBuffers(Key, Data, gltf_model, VertexBasicData);
+                            ConvertBuffers(Key, Data, gltf_model, VertexData);
                         }
 
                         // TODO: Skinning
@@ -322,6 +327,7 @@ namespace Corona
                             const void *dataPtr = &(buffer.data[accessor.byteOffset + bufferView.byteOffset]);
 
                             IndexData.reserve(IndexData.size() + accessor.count);
+                            // IndexData.reserve(IndexData.GetIndexCount() + accessor.count);
                             switch (accessor.componentType)
                             {
                             case TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT:
@@ -357,31 +363,23 @@ namespace Corona
                             }
                         }
 
-                        // TODO: add function to get index and vertex data in constructor of SceneObjectPrimitive
-                        pNewMesh->Primitives.emplace_back( //
-                            std::make_shared<SceneObjectPrimitive>(indexStart,
-                                                                   indexCount,
-                                                                   vertexCount,
-                                                                   std::move(VertexBasicData),
-                                                                   std::move(IndexData))
-                            // primitive.material >= 0 ? static_cast<uint32_t>(primitive.material) : static_cast<uint32_t>(Materials.size() - 1),
-                            // PosMin,
-                            // PosMax
-                            //
-                        );
+                        pNewMesh->AddPrimitive( //
+                            std::make_shared<SceneObjectPrimitive>(std::move(VertexData), std::move(IndexData)));
+                        // TODO: add ref of pNewMesh and pNewNode
                     }
                 }
 
-                m_Geometries[NewNode->Name] = pNewMesh;
-                NewNode->pMesh = std::move(pNewMesh);
+                m_Geometries[gltf_mesh.name] = pNewMesh;
+                m_GeometryNodes[gltf_node.name] = std::dynamic_pointer_cast<SceneGeometryNode>(pNewNode); // TODO: Attention
+                // pNewNode->pMesh = std::move(pNewMesh);
             }
 
             // Node contains camera
             if (gltf_node.camera >= 0)
             {
-                const auto &gltf_cam = gltf_model.cameras[gltf_node.camera];
+                pNewNode = std::make_shared<SceneCameraNode>(pNewNode);
 
-                std::shared_ptr<SceneObjectCamera> pNewCamera;
+                const auto &gltf_cam = gltf_model.cameras[gltf_node.camera];
 
                 if (gltf_cam.type == "perspective")
                 {
@@ -390,12 +388,15 @@ namespace Corona
                     // pNewCamera->Perspective.YFov        = static_cast<float>(gltf_cam.perspective.yfov);
                     // pNewCamera->Perspective.ZNear       = static_cast<float>(gltf_cam.perspective.znear);
                     // pNewCamera->Perspective.ZFar        = static_cast<float>(gltf_cam.perspective.zfar);
-                    pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>(
-                        static_cast<float>(gltf_cam.perspective.aspectRatio),
-                        static_cast<float>(gltf_cam.perspective.yfov),
+                    auto pNewCamera = std::make_shared<SceneObjectPerspectiveCamera>(
+                        gltf_cam.type,
                         static_cast<float>(gltf_cam.perspective.znear),
-                        static_cast<float>(gltf_cam.perspective.zfar));
-                    pNewCamera->Name = gltf_cam.name;
+                        static_cast<float>(gltf_cam.perspective.zfar),
+                        static_cast<float>(gltf_cam.perspective.aspectRatio),
+                        static_cast<float>(gltf_cam.perspective.yfov));
+
+                    m_Cameras[gltf_cam.name] = pNewCamera;
+                    // TODO: add ref of pNewCamera and pNewCamNode
                 }
                 else if (gltf_cam.type == "orthographic")
                 {
@@ -404,36 +405,35 @@ namespace Corona
                     // pNewCamera->Orthographic.YMag  = static_cast<float>(gltf_cam.orthographic.ymag);
                     // pNewCamera->Orthographic.ZNear = static_cast<float>(gltf_cam.orthographic.znear);
                     // pNewCamera->Orthographic.ZFar  = static_cast<float>(gltf_cam.orthographic.zfar);
-                    pNewCamera = std::make_unique<SceneObjectPerspectiveCamera>(
-                        static_cast<float>(gltf_cam.orthographic.xmag),
-                        static_cast<float>(gltf_cam.orthographic.ymag),
+                    auto pNewCamera = std::make_shared<SceneObjectPerspectiveCamera>(
+                        gltf_cam.type,
                         static_cast<float>(gltf_cam.orthographic.znear),
-                        static_cast<float>(gltf_cam.orthographic.zfar));
-                    pNewCamera->Name = gltf_cam.name;
+                        static_cast<float>(gltf_cam.orthographic.zfar),
+                        static_cast<float>(gltf_cam.orthographic.xmag),
+                        static_cast<float>(gltf_cam.orthographic.ymag));
+
+                    m_Cameras[gltf_cam.name] = pNewCamera;
+                    // TODO
                 }
                 else
                 {
                     // TODO: Add an assert here
                     // UNEXPECTED("Unexpected camera type: ", gltf_cam.type);
                     printf("Unexpected camera type");
-                    pNewCamera.reset();
                 }
 
-                if (pNewCamera)
-                {
-                    m_Cameras[NewNode->Name] = pNewCamera;
-                    NewNode->pCamera = std::move(pNewCamera);
-                }
+                m_CameraNodes[gltf_node.name] = std::dynamic_pointer_cast<SceneCameraNode>(pNewNode); // TODO
             }
 
-            m_pModel->LinearNodes.push_back(NewNode.get());
+            // use dynamic_cast and dynamic_pointer_cast to get various Nodes
+            pScene->LUT_Name_LinearNodes[gltf_node.name] = pNewNode;
             if (parent)
             {
-                parent->Children.push_back(std::move(NewNode));
+                parent->m_Children.push_back(std::move(pNewNode));
             }
             else
             {
-                m_pModel->Nodes.push_back(std::move(NewNode));
+                pScene->RootNodes.push_back(std::move(pNewNode));
             }
         }
 
@@ -702,8 +702,10 @@ namespace Corona
             // LoadTextureSamplers(pDevice, gltf_model);
             LoadMaterialsAndTextures(gltf_model, pScene, basePath);
 
+            // TODO
+            std::vector<VertexBasicAttribs> VertexData;
             std::vector<uint32_t> IndexData;
-            std::vector<VertexBasicAttribs> VertexBasicData;
+
             ConvertedBufferViewMap ConvertedBuffers;
 
             // pScene->pModel = std::make_unique<Model>();
@@ -719,7 +721,7 @@ namespace Corona
             {
                 const tinygltf::Node node = gltf_model.nodes[scene.nodes[i]];
                 LoadNode(nullptr, node, scene.nodes[i], gltf_model,
-                         IndexData, VertexBasicData, ConvertedBuffers, pScene);
+                         VertexData, IndexData, ConvertedBuffers, pScene);
             }
 
             // for (auto* node : LinearNodes)
@@ -734,7 +736,7 @@ namespace Corona
             // Initial pose
             for (auto &root_node : pScene->RootNodes)
             {
-                root_node->UpdateTransforms();
+                root_node.lock()->UpdateTransforms();
             }
             // TODO: use this function to get boundbox and BVH
             // CalculateSceneDimensions();
