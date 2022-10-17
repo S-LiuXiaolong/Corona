@@ -94,4 +94,4 @@ class BmpParser : implements ImageParser {
         return img;
     }
 };
-}  // namespace My
+}  // namespace Corona

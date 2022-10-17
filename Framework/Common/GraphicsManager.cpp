@@ -26,7 +26,7 @@ namespace Corona
             cout << "[GraphicsManager] Detected Scene Change, reinitialize buffers ..." << endl;
             ClearBuffers();
             ClearShaders();
-            const Scene& scene = g_pSceneManager->GetSceneForRendering();
+            Scene& scene = g_pSceneManager->GetSceneForRendering();
             InitializeShaders();
             InitializeBuffers(scene);
             g_pSceneManager->NotifySceneIsRenderingQueued();
@@ -204,7 +204,7 @@ namespace Corona
     bool GraphicsManager::InitializeBuffers(const Scene& scene)
     {
         cout << "[GraphicsManager] GraphicsManager::InitializeBuffers()" << endl;
-        return 0;
+        return true;
     }
 
     void GraphicsManager::ClearBuffers()

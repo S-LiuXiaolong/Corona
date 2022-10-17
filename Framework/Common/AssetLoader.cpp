@@ -94,7 +94,8 @@ namespace Corona
             upPath.append("../");
         }
 
-        return nullptr;
+        printf("Cannot find file!");
+        return name;
     }
 
     AssetLoader::AssetFilePtr AssetLoader::OpenFile(const char* name, AssetOpenMode mode)

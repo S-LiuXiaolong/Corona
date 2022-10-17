@@ -286,4 +286,4 @@ struct Image {
 
 std::ostream& operator<<(std::ostream& out, const Image& image);
 
-}  // namespace My
+}  // namespace Corona

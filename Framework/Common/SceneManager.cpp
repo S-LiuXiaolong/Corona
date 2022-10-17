@@ -13,6 +13,7 @@ namespace Corona
         int result = 0;
 
         m_pScene = std::make_shared<Scene>();
+
         return result;
     }
 
@@ -34,7 +35,7 @@ namespace Corona
         // now we only has gltf scene parser, call it directly
         if(LoadGltfScene(scene_file_name))
         {
-            m_pScene->LoadResource();
+            // m_pScene->LoadResource();
             m_bDirtyFlag = true;
             m_bRenderingQueued = false;
             m_bPhysicalSimulationQueued = false;
@@ -50,7 +51,8 @@ namespace Corona
 
     bool SceneManager::LoadGltfScene(std::string gltf_scene_file_name)
     {
-        // m_pScene = std::make_shared<Scene>(gltf_text);
+        m_pScene->name = gltf_scene_file_name;
+
         GltfParser gltf_parser;
         m_pScene = gltf_parser.Parse(gltf_scene_file_name);
 
@@ -61,13 +63,13 @@ namespace Corona
         return true;
     }
 
-    const Scene& SceneManager::GetSceneForRendering()
+    Scene& SceneManager::GetSceneForRendering()
     {
         // TODO: we should perform CPU scene crop at here
         return *m_pScene;
     }
 
-    // const Scene& SceneManager::GetSceneForPhysicalSimulation()
+    // Scene& SceneManager::GetSceneForPhysicalSimulation()
     // {
     //     // TODO: we should perform CPU scene crop at here
     //     return *m_pScene;

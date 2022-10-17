@@ -4,6 +4,8 @@
 
 namespace Corona
 {
+    class Scene;
+
     class GraphicsManager : implements IRuntimeModule
     {
     public:

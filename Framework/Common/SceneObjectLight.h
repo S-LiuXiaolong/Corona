@@ -60,7 +60,7 @@ namespace Corona
         float m_fOuterConeAngle;
 
     public:
-        SceneObjectSpotLight(void) : SceneObjectLight(), m_fInnerConeAngle(0.0f), m_fOuterConeAngle(0.7853981634){}; // PI / 4 = 0.785
+        SceneObjectSpotLight(void) : SceneObjectLight(), m_fInnerConeAngle(0.0f), m_fOuterConeAngle(0.7853981634f){}; // PI / 4 = 0.785
 
         friend std::ostream &operator<<(std::ostream &out, const SceneObjectSpotLight &obj);
     };

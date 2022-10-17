@@ -53,6 +53,8 @@ int WindowsApplication::Initialize()
 
     CreateMainWindow();
 
+    m_hDc = GetDC(m_hWnd);
+
 	// first call base class initialization
     result = BaseApplication::Initialize();
 
@@ -64,6 +66,9 @@ int WindowsApplication::Initialize()
 
 void WindowsApplication::Finalize()
 {
+	ReleaseDC(m_hWnd, m_hDc);
+
+	BaseApplication::Finalize();
 }
 
 void WindowsApplication::Tick()
@@ -106,122 +111,88 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
 	}
 
     // sort through and find what code to run for the message given
-    switch(message)
-    {
-        // pThis is nullptr and OnDraw make mistakes
+	switch (message)
+	{
+		// TODO ?
 	case WM_PAINT:
-	    {
-            pThis->OnDraw();
-	    } 
-        break;
+		break;
+	case WM_CHAR:
+		{
+			g_pInputManager->AsciiKeyDown(static_cast<char>(wParam));
+		}
+		break;
+	case WM_KEYUP:
+		{
+			switch (wParam)
+			{
+			case VK_LEFT:
+				g_pInputManager->LeftArrowKeyUp();
+				break;
+			case VK_RIGHT:
+				g_pInputManager->RightArrowKeyUp();
+				break;
+			case VK_UP:
+				g_pInputManager->UpArrowKeyUp();
+				break;
+			case VK_DOWN:
+				g_pInputManager->DownArrowKeyUp();
+				break;
 
-    case WM_KEYUP:
-        {
-            switch(wParam)
-            {
-                case VK_LEFT:
-                    g_pInputManager->LeftArrowKeyUp();
-                    break;
-                case VK_RIGHT:
-                    g_pInputManager->RightArrowKeyUp();
-                    break;
-                case VK_UP:
-                    g_pInputManager->UpArrowKeyUp();
-                    break;
-                case VK_DOWN:
-                    g_pInputManager->DownArrowKeyUp();
-                    break;
-                default:
-                    break;
-            }
-        } 
-        break;
-    case WM_KEYDOWN:
-        {
-            switch(wParam)
-            {
-                case VK_LEFT:
-                    g_pInputManager->LeftArrowKeyDown();
-                    break;
-                case VK_RIGHT:
-                    g_pInputManager->RightArrowKeyDown();
-                    break;
-                case VK_UP:
-                    g_pInputManager->UpArrowKeyDown();
-                    break;
-                case VK_DOWN:
-                    g_pInputManager->DownArrowKeyDown();
-                    break;
+			default:
+				break;
+			}
+		}
+		break;
+	case WM_KEYDOWN:
+		{
+			switch (wParam)
+			{
+			case VK_LEFT:
+				g_pInputManager->LeftArrowKeyDown();
+				break;
+			case VK_RIGHT:
+				g_pInputManager->RightArrowKeyDown();
+				break;
+			case VK_UP:
+				g_pInputManager->UpArrowKeyDown();
+				break;
+			case VK_DOWN:
+				g_pInputManager->DownArrowKeyDown();
+				break;
 
-                case 'A': // VK_A
-                    g_pInputManager->AKeyDown();
-                    break;
-                case 'D': // VK_D
-                    g_pInputManager->DKeyDown();
-                    break;
-                case 'W': // VK_W
-                    g_pInputManager->WKeyDown();
-                    break;
-                case 'S': // VK_S
-                    g_pInputManager->SKeyDown();
-                    break;
-				case 'Q': // VK_W
-					g_pInputManager->QKeyDown();
-					break;
-				case 'E': // VK_S
-					g_pInputManager->EKeyDown();
-					break;
-
-				case 'J': // VK_J
-					g_pInputManager->JKeyDown();
-					break;
-				case 'L': // VK_L
-					g_pInputManager->LKeyDown();
-					break;
-				case 'I': // VK_I
-					g_pInputManager->IKeyDown();
-					break;
-				case 'K': // VK_K
-					g_pInputManager->KKeyDown();
-					break;
-				default:
-					break;
-            }
-        } 
-        break;
-
+			default:
+				break;
+			}
+		}
+		break;
 	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-        g_pInputManager->OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-
+		{
+			g_pInputManager->LeftMouseButtonDown();
+			pThis->m_bInDrag = true;
+			pThis->m_iPreviousX = GET_X_LPARAM(lParam);
+			pThis->m_iPreviousY = GET_Y_LPARAM(lParam);
+		}
+		break;
+	case WM_LBUTTONUP:
+		{
+			g_pInputManager->LeftMouseButtonUp();
+			pThis->m_bInDrag = false;
+		}
+		break;
 	case WM_MOUSEMOVE:
-        switch (wParam)
-        {
-        case MK_LBUTTON:
-            g_pInputManager->OnMouseMoveL(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-            break;
-        case MK_RBUTTON:
-            g_pInputManager->OnMouseMoveR(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-            break;
-        default:
-            break;
-        }
-        break;
-
-    case WM_MOUSEWHEEL:
-        g_pInputManager->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
-        break;
-
-        // this message is read when the window is closed
-    case WM_DESTROY:
-        {
-            // close the application entirely
-            PostQuitMessage(0);
-            m_bQuit = true;
-            return 0;
-        }
+			if (pThis->m_bInDrag) {
+				int pos_x = GET_X_LPARAM(lParam);
+				int pos_y = GET_Y_LPARAM(lParam);
+				g_pInputManager->LeftMouseDrag(pos_x - pThis->m_iPreviousX, pos_y - pThis->m_iPreviousY);
+			}
+			break;
+			// this message is read when the window is closed
+	case WM_DESTROY:
+		{
+			// close the application entirely
+			PostQuitMessage(0);
+			m_bQuit = true;
+		}
     }
 
     // Handle any messages the switch statement didn't

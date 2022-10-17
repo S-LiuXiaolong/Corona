@@ -40,30 +40,6 @@ namespace Corona
 		return out;
 	}
 
-	ostream& operator<<(ostream& out, const SceneObjectVertexArray& obj)
-	{
-		out << "Data Size in Bytes: 0x" << obj.m_szData << endl;
-		// out << "Data: ";
-		// for(size_t i = 0; i < obj.m_szData; i++)
-		// {
-		// 	out << *(reinterpret_cast<const float*>(obj.m_pData) + i) << ' ';;
-		// }
-
-		return out;
-	}
-
-	ostream& operator<<(ostream& out, const SceneObjectIndexArray& obj)
-	{
-		out << "Data Size in Bytes: 0x" << obj.m_szData << endl;
-		// out << "Data: ";
-		// for(size_t i = 0; i < obj.m_szData; i++)
-		// {
-        //     out << "0x" << *(reinterpret_cast<const uint16_t*>(obj.m_pData) + i) << ' ';
-		// }
-
-		return out;
-	}
-
 	ostream& operator<<(ostream& out, const SceneObjectPrimitive& obj)
 	{
 		out << static_cast<const BaseSceneObject&>(obj) << endl;
@@ -87,11 +63,6 @@ namespace Corona
 	{
 		out << static_cast<const BaseSceneObject&>(obj) << endl;
 		out << "Name: " << obj.m_Name << endl;
-		out << "Color: " << *obj.ColorMap << endl;
-		out << "PhysicsDescriptor: " << *obj.PhysicsDescriptorMap << endl;
-		out << "Normal: " << *obj.NormalMap << endl;
-		out << "Ambient Occlusion: " << *obj.AOMap << endl;
-        out << "Emissive: " << *obj.Emissivemap << endl;
 
 		return out;
 	}
@@ -146,7 +117,6 @@ namespace Corona
 	ostream& operator<<(ostream& out, const SceneObjectCamera& obj)
 	{
 		out << static_cast<const BaseSceneObject&>(obj) << endl;
-		out << "Aspect: " << obj.m_fAspect << endl;
 		out << "Near Clip Distance: " << obj.m_fNearClipDistance << endl;
 		out << "Far Clip Distance: " << obj.m_fFarClipDistance << endl;
 
@@ -157,6 +127,8 @@ namespace Corona
 	{
 		out << "Camera Type: Orthogonal" << endl;
 		out << static_cast<const SceneObjectCamera&>(obj) << endl;
+		out << "X Magnitude: " << obj.m_fXMag << endl;
+		out << "Y Magnitude: " << obj.m_fYMag << endl;
 
 		return out;
 	}
@@ -166,6 +138,7 @@ namespace Corona
 	{
 		out << "Camera Type: Perspective" << endl;
 		out << static_cast<const SceneObjectCamera&>(obj) << endl;
+		out << "Aspect: " << obj.m_fAspect << endl;
 		out << "FOV: " << obj.m_fFov<< endl;
 
 		return out;

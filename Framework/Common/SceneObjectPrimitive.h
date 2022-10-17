@@ -30,10 +30,14 @@ namespace Corona
             : BaseSceneObject(SceneObjectType::kSceneObjectTypePrimitive),
               m_IndexArray(std::move(primitive.m_IndexArray)),
               m_VertexArray(std::move(primitive.m_VertexArray)) {};
+		SceneObjectPrimitive(std::vector<VertexBasicAttribs>& vertex, std::vector<uint32_t>& index)
+			: BaseSceneObject(SceneObjectType::kSceneObjectTypePrimitive),
+			m_IndexArray(index),
+			m_VertexArray(vertex) {};
         SceneObjectPrimitive(std::vector<VertexBasicAttribs>&& vertex, std::vector<uint32_t>&& index)
              : BaseSceneObject(SceneObjectType::kSceneObjectTypePrimitive),
-              m_IndexArray(std::move(m_IndexArray)),
-              m_VertexArray(std::move(m_VertexArray)) {};
+              m_IndexArray(std::move(index)),
+              m_VertexArray(std::move(vertex)) {};
 
         // void SetPrimitiveType(PrimitiveType type) { m_PrimitiveType = type;  };
 
@@ -43,6 +47,6 @@ namespace Corona
         // BoundingBox GetBoundingBox() const;
         // ConvexHull GetConvexHull() const;
 
-        friend std::ostream& operator<<(std::ostream& out, const SceneObjectMesh& obj);
+        friend std::ostream& operator<<(std::ostream& out, const SceneObjectPrimitive& obj);
     };
 }

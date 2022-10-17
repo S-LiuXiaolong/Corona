@@ -53,35 +53,35 @@ namespace Corona
         return (Materials.empty()? nullptr : Materials.cbegin()->second);
     }
 
-    const shared_ptr<SceneGeometryNode> Scene::GetFirstGeometryNode() const
+    const shared_ptr<SceneNode> Scene::GetFirstGeometryNode() const
     {
         return (GeometryNodes.empty()? 
                 nullptr 
                 : GeometryNodes.cbegin()->second.lock());
     }
 
-    const shared_ptr<SceneLightNode> Scene::GetFirstLightNode() const
+    const shared_ptr<SceneNode> Scene::GetFirstLightNode() const
     {
         return (LightNodes.empty()? 
                 nullptr 
                 : LightNodes.cbegin()->second.lock());
     }
 
-    const shared_ptr<SceneCameraNode> Scene::GetFirstCameraNode() const
+    const shared_ptr<SceneNode> Scene::GetFirstCameraNode() const
     {
         return (CameraNodes.empty()? 
                 nullptr 
                 : CameraNodes.cbegin()->second.lock());
     }
 
-    void Scene::LoadResource()
-    {
-        for (auto material : Materials)
-        {
-            if (auto ptr = material.second)
-                ptr->LoadMaterial();
-        }
-    }
+//     void Scene::LoadResource()
+//     {
+//         for (auto material : Materials)
+//         {
+//             if (auto ptr = material.second)
+//                 ptr->LoadMaterial();
+//         }
+//     }
 
 }
 

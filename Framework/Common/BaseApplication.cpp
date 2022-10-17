@@ -48,28 +48,28 @@ namespace Corona
             return ret;
         }
 
-        if ((ret = g_pPhysicsManager->Initialize()) != 0)
-        {
-            cerr << "Failed. err = " << ret;
-            return ret;
-        }
+		// if ((ret = g_pPhysicsManager->Initialize()) != 0)
+		// {
+		//     cerr << "Failed. err = " << ret;
+		//     return ret;
+		// }
 
         // if ((ret = g_pAnimationManager->Initialize()) != 0)
         // {
-        //     cerr << "Failed. err =" << ret;
+        //     cerr << "Failed. err = " << ret;
         //     return ret;
         // }
 
         if ((ret = g_pGameLogic->Initialize()) != 0)
         {
-            cerr << "Failed. err =" << ret;
+            cerr << "Failed. err = " << ret;
             return ret;
         }
 
-#ifdef _DEBUG
+#ifdef DEBUG
         if ((ret = g_pDebugManager->Initialize()) != 0)
         {
-            cerr << "Failed. err =" << ret;
+            cerr << "Failed. err = " << ret;
             return ret;
         }
 #endif
@@ -80,7 +80,7 @@ namespace Corona
     // Finalize all submodules and clean up all runtime temporary files.
     void BaseApplication::Finalize()
     {
-#ifdef _DEBUG
+#ifdef DEBUG
         g_pDebugManager->Finalize();
 #endif
         g_pGameLogic->Finalize();

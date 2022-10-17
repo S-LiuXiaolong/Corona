@@ -648,7 +648,7 @@ namespace Corona
             }
         }
 
-        virtual std::unique_ptr<Scene> Parse(const std::string& FilePath) final
+        virtual std::shared_ptr<Scene> Parse(const std::string& FilePath) final
         {
             if (pScene->name == "")
                 assert("File path must not be empty");

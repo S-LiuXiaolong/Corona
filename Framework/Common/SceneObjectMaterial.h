@@ -80,18 +80,17 @@ namespace Corona
     protected:
         std::string m_Name;
         ShaderAttribs m_Attribs;
-        bool DoubleSided;
+        bool DoubleSided = false;
 
     public:
         // Texture indices in Model.Textures array
-        std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds;
+        std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds = {-1, -1, -1, -1, -1};
         // TODO: use std::string instead of int
-        std::unordered_map<int, std::shared_ptr<SceneObjectTexture>> Textures;
-        std::shared_ptr<SceneObjectTexture> ColorMap, PhysicsDescriptorMap, NormalMap, AOMap, Emissivemap;
+        std::array<std::shared_ptr<SceneObjectTexture>, TEXTURE_ID_NUM_TEXTURES> Textures;
+        std::weak_ptr<SceneObjectTexture> ColorMap, PhysicsDescriptorMap, NormalMap, AOMap, Emissivemap;
+
     public:
-        SceneObjectMaterial(void) : BaseSceneObject(SceneObjectType::kSceneObjectTypeMaterial),
-                                    m_Name(""),
-                                    TextureIds({-1, -1, -1, -1, -1}){};
+        SceneObjectMaterial() : BaseSceneObject(SceneObjectType::kSceneObjectTypeMaterial) {};
         SceneObjectMaterial(const char *name) : SceneObjectMaterial()
         {
             m_Name = name;
@@ -105,12 +104,12 @@ namespace Corona
             m_Name = std::move(name);
         };
 
-        const std::string& GetName() const { return m_Name; };
-        void SetName(const std::string& name) { m_Name = name; };
-        void SetName(std::string&& name) { m_Name = std::move(name); };
-        ShaderAttribs& GetShaderAttribs() { return m_Attribs; };
+        const std::string &GetName() const { return m_Name; };
+        void SetName(const std::string &name) { m_Name = name; };
+        void SetName(std::string &&name) { m_Name = std::move(name); };
+        ShaderAttribs &GetShaderAttribs() { return m_Attribs; };
         void SetDoubleSided(bool isDoubleSided) { DoubleSided = isDoubleSided; };
 
-        friend std::ostream& operator<<(std::ostream& out, const SceneObjectMaterial& obj);
+        friend std::ostream &operator<<(std::ostream &out, const SceneObjectMaterial &obj);
     };
 }

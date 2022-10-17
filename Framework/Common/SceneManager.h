@@ -17,15 +17,13 @@ namespace Corona
 
         int LoadScene(std::string scene_file_name);
 
-        const Scene& GetSceneForRendering();
-
         bool IsSceneChanged();
         void NotifySceneIsRenderingQueued();
         void NotifySceneIsPhysicalSimulationQueued();
         void NotifySceneIsAnimationQueued();
 
-        const Scene& GetSceneForRendering();
-        // const Scene& GetSceneForPhysicalSimulation();
+        Scene& GetSceneForRendering();
+        // Scene& GetSceneForPhysicalSimulation();
 
         void ResetScene();
 

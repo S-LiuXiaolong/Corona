@@ -27,6 +27,10 @@ namespace Corona
                                         LPARAM lParam);
 
     protected:
-        HWND m_hWnd;
+		HWND m_hWnd;
+		HDC  m_hDc;
+		bool m_bInDrag = false;
+		int  m_iPreviousX = 0;
+		int  m_iPreviousY = 0;
     };
 }
