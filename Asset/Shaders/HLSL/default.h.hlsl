@@ -25,11 +25,11 @@ struct Material
 };
 
 SamplerState samp0 : register(s0);
-Texture2D BaseColorMap : register(t0);
-Texture2D metallicRoughnessMap: register(t1);
+Texture2D colorMap : register(t0);
+Texture2D physicsDescriptorMap: register(t1);
 Texture2D normalMap : register(t2);
-Texture2D occlusionMap : register(t3);
-Texture2D emissiveMap : register(t4);
+Texture2D AOMap : register(t3);
+Texture2D emissivemap : register(t4);
 
 // ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)
 cbuffer PerFrameConstants : register(b0)

@@ -94,7 +94,9 @@ namespace Corona
         };
 
         struct DrawBatchContext {
-            uint32_t index_count;
+            uint32_t IndexCount;
+            uint32_t StartIndexLocation;
+            uint32_t BaseVertexLocation;
             std::shared_ptr<SceneNode> node;
             std::shared_ptr<SceneObjectMaterial> material;
         };

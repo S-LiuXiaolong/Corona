@@ -87,7 +87,7 @@ namespace Corona
         std::array<int, TEXTURE_ID_NUM_TEXTURES> TextureIds = {-1, -1, -1, -1, -1};
         // TODO: use std::string instead of int
         std::array<std::shared_ptr<SceneObjectTexture>, TEXTURE_ID_NUM_TEXTURES> Textures;
-        std::weak_ptr<SceneObjectTexture> ColorMap, PhysicsDescriptorMap, NormalMap, AOMap, Emissivemap;
+        std::weak_ptr<SceneObjectTexture> ColorMap, PhysicsDescriptorMap, NormalMap, AOMap, EmissiveMap;
 
     public:
         SceneObjectMaterial() : BaseSceneObject(SceneObjectType::kSceneObjectTypeMaterial) {};

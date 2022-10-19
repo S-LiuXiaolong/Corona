@@ -223,7 +223,7 @@ namespace Corona
         resourceDesc.Alignment = 0;
         // size in byte of resource
         // TODO
-        resourceDesc.Width = vertex_array.size() * 11 * 4;
+        resourceDesc.Width = vertex_array.size() * sizeof(VertexBasicAttribs);
         resourceDesc.Height = 1;
         resourceDesc.DepthOrArraySize = 1;
         resourceDesc.MipLevels = 1;
@@ -282,8 +282,8 @@ namespace Corona
         D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
         vertexBufferView.BufferLocation = pVertexBuffer->GetGPUVirtualAddress();
         // TODO: automatically calculate stride and size
-        vertexBufferView.StrideInBytes = 11 * 4;
-        vertexBufferView.SizeInBytes = (UINT)vertex_array.size() * 11 * 4;
+        vertexBufferView.StrideInBytes = sizeof(VertexBasicAttribs);
+        vertexBufferView.SizeInBytes = (UINT)vertex_array.size() * sizeof(VertexBasicAttribs);
         m_VertexBufferView.push_back(vertexBufferView);
 
         m_Buffers.push_back(pVertexBuffer);
@@ -806,8 +806,8 @@ namespace Corona
     // this is the function that loads and prepares the shaders
     bool D3d12GraphicsManager::InitializeShaders() {
         HRESULT hr = S_OK;
-		const char* vsFilename = "Shaders/HLSL/default.vert.cso";
-		const char* fsFilename = "Shaders/HLSL/default.frag.cso";
+		const char* vsFilename = "Shaders/HLSL/pbr.vert.cso";
+		const char* fsFilename = "Shaders/HLSL/pbr.frag.cso";
 
         // load the shaders
         Buffer vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
@@ -824,7 +824,6 @@ namespace Corona
         // create the input layout object
         D3D12_INPUT_ELEMENT_DESC ied[] =
         {
-            // Attention: you cannot change here without changing VertexBuffer and VertexBufferView (in function CreateVertexBuffer)
             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -944,27 +943,36 @@ namespace Corona
         }
 
         int32_t n = 0;
+        uint32_t startIndex = 0; // 暂且没有那么复杂的模型，不用考虑这里超出uint32_t表示范围的情况
+        uint32_t startVertex = 0;
         for (auto _it : scene.GeometryNodes)
         {
             auto pGeometryNode = _it.second.lock();
-
+    
             if (pGeometryNode)
             {
                 auto pMesh = pGeometryNode->pMesh;
                 assert(pMesh);
                 // TODO: 在我短暂声明中所见过的gltf模型里，每个mesh都只有一个对应primitive
                 DrawBatchContext dbc;
-                dbc.index_count = 0;
+                dbc.IndexCount = 0;
 
+                uint32_t vertexCount = 0;
                 for (auto pPrimitive : pMesh->GetMesh())
                 {
                     assert(pPrimitive);
                     CreateVertexBuffer(pPrimitive->GetVertexData());
                     CreateIndexBuffer(pPrimitive->GetIndexData());
                     // TODO: 我不知道这里对不对（一个primitive肯定没问题），多个的话没有测试用例
-                    dbc.index_count += (uint32_t)pPrimitive->GetIndexData().size();
+                    dbc.IndexCount += (uint32_t)pPrimitive->GetIndexCount();
+                    vertexCount += (uint32_t)pPrimitive->GetVertexCount();
                 }
-                
+                dbc.StartIndexLocation = startIndex;
+                startIndex += dbc.IndexCount;
+
+				dbc.BaseVertexLocation = startVertex;
+                startVertex += vertexCount;
+
                 auto material_index = pMesh->GetMaterial();
                 auto material = scene.LinearMaterials[material_index].lock();
 
@@ -1180,7 +1188,7 @@ namespace Corona
                     srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
                     m_pCommandList->SetGraphicsRootDescriptorTable(5, srvHandle);
                 }
-                if (auto texture = dbc.material->Emissivemap.lock())
+                if (auto texture = dbc.material->EmissiveMap.lock())
                 {
                     auto texture_index = m_TextureIndex[texture->GetName()];
                     D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
@@ -1206,7 +1214,7 @@ namespace Corona
             }
 
 		    // draw the vertex buffer to the back buffer
-		    m_pCommandList->DrawIndexedInstanced(dbc.index_count, 1, 0, 0, 0);
+		    m_pCommandList->DrawIndexedInstanced(dbc.IndexCount, 1, 0, 0, 0);
 		    i++;
 		}
 

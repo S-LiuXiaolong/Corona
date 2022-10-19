@@ -50,10 +50,10 @@ namespace Corona
 
         struct ConvertedBufferViewData
         {
-            size_t VertexDataOffset = ~size_t(0);
+            size_t VertexBasicDataOffset = ~size_t(0);
             size_t VertexSkinDataOffset = ~size_t(0);
 
-            bool IsInitialized() const { return VertexDataOffset != ~size_t(0); }
+            bool IsInitialized() const { return VertexBasicDataOffset != ~size_t(0); }
         };
 
         using ConvertedBufferViewMap = std::unordered_map<ConvertedBufferViewKey, ConvertedBufferViewData, ConvertedBufferViewKey::Hasher>;
@@ -144,7 +144,7 @@ namespace Corona
                 texCoordSet1Stride = uvAccessor.ByteStride(uvView) / tinygltf::GetComponentSizeInBytes(uvAccessor.componentType);
                 // VERIFY(texCoordSet1Stride > 0, "Texcoord1 stride is invalid");
             }
-            Data.VertexDataOffset = VertexData.size();
+            Data.VertexBasicDataOffset = VertexData.size();
 
             for (size_t v = 0; v < vertexCount; v++)
             {
@@ -240,6 +240,7 @@ namespace Corona
             if (gltf_node.mesh >= 0)
             {
                 // TODO: Attention
+                // 妈的，vertexData取的一直都是同一组啊（都是从第零个开始取）
                 const tinygltf::Mesh &gltf_mesh = gltf_model.meshes[gltf_node.mesh];
                 std::shared_ptr<SceneObjectMesh> pNewMesh(new SceneObjectMesh);
 
@@ -311,6 +312,9 @@ namespace Corona
                             ConvertBuffers(Key, Data, gltf_model, VertexData);
                         }
 
+                        // TODO: 还是没弄对
+                        vertexStart = static_cast<uint32_t>(Data.VertexBasicDataOffset);
+
                         // TODO: Skinning
 
                         // Indices
@@ -334,7 +338,7 @@ namespace Corona
                                 const uint32_t *buf = static_cast<const uint32_t *>(dataPtr);
                                 for (size_t index = 0; index < accessor.count; index++)
                                 {
-                                    IndexData.push_back(buf[index] + vertexStart);
+                                    IndexData.push_back(buf[index]);
                                 }
                                 break;
                             }
@@ -343,7 +347,7 @@ namespace Corona
                                 const uint16_t *buf = static_cast<const uint16_t *>(dataPtr);
                                 for (size_t index = 0; index < accessor.count; index++)
                                 {
-                                    IndexData.push_back(buf[index] + vertexStart);
+                                    IndexData.push_back(buf[index]);
                                 }
                                 break;
                             }
@@ -352,7 +356,7 @@ namespace Corona
                                 const uint8_t *buf = static_cast<const uint8_t *>(dataPtr);
                                 for (size_t index = 0; index < accessor.count; index++)
                                 {
-                                    IndexData.push_back(buf[index] + vertexStart);
+                                    IndexData.push_back(buf[index]);
                                 }
                                 break;
                             }
@@ -697,7 +701,7 @@ namespace Corona
 						}
 						if (i == 4)
 						{
-							pMat->Emissivemap = texture;
+							pMat->EmissiveMap = texture;
 						}
                     }
                 }

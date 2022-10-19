@@ -3,23 +3,17 @@
 
 float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 {
-    // // Get light direction for this fragment
-    // float3 lightDir = normalize((input.WorldPosition - m_lightPosition).xyz);
+    // used for DamagedHelmet (pbr metallic workflow)
+	// float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
+	// float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
+	// float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
+    // float3 ao = AOMap.Sample(samp0, input.TextureUV).rgb;
 
-    // // Note: Non-uniform scaling not supported
-    // float diffuseLighting = saturate(dot(input.vNorm, -lightDir)); // per pixel diffuse lighting
-
-    // // Introduce fall-off of light intensity
-    // diffuseLighting *= ((length(lightDir) * length(lightDir)) / dot(m_lightPosition - input.WorldPosition, m_lightPosition - input.WorldPosition));
-
-    // // Using Blinn half angle modification for performance over correctness
-    // float3 h = normalize(normalize((m_cameraPosition - input.WorldPosition).xyz) - lightDir);
-    // float specLighting = pow(saturate(dot(h, input.vNorm)), 2.0f);
-
-	float3 albedo = pow(BaseColorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
-	float metallic = metallicRoughnessMap.Sample(samp0, input.TextureUV).b;
-	float roughness = metallicRoughnessMap.Sample(samp0, input.TextureUV).g;
-    float3 ao = occlusionMap.Sample(samp0, input.TextureUV).rgb;
+    // used for ABeautifulGame
+	float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
+	float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
+	float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
+    float3 ao = AOMap.Sample(samp0, input.TextureUV).r;
 
 	// Outgoing light direction (vector from world-space fragment position to the "camera").
 	float3 V = normalize(m_cameraPosition - input.WorldPosition).xyz;
@@ -73,7 +67,7 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
-    float3 ambient = 0.1 * albedo * ao;
+    float3 ambient = 0.5 * albedo * ao;
     float3 color = Lo + ambient;
     // HDR tonemapping
     color = color / (color + 1.0);
