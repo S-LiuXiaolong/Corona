@@ -47,13 +47,10 @@ cbuffer PerFrameConstants : register(b0)
 	float4   m_cameraPosition;
 };
 
-// cbuffer PerBatchConstants : register(b1)
-// {
-//     float3 ambientColor;
-//     float3 diffuseColor;
-//     float3 specularColor;
-//     float specularPower;
-// };
+cbuffer PerBatchConstants : register(b1)
+{
+	float4x4 m_objectMatrix;
+};
 
 #endif // !__STDCBUFFER_H__
 

@@ -1,6 +1,6 @@
 add_library(WindowsApplication WindowsApplication.cpp)
 
-add_executable(CoronaEngineD3d12 
+add_library(CoronaEngineD3d12 
     D3d12Application.cpp
     D3d12ApplicationConfig.cpp
 )

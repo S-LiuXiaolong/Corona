@@ -1,6 +1,6 @@
 find_package(OpenGL REQUIRED)
 
-add_executable(MyGameEngineOpenGL 
+add_library(MyGameEngineOpenGL 
     main.cpp
     glad.c
     )

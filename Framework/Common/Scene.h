@@ -21,6 +21,9 @@ namespace Corona
         std::unordered_map<std::string, std::shared_ptr<SceneObjectMaterial>> Materials;
         std::unordered_map<std::string, std::shared_ptr<SceneObjectMesh>> Geometries;
 
+        // For binding meshes and materials
+        std::vector<std::weak_ptr<SceneObjectMaterial>> LinearMaterials;
+
         // TODO: why weak_ptr here ?
         std::unordered_map<std::string, std::weak_ptr<SceneNode>> CameraNodes;
         std::unordered_map<std::string, std::weak_ptr<SceneNode>> LightNodes;

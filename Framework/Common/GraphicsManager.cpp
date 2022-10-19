@@ -28,7 +28,7 @@ namespace Corona
             ClearShaders();
             Scene& scene = g_pSceneManager->GetSceneForRendering();
             InitializeShaders();
-            InitializeBuffers(scene);
+            InitializeBuffers();
             g_pSceneManager->NotifySceneIsRenderingQueued();
         }
 
@@ -113,7 +113,8 @@ namespace Corona
         // }
 
         // use default build-in camera
-        Vector3f position = { 0, -2, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
+        // Vector3f position = { 0.75, 0, 1.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
+        Vector3f position = { 0, 0.5, 0.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
         BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
@@ -156,7 +157,8 @@ namespace Corona
 		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 		// Build the perspective projection matrix.
 		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
-
+        
+        // 能不能传入各个单独矩阵的逆然后在里面相乘得到整体的逆？（我估计是不行（没准齐次矩阵可以））
         m_DrawFrameContext.m_worldMatrix = m_worldMatrix;
         m_DrawFrameContext.m_worldViewMatrix = m_worldMatrix * m_viewMatrix;
         m_DrawFrameContext.m_worldViewProjectionMatrix = m_worldMatrix * m_viewMatrix * m_projectionMatrix;
@@ -201,7 +203,7 @@ namespace Corona
         m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
 
-    bool GraphicsManager::InitializeBuffers(const Scene& scene)
+    bool GraphicsManager::InitializeBuffers()
     {
         cout << "[GraphicsManager] GraphicsManager::InitializeBuffers()" << endl;
         return true;

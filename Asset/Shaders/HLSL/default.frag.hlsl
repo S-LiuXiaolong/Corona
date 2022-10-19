@@ -26,7 +26,7 @@ float4 default_frag_main(default_vert_output input) : SV_Target
     float3 h = normalize(normalize((m_cameraPosition - input.WorldPosition).xyz) - lightDir);
     float specLighting = pow(saturate(dot(h, input.vNorm)), 2.0f);
 
-    return (saturate(specLighting));
+    return (saturate(specLighting + float4(input.vNorm, 1.0f)));
     // return (saturate(0.15f + (0.2f * BaseColorMap.Sample(samp0, input.TextureUV) * 0.4f) + (specLighting * 0.8f)));
     // return saturate((0.3f * diffuseLighting) + normalMap.Sample(samp0, input.TextureUV) + (specLighting * 0.5f));
 }

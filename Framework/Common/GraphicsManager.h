@@ -55,7 +55,7 @@ namespace Corona
     protected:
         virtual bool InitializeShaders();
         virtual void ClearShaders();
-        virtual bool InitializeBuffers(const Scene& scene);
+        virtual bool InitializeBuffers();
         virtual void ClearBuffers();
 
         virtual void InitConstants();

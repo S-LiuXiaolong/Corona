@@ -104,7 +104,7 @@ namespace Corona
         // g_pAnimationManager->Tick();
         g_pGraphicsManager->Tick();
         g_pGameLogic->Tick();
-#ifdef _DEBUG
+#ifdef DEBUG
         g_pDebugManager->Tick();
 #endif
     }

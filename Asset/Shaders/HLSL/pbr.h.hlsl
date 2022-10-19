@@ -44,7 +44,7 @@ cbuffer PerFrameConstants : register(b0)
 	// float4x4 m_viewMatrix;
 	// float4x4 m_projectionMatrix;
 	float4x4 m_worldViewMatrix;
-	float4x4 m_worldViewProjectionMatrix; // this 5 matrix cannot live together
+	float4x4 m_worldViewProjectionMatrix; // this 5 matrix cannot live together for the size limit
 
 	// try multi-lights
 	// Light    m_lights[MaxLights];
@@ -53,13 +53,10 @@ cbuffer PerFrameConstants : register(b0)
 	float4   m_cameraPosition;
 };
 
-// cbuffer PerBatchConstants : register(b1)
-// {
-//     float3 ambientColor;
-//     float3 diffuseColor;
-//     float3 specularColor;
-//     float specularPower;
-// };
+cbuffer PerBatchConstants : register(b1)
+{
+	float4x4 m_objectMatrix;
+};
 
 #endif // !__STDCBUFFER_H__
 

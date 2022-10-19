@@ -204,7 +204,7 @@ namespace Corona
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateVertexBuffer(std::vector<VertexBasicAttribs>& v_property_array)
+    HRESULT D3d12GraphicsManager::CreateVertexBuffer(std::vector<VertexBasicAttribs>& vertex_array)
     {
         HRESULT hr;
 
@@ -223,7 +223,7 @@ namespace Corona
         resourceDesc.Alignment = 0;
         // size in byte of resource
         // TODO
-        resourceDesc.Width = v_property_array.size() * 11 * 4;
+        resourceDesc.Width = vertex_array.size() * 11 * 4;
         resourceDesc.Height = 1;
         resourceDesc.DepthOrArraySize = 1;
         resourceDesc.MipLevels = 1;
@@ -266,7 +266,7 @@ namespace Corona
         }
 
         D3D12_SUBRESOURCE_DATA vertexData = {};
-        vertexData.pData = v_property_array.data();
+        vertexData.pData = vertex_array.data();
 
         UpdateSubresources<1>(m_pCommandList, pVertexBuffer, pVertexBufferUploadHeap, 0, 0, 1, &vertexData);
         D3D12_RESOURCE_BARRIER barrier = {};
@@ -283,7 +283,7 @@ namespace Corona
         vertexBufferView.BufferLocation = pVertexBuffer->GetGPUVirtualAddress();
         // TODO: automatically calculate stride and size
         vertexBufferView.StrideInBytes = 11 * 4;
-        vertexBufferView.SizeInBytes = (UINT)v_property_array.size() * 11 * 4;
+        vertexBufferView.SizeInBytes = (UINT)vertex_array.size() * 11 * 4;
         m_VertexBufferView.push_back(vertexBufferView);
 
         m_Buffers.push_back(pVertexBuffer);
@@ -372,166 +372,145 @@ namespace Corona
         m_Buffers.push_back(pIndexBuffer);
         m_Buffers.push_back(pIndexBufferUploadHeap);
 
-        DrawBatchContext dbc;
-        dbc.count = (int32_t)index_array.size();
-        m_DrawBatchContext.push_back(std::move(dbc));
-
         return hr;
     }
 
-    HRESULT D3d12GraphicsManager::CreateTextureBuffer()
+    HRESULT D3d12GraphicsManager::CreateTextureBuffer(SceneObjectTexture& texture)
     {
         HRESULT hr = S_OK;
 
-        auto& scene = g_pSceneManager->GetSceneForRendering();
-
-        for (auto it : scene.Materials)
+        // TODO
+        auto it = m_TextureIndex.find(texture.GetName());
+        if (it == m_TextureIndex.end())
         {
-            auto pMat = it.second;
-            if (pMat)
+            auto& image = texture.GetTextureImage();
+
+            // Describe and create a Texture2D.
+            D3D12_HEAP_PROPERTIES prop = {};
+            prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+            prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            prop.CreationNodeMask = 1;
+            prop.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC textureDesc = {};
+            textureDesc.MipLevels = 1;
+            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            textureDesc.Width = image.Width;
+            textureDesc.Height = image.Height;
+            textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+            textureDesc.DepthOrArraySize = 1;
+            textureDesc.SampleDesc.Count = 1;
+            textureDesc.SampleDesc.Quality = 0;
+            textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+            ID3D12Resource* pTextureBuffer;
+            ID3D12Resource* pTextureUploadHeap;
+
+            if (FAILED(hr = m_pDev->CreateCommittedResource(
+                &prop,
+                D3D12_HEAP_FLAG_NONE,
+                &textureDesc,
+                D3D12_RESOURCE_STATE_COPY_DEST,
+                nullptr,
+                IID_PPV_ARGS(&pTextureBuffer))))
             {
-				// Image& image = pMat->Textures[0]->GetTextureImage();
-                for (auto index : pMat->TextureIds)
-                {
-                    if (index != -1)
-                    {
-						Image& image = pMat->Textures[index]->GetTextureImage();
-
-						// TODO
-						// auto it = m_TextureIndex.find(texture.GetName());
-						// if (it == m_TextureIndex.end()) {
-						//     auto image = texture.GetTextureImage();
-
-						// Describe and create a Texture2D.
-						D3D12_HEAP_PROPERTIES prop = {};
-						prop.Type = D3D12_HEAP_TYPE_DEFAULT;
-						prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-						prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-						prop.CreationNodeMask = 1;
-						prop.VisibleNodeMask = 1;
-
-						D3D12_RESOURCE_DESC textureDesc = {};
-						textureDesc.MipLevels = 1;
-						// ? only for PNG
-						textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						textureDesc.Width = image.Width;
-						textureDesc.Height = image.Height;
-						textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-						textureDesc.DepthOrArraySize = 1;
-						textureDesc.SampleDesc.Count = 1;
-						textureDesc.SampleDesc.Quality = 0;
-						textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-						ID3D12Resource* pTextureBuffer;
-						ID3D12Resource* pTextureUploadHeap;
-
-						if (FAILED(hr = m_pDev->CreateCommittedResource(
-							&prop,
-							D3D12_HEAP_FLAG_NONE,
-							&textureDesc,
-							D3D12_RESOURCE_STATE_COPY_DEST,
-							nullptr,
-							IID_PPV_ARGS(&pTextureBuffer))))
-						{
-							return hr;
-						}
-
-						const UINT subresourceCount = textureDesc.DepthOrArraySize * textureDesc.MipLevels;
-						const UINT64 uploadBufferSize = GetRequiredIntermediateSize(pTextureBuffer, 0, subresourceCount);
-
-						prop.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-						D3D12_RESOURCE_DESC resourceDesc = {};
-						resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-						resourceDesc.Alignment = 0;
-						resourceDesc.Width = uploadBufferSize;
-						resourceDesc.Height = 1;
-						resourceDesc.DepthOrArraySize = 1;
-						resourceDesc.MipLevels = 1;
-						resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-						resourceDesc.SampleDesc.Count = 1;
-						resourceDesc.SampleDesc.Quality = 0;
-						resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-						resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-						if (FAILED(hr = m_pDev->CreateCommittedResource(
-							&prop,
-							D3D12_HEAP_FLAG_NONE,
-							&resourceDesc,
-							D3D12_RESOURCE_STATE_GENERIC_READ,
-							nullptr,
-							IID_PPV_ARGS(&pTextureUploadHeap)
-						)))
-						{
-							return hr;
-						}
-
-						// Copy data to the intermediate upload heap and then schedule a copy 
-						// from the upload heap to the Texture2D.
-						D3D12_SUBRESOURCE_DATA textureData = {};
-						if (image.bitcount == 24)
-						{
-							// DXGI does not have 24bit formats so we have to extend it to 32bit
-							uint32_t new_pitch = image.pitch / 3 * 4;
-							size_t data_size = new_pitch * image.Height;
-							void* data = g_pMemoryManager->Allocate(data_size);
-							uint8_t* buf = reinterpret_cast<uint8_t*>(data);
-							uint8_t* src = reinterpret_cast<uint8_t*>(image.data);
-							for (auto row = 0; row < image.Height; row++) {
-								buf = reinterpret_cast<uint8_t*>(data) + row * new_pitch;
-								src = reinterpret_cast<uint8_t*>(image.data) + row * image.pitch;
-								for (auto col = 0; col < image.Width; col++) {
-									*(uint32_t*)buf = *(uint32_t*)src;
-									buf[3] = 0;  // set alpha to 0
-									buf += 4;
-									src += 3;
-								}
-							}
-							// we do not need to free the old data because the old data is still referenced by the
-							// SceneObject
-							// g_pMemoryManager->Free(image.data, image.data_size);
-							image.data = (uint8_t*)data;
-							image.data_size = data_size;
-							image.pitch = new_pitch;
-						}
-
-						textureData.pData = image.data;
-						textureData.RowPitch = image.pitch;
-						textureData.SlicePitch = image.pitch * image.Height;
-
-						UpdateSubresources(m_pCommandList, pTextureBuffer, pTextureUploadHeap, 0, 0, subresourceCount, &textureData);
-						D3D12_RESOURCE_BARRIER barrier = {};
-						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-						barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-						barrier.Transition.pResource = pTextureBuffer;
-						barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-						barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-						barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-						m_pCommandList->ResourceBarrier(1, &barrier);
-
-						// Describe and create a SRV for the texture.
-						D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-						srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-						srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-						srvDesc.Texture2D.MipLevels = -1;
-						srvDesc.Texture2D.MostDetailedMip = 0;
-						D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
-						// TODO
-						int32_t texture_id = index + 1;
-						// int32_t texture_id = 1;
-						srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_id) * m_nCbvSrvDescriptorSize;
-						m_pDev->CreateShaderResourceView(pTextureBuffer, &srvDesc, srvHandle);
-						// m_TextureIndex[texture.GetName()] = texture_id;
-
-						m_Buffers.push_back(pTextureUploadHeap);
-						m_Textures.push_back(pTextureBuffer);
-                    }
-
-                }
+                return hr;
             }
-        }
 
+            const UINT subresourceCount = textureDesc.DepthOrArraySize * textureDesc.MipLevels;
+            const UINT64 uploadBufferSize = GetRequiredIntermediateSize(pTextureBuffer, 0, subresourceCount);
+
+            prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+            D3D12_RESOURCE_DESC resourceDesc = {};
+            resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            resourceDesc.Alignment = 0;
+            resourceDesc.Width = uploadBufferSize;
+            resourceDesc.Height = 1;
+            resourceDesc.DepthOrArraySize = 1;
+            resourceDesc.MipLevels = 1;
+            resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            resourceDesc.SampleDesc.Count = 1;
+            resourceDesc.SampleDesc.Quality = 0;
+            resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            if (FAILED(hr = m_pDev->CreateCommittedResource(
+                &prop,
+                D3D12_HEAP_FLAG_NONE,
+                &resourceDesc,
+                D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&pTextureUploadHeap)
+            )))
+            {
+                return hr;
+            }
+
+            // Copy data to the intermediate upload heap and then schedule a copy 
+            // from the upload heap to the Texture2D.
+            D3D12_SUBRESOURCE_DATA textureData = {};
+            if (image.bitcount == 24)
+            {
+                // DXGI does not have 24bit formats so we have to extend it to 32bit
+                uint32_t new_pitch = (uint32_t)image.pitch / 3 * 4;
+                size_t data_size = new_pitch * image.Height;
+                void* data = g_pMemoryManager->Allocate(data_size);
+                uint8_t* buf = reinterpret_cast<uint8_t*>(data);
+                uint8_t* src = reinterpret_cast<uint8_t*>(image.data);
+                for (uint32_t row = 0; row < image.Height; row++) {
+                    buf = reinterpret_cast<uint8_t*>(data) + row * new_pitch;
+                    src = reinterpret_cast<uint8_t*>(image.data) + row * image.pitch;
+                    for (uint32_t col = 0; col < image.Width; col++) {
+                        *(uint32_t*)buf = *(uint32_t*)src;
+                        buf[3] = 0;  // set alpha to 0
+                        buf += 4;
+                        src += 3;
+                    }
+                }
+                // we do not need to free the old data because the old data is still referenced by the
+                // SceneObject
+                // g_pMemoryManager->Free(image.data, image.data_size);
+                image.data = (uint8_t*)data;
+                image.data_size = data_size;
+                image.pitch = new_pitch;
+            }
+
+            textureData.pData = image.data;
+            textureData.RowPitch = image.pitch;
+            textureData.SlicePitch = image.pitch * image.Height;
+
+            UpdateSubresources(m_pCommandList, pTextureBuffer, pTextureUploadHeap, 0, 0, subresourceCount, &textureData);
+            D3D12_RESOURCE_BARRIER barrier = {};
+            barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            barrier.Transition.pResource = pTextureBuffer;
+            barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+            barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+            barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+            m_pCommandList->ResourceBarrier(1, &barrier);
+
+            // Describe and create a SRV for the texture.
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Texture2D.MipLevels = -1;
+            srvDesc.Texture2D.MostDetailedMip = 0;
+            D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
+            // TODO
+            int32_t texture_id = static_cast<uint32_t>(m_TextureIndex.size());
+            // int32_t texture_id = 1;
+            srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_id) * m_nCbvSrvDescriptorSize;
+            m_pDev->CreateShaderResourceView(pTextureBuffer, &srvDesc, srvHandle);
+            // TODO: 为了应对大于五张贴图的情况，必须要对进入heap的texture blob的index进行记录
+            // 不然要不就是贴图不匹配，要不就是多了或者少了贴图
+            m_TextureIndex[texture.GetName()] = texture_id;
+
+            m_Buffers.push_back(pTextureUploadHeap);
+            m_Textures.push_back(pTextureBuffer);
+        }
 
         return hr;
     }
@@ -757,7 +736,6 @@ namespace Corona
 
     }
 
-    // ?
     HRESULT D3d12GraphicsManager::CreateRootSignature()
     {
         HRESULT hr = S_OK;
@@ -772,6 +750,9 @@ namespace Corona
             featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
         }
 
+        // TODO: 以后要把根签名的生成和绑定作为一个独立的、和资源绑定过程在一起的行为存在
+        // Attention: 这里绑定常量缓冲区的描述符是单根签名多描述符形式。
+        // Get more from https://stackoverflow.com/questions/55628161/how-to-bind-textures-to-different-register-in-dx12
         D3D12_DESCRIPTOR_RANGE1 ranges[7] = {
             { D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC },
             { D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 },
@@ -825,8 +806,8 @@ namespace Corona
     // this is the function that loads and prepares the shaders
     bool D3d12GraphicsManager::InitializeShaders() {
         HRESULT hr = S_OK;
-		const char* vsFilename = "Shaders/default.vert.cso";
-		const char* fsFilename = "Shaders/default.frag.cso";
+		const char* vsFilename = "Shaders/HLSL/default.vert.cso";
+		const char* fsFilename = "Shaders/HLSL/default.frag.cso";
 
         // load the shaders
         Buffer vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
@@ -926,7 +907,7 @@ namespace Corona
 		SafeRelease(&m_pPipelineState);
 	}
 
-    bool D3d12GraphicsManager::InitializeBuffers(const Scene& scene)
+    bool D3d12GraphicsManager::InitializeBuffers()
     {
         HRESULT hr = S_OK;
 
@@ -941,84 +922,64 @@ namespace Corona
         if (FAILED(hr = CreateSamplerBuffer())) {
             return hr;
         }
-
-//         if (FAILED(hr = CreateTextureBuffer())) {
-//             return hr;
-//         }
         
         auto& scene = g_pSceneManager->GetSceneForRendering();
         
-        // TODO
+        // TODO: ugly
         for (auto it : scene.Materials)
         {
             auto pMat = it.second;
             if (pMat)
             {
-                // Image& img = pMat->Textures[0]->GetTextureImage();
-                // if (FAILED(hr = CreateTextureBuffer(img))) {
-                //     return hr;
-                // }
-                // Image& img1 = pMat->Textures[1]->GetTextureImage();
-                // if (FAILED(hr = CreateTextureBuffer(img1))) {
-                //     return hr;
-                // }
+                for (auto pTex : pMat->Textures)
+                {
+                    if (pTex)
+                    {
+                        if (FAILED(hr = CreateTextureBuffer(*pTex))) {
+                            return hr;
+                        }
+                    }
+                }
             }
         }
 
-        
-        auto pGeometryNode = scene.GetFirstGeometryNode();
         int32_t n = 0;
-//         while(pGeometry)
-//         {
-//             // if (pGeometryNode->Visible())
-//             // {
-//             //     auto pGeometry = scene.GetGeometry(pGeometryNode->GetSceneObjectRef());
-//             //     assert(pGeometry);
-//             //     auto pMesh = pGeometry->GetMesh().lock();
-//             //     if(!pMesh) continue;
-//                 
-//             //     // Set the number of vertex properties.
-//             //     auto vertexPropertiesCount = pMesh->GetVertexPropertiesCount();
-//                 
-//             //     // Set the number of vertices in the vertex array.
-//             //     auto vertexCount = pMesh->GetVertexCount();
-// 
-//             //     Buffer buff;
-// 
-//             //     for (decltype(vertexPropertiesCount) i = 0; i < vertexPropertiesCount; i++)
-//             //     {
-//             //         const SceneObjectVertexArray& v_property_array = pMesh->GetVertexPropertyArray(i);
-// 
-//             //         CreateVertexBuffer(v_property_array);
-//             //     }
-// 
-//             //     auto indexGroupCount = pMesh->GetIndexGroupCount();
-// 
-//             //     for (decltype(indexGroupCount) i = 0; i < indexGroupCount; i++)
-//             //     {
-//             //         const SceneObjectIndexArray& index_array      = pMesh->GetIndexArray(i);
-// 
-//             //         CreateIndexBuffer(index_array);
-//             //     }
-// 
-//             //     SetPerBatchShaderParameters(n);
-//             //     n++;
-//             // }
-// 
-//             // TODO
-//             for (auto& pPrimitive : pGeometry->Primitives)
-//             {
-//                 auto& m_VertexData = pPrimitive->VertexData;
-//                 CreateVertexBuffer(m_VertexData);
-//                 auto& m_IndexData = pPrimitive->IndexData;
-//                 CreateIndexBuffer(m_IndexData);
-// 
-// 				// SetPerBatchShaderParameters(n);
-// 				// n++;
-//             }
-// 
-//             pGeometry = scene.GetNextGeometry();
-//        }
+        for (auto _it : scene.GeometryNodes)
+        {
+            auto pGeometryNode = _it.second.lock();
+
+            if (pGeometryNode)
+            {
+                auto pMesh = pGeometryNode->pMesh;
+                assert(pMesh);
+                // TODO: 在我短暂声明中所见过的gltf模型里，每个mesh都只有一个对应primitive
+                DrawBatchContext dbc;
+                dbc.index_count = 0;
+
+                for (auto pPrimitive : pMesh->GetMesh())
+                {
+                    assert(pPrimitive);
+                    CreateVertexBuffer(pPrimitive->GetVertexData());
+                    CreateIndexBuffer(pPrimitive->GetIndexData());
+                    // TODO: 我不知道这里对不对（一个primitive肯定没问题），多个的话没有测试用例
+                    dbc.index_count += (uint32_t)pPrimitive->GetIndexData().size();
+                }
+                
+                auto material_index = pMesh->GetMaterial();
+                auto material = scene.LinearMaterials[material_index].lock();
+
+                if (material)
+                {
+                    dbc.material = material;
+                }
+
+                dbc.node = pGeometryNode;
+
+                m_DrawBatchContext.push_back(dbc);
+
+                n++;
+            }
+        }
 
         if (SUCCEEDED(hr = m_pCommandList->Close()))
         {
@@ -1169,30 +1130,10 @@ namespace Corona
         m_pCommandList->RSSetScissorRects(1, &m_ScissorRect);
         m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        SetPerFrameShaderParameters();
-
         // do 3D rendering on the back buffer here
         int32_t i = 0;
-        //for (auto dbc : m_DrawBatchContext)
-        //{
-
-        //    // CBV Per Batch
-        //    cbvSrvHandle[1].ptr = m_nCbvSrvDescriptorSize;
-        //    m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle[0]);
-
-        //    // select which vertex buffer(s) to use
-        //    m_pCommandList->IASetVertexBuffers(0, 2, &m_VertexBufferView[i * 2]);
-        //    // select which index buffer to use
-        //    m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
-
-        //    // draw the vertex buffer to the back buffer
-        //    m_pCommandList->DrawIndexedInstanced(dbc.count, 1, 0, 0, 0);
-        //    i++;
-        //}
-         
 		for (auto dbc : m_DrawBatchContext)
 		{
-
 		    // CBV Per Batch
             D3D12_GPU_DESCRIPTOR_HANDLE cbvSrvHandle;
             uint32_t nFrameResourceDescriptorOffset = m_nFrameIndex * (2 * kMaxSceneObjectCount); // 2 descriptors for each draw call
@@ -1200,38 +1141,75 @@ namespace Corona
                                     + (nFrameResourceDescriptorOffset + i * 2 /* 2 descriptors for each batch */) * m_nCbvSrvDescriptorSize;
             m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle);
 
-		    // select which vertex buffer(s) to use
-		    m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView[i]);
-		    // select which index buffer to use
-		    m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
+            // select which vertex buffer(s) to use
+            m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView[i]);
+            // select which index buffer to use
+            m_pCommandList->IASetIndexBuffer(&m_IndexBufferView[i]);
 
 			auto& scene = g_pSceneManager->GetSceneForRendering();
+
             // Texture
-			for (auto it : scene.Materials)
-			{
-				auto pMat = it.second;
-                if (pMat)
+            if(dbc.material)
+            {
+                // more readable way
+                if (auto texture = dbc.material->ColorMap.lock())
                 {
-                    int j = 0;
-                    for (auto index : pMat->TextureIds)
-                    {
-                        // TODO
-                        auto texture_index = index + 1;
-                        D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
-                        srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
-                        // TODO
-                        m_pCommandList->SetGraphicsRootDescriptorTable(j + 2, srvHandle);
-                        j++;
-                    }
+                    auto texture_index = m_TextureIndex[texture->GetName()];
+                    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                    srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                    m_pCommandList->SetGraphicsRootDescriptorTable(2, srvHandle);
                 }
+                if (auto texture = dbc.material->PhysicsDescriptorMap.lock())
+                {
+                    auto texture_index = m_TextureIndex[texture->GetName()];
+                    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                    srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                    m_pCommandList->SetGraphicsRootDescriptorTable(3, srvHandle);
+                }
+                if (auto texture = dbc.material->NormalMap.lock())
+                {
+                    auto texture_index = m_TextureIndex[texture->GetName()];
+                    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                    srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                    m_pCommandList->SetGraphicsRootDescriptorTable(4, srvHandle);
+                }
+                if (auto texture = dbc.material->AOMap.lock())
+                {
+                    auto texture_index = m_TextureIndex[texture->GetName()];
+                    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                    srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                    m_pCommandList->SetGraphicsRootDescriptorTable(5, srvHandle);
+                }
+                if (auto texture = dbc.material->Emissivemap.lock())
+                {
+                    auto texture_index = m_TextureIndex[texture->GetName()];
+                    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                    srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                    m_pCommandList->SetGraphicsRootDescriptorTable(6, srvHandle);
+                }
+
+                // // a cleaner way
+                // // A little bit silly "j = 2"
+                // int32_t j = 2;
+                // for (auto texture : dbc.material->Textures)
+                // {
+                //     if (texture)
+                //     {
+                //         auto texture_index = m_TextureIndex[texture->GetName()];
+                //         D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
+                //         srvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_index) * m_nCbvSrvDescriptorSize;
+                //         m_pCommandList->SetGraphicsRootDescriptorTable(i, srvHandle);
+                //     }
+
+                //     ++j;
+                // }
             }
 
 		    // draw the vertex buffer to the back buffer
-		    m_pCommandList->DrawIndexedInstanced(dbc.count, 1, 0, 0, 0);
+		    m_pCommandList->DrawIndexedInstanced(dbc.index_count, 1, 0, 0, 0);
 		    i++;
 		}
 
-        D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
         barrier.Transition.pResource = m_pRenderTargets[m_nFrameIndex];
@@ -1250,13 +1228,13 @@ namespace Corona
 		GraphicsManager::UpdateConstants();
 
         // TODO
-// 		// CBV Per Frame
-// 		SetPerFrameShaderParameters();
-// 		int32_t i = 0;
-// 		for (auto dbc : m_DrawBatchContext)
-// 		{
-// 			SetPerBatchShaderParameters(i++);
-// 		}
+		// CBV Per Frame
+		SetPerFrameShaderParameters();
+		int32_t i = 0;
+		for (auto dbc : m_DrawBatchContext)
+		{
+			SetPerBatchShaderParameters(i++);
+		}
 	}
 
     void D3d12GraphicsManager::RenderBuffers()
@@ -1281,8 +1259,18 @@ namespace Corona
 
     bool D3d12GraphicsManager::SetPerBatchShaderParameters(int32_t index)
     {
-        memcpy(m_pCbvDataBegin + m_nFrameIndex * kSizeConstantBufferPerFrame + kSizePerFrameConstantBuffer + index * kSizePerFrameConstantBuffer, 
-            &m_DrawBatchContext, sizeof(m_DrawBatchContext));
+        PerBatchConstants pbc;
+        memset(&pbc, 0x00, sizeof(pbc));
+
+        Matrix4X4f trans = m_DrawBatchContext[index].node->Transforms.matrix;
+        // 这里和GraphicsManager里面的操作一样，也需要转置
+        Transpose(trans);
+        pbc.objectMatrix = trans;
+
+        memcpy(m_pCbvDataBegin + m_nFrameIndex * kSizeConstantBufferPerFrame                // offset by frame index
+                    + kSizePerFrameConstantBuffer                                           // offset by per frame buffer 
+                    + index * kSizePerBatchConstantBuffer,                                  // offset by object index 
+            &pbc, sizeof(pbc));
         return true;
     }
 

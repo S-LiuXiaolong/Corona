@@ -41,8 +41,10 @@ namespace Corona
 
         // void SetPrimitiveType(PrimitiveType type) { m_PrimitiveType = type;  };
 
-        size_t GetIndexCount() const { return m_IndexArray.size(); };
         size_t GetVertexCount() const { return m_VertexArray.size(); };
+        size_t GetIndexCount() const { return m_IndexArray.size(); };
+        std::vector<VertexBasicAttribs>& GetVertexData() { return m_VertexArray; };
+        std::vector<uint32_t>& GetIndexData() { return m_IndexArray; };
         // const PrimitiveType& GetPrimitiveType() { return m_PrimitiveType; };
         // BoundingBox GetBoundingBox() const;
         // ConvexHull GetConvexHull() const;

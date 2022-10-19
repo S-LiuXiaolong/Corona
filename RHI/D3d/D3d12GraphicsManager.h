@@ -28,7 +28,7 @@ namespace Corona
         bool SetPerBatchShaderParameters(int32_t index);
 
         void UpdateConstants();
-        bool InitializeBuffers(const Scene& scene);
+        bool InitializeBuffers();
         void ClearBuffers();
         bool InitializeShaders();
         void ClearShaders();
@@ -40,11 +40,11 @@ namespace Corona
         HRESULT CreateDepthStencil();
         HRESULT CreateGraphicsResources();
         HRESULT CreateSamplerBuffer();
-        HRESULT CreateTextureBuffer();
+        HRESULT CreateTextureBuffer(SceneObjectTexture& texture);
         HRESULT CreateConstantBuffer();
         // HRESULT CreateIndexBuffer(const Buffer& buffer);
         // HRESULT CreateVertexBuffer(const Buffer& buffer);
-        HRESULT CreateVertexBuffer(std::vector<VertexBasicAttribs>& v_property_array);
+        HRESULT CreateVertexBuffer(std::vector<VertexBasicAttribs>& vertex_array);
         HRESULT CreateIndexBuffer(std::vector<uint32_t>& index_array);
         HRESULT CreateRootSignature();
         HRESULT WaitForPreviousFrame();
@@ -83,10 +83,20 @@ namespace Corona
         std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_VertexBufferView;                 // a view of the vertex buffer
         std::vector<D3D12_INDEX_BUFFER_VIEW>        m_IndexBufferView;                  // a view of the vertex buffer
 
+        struct PerBatchConstants
+        {
+            Matrix4X4f objectMatrix;
+            // Vector4f   diffuseColor;
+            // Vector4f   specularColor;
+            // float specularPower;
+	        // bool usingDiffuseMap;
+	        // bool usingNormalMap;
+        };
+
         struct DrawBatchContext {
-            int32_t count;
-            std::shared_ptr<Matrix4X4f> transform;
-            // std::shared_ptr<SceneObjectMaterial> material;
+            uint32_t index_count;
+            std::shared_ptr<SceneNode> node;
+            std::shared_ptr<SceneObjectMaterial> material;
         };
 
         std::vector<DrawBatchContext> m_DrawBatchContext;

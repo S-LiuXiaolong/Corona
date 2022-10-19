@@ -11,7 +11,7 @@ namespace Corona
 	struct TransformData
 	{
 		Matrix4X4f              matrix;
-		std::vector<Matrix4X4f> jointMatrices;
+		// std::vector<Matrix4X4f> jointMatrices;
 	};
 
     class SceneNode
@@ -41,7 +41,12 @@ namespace Corona
 		// typedef std::map<int, std::shared_ptr<SceneObjectAnimationClip>>::const_iterator animation_clip_iterator;
 
 	public:
-		SceneNode() : Scale({1.0f, 1.0f, 1.0f}) { BuildIdentityMatrix(Matrix); };
+		SceneNode() : Scale({ 1.0f, 1.0f, 1.0f }) {
+		BuildIdentityMatrix(Matrix); BuildIdentityMatrix(Transforms.matrix);
+		};
+		// SceneNode() : Scale({ 1.0f, 1.0f, 1.0f }) {
+		// 	BuildIdentityMatrix(Matrix);
+		// };
 		SceneNode(const std::string& name) : SceneNode() { m_strName = name; };
 
 		virtual ~SceneNode() {};
@@ -99,6 +104,7 @@ namespace Corona
 
             for (auto* p = m_Parent; p != nullptr; p = p->m_Parent)
             {
+				auto temp = p->GetLocalTransform();
                 mat = mat * p->GetLocalTransform();
             }
             return mat;

@@ -367,6 +367,7 @@ namespace Corona
                         std::shared_ptr<SceneObjectPrimitive> pNewPrimitive(
                             new SceneObjectPrimitive(std::move(cutVertexData), std::move(cutIndexData)));
                         pNewMesh->AddPrimitive(pNewPrimitive);
+                        pNewMesh->SetMaterial(primitive.material >= 0 ? static_cast<uint32_t>(primitive.material) : -1 );
                     }
                 }
                 pNewNode->pMesh = pNewMesh;
@@ -701,6 +702,7 @@ namespace Corona
                     }
                 }
 
+                pScene->LinearMaterials.emplace_back(pMat);
                 m_Materials[gltf_mat.name] = pMat;
             }
 
