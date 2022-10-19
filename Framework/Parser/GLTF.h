@@ -118,7 +118,11 @@ namespace Corona
 
                 bufferTangents = reinterpret_cast<const float *>(&(gltf_model.buffers[tanView.buffer].data[tanAccessor.byteOffset + tanView.byteOffset]));
                 tangentsStride = tanAccessor.ByteStride(tanView) / tinygltf::GetComponentSizeInBytes(tanAccessor.componentType);
-                // VERIFY(normalsStride > 0, "Normal stride is invalid");
+                // VERIFY(normalsStride > 0, "tangent stride is invalid");
+            }
+            else
+            {
+                // TODO: Calculate tangent space (with mikktspace ?)
             }
 
             if (Key.UV0Access >= 0)

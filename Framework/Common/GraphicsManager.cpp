@@ -113,8 +113,9 @@ namespace Corona
         // }
 
         // use default build-in camera
-        // Vector3f position = { 0.75, 0, 1.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
-        Vector3f position = { 0, 0.5, 0.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
+        Vector3f position = { 0.3, 0.1, 3 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
+        // ABeautifulGame
+        // Vector3f position = { 0, 0.5, 0.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
         BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
@@ -199,7 +200,7 @@ namespace Corona
         // }
 
         // only support default light at the time
-        m_DrawFrameContext.m_lightPosition = { 0.0f, 0.0f, 1.0f};
+        m_DrawFrameContext.m_lightPosition = { 0.0f, 1.0f, 1.0f};
         m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
 

@@ -4,22 +4,24 @@
 float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 {
     // used for DamagedHelmet (pbr metallic workflow)
-	// float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
-	// float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
-	// float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
-    // float3 ao = AOMap.Sample(samp0, input.TextureUV).rgb;
-
-    // used for ABeautifulGame
 	float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
 	float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
 	float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
-    float3 ao = AOMap.Sample(samp0, input.TextureUV).r;
+    float3 normal = normalMap.Sample(samp0, input.TextureUV).rgb;
+    float3 ao = AOMap.Sample(samp0, input.TextureUV).rgb;
+
+    // used for ABeautifulGame
+	// float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
+	// float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
+	// float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
+    // float3 ao = AOMap.Sample(samp0, input.TextureUV).r;
 
 	// Outgoing light direction (vector from world-space fragment position to the "camera").
 	float3 V = normalize(m_cameraPosition - input.WorldPosition).xyz;
 
 	// Get current fragment's normal and transform to world space (no normal map support yet).
-	float3 N = input.vNorm;
+	// float3 N = input.vNorm;
+    float3 N = NormalSampleToWorldSpace(normal, input.vNorm, input.vTangent);
 
 	// Fresnel reflectance at normal incidence (for metals use albedo color).
 	float3 F0 = lerp(Fdielectric, albedo, metallic);

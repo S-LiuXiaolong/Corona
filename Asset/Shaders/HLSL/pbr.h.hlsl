@@ -90,7 +90,8 @@ struct pbr_vert_output
 	float4 WorldPosition : POSITION;
     float2 TextureUV     : TEXCOORD0;
 	float3 vNorm		 : TEXCOORD1;
-	float3 vLightDir	 : TEXCOORD2;
+	float3 vTangent		 : TEXCOORD2;
+	float3 vLightDir	 : TEXCOORD3;
 };
 
 #endif // !__VSOUTPUT_H__
