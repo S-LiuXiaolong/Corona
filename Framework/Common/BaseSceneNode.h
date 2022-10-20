@@ -8,20 +8,30 @@
 
 namespace Corona
 {
+	class SceneNodeCreator
+	{
+	public:
+	};
+
 	struct TransformData
 	{
-		Matrix4X4f              matrix;
+		Matrix4X4f matrix;
 		// std::vector<Matrix4X4f> jointMatrices;
 	};
 
-    class SceneNode
-    {
+	// temporary only for testing LogicManager
+	struct CameraData
+	{
+	};
+
+	class SceneNode
+	{
 	public:
 		std::string m_strName;
+		std::string m_type;
 		std::shared_ptr<SceneObjectMesh> pMesh;
-		std::shared_ptr<SceneObjectCamera> pCamera;
 
-		SceneNode* m_Parent = nullptr;
+		SceneNode *m_Parent = nullptr;
 		// ? index
 		uint32_t Index;
 
@@ -35,115 +45,112 @@ namespace Corona
 		TransformData Transforms;
 
 	protected:
-		virtual void dump(std::ostream& out) const {};
+		virtual void dump(std::ostream &out) const {};
 
 	public:
 		// typedef std::map<int, std::shared_ptr<SceneObjectAnimationClip>>::const_iterator animation_clip_iterator;
 
 	public:
-		SceneNode() : Scale({ 1.0f, 1.0f, 1.0f }) {
-		BuildIdentityMatrix(Matrix); BuildIdentityMatrix(Transforms.matrix);
+		SceneNode() : Scale({1.0f, 1.0f, 1.0f})
+		{
+			BuildIdentityMatrix(Matrix);
+			BuildIdentityMatrix(Transforms.matrix);
 		};
 		// SceneNode() : Scale({ 1.0f, 1.0f, 1.0f }) {
 		// 	BuildIdentityMatrix(Matrix);
 		// };
-		SceneNode(const std::string& name) : SceneNode() { m_strName = name; };
+		SceneNode(const std::string &name) : SceneNode() { m_strName = name; };
+		SceneNode(SceneNode&& other)
+			: m_strName(std::move(other.m_strName)),
+			m_type(std::move(other.m_type)),
+			pMesh(std::move(other.pMesh)),
+			m_Parent(std::move(other.m_Parent)),
+			Index(std::move(other.Index)),
+			m_Children(std::move(other.m_Children)),
+			Matrix(std::move(other.Matrix)),
+			Translation(std::move(other.Translation)),
+			Scale(std::move(other.Scale)),
+			Rotation(std::move(other.Rotation)),
+			Transforms(std::move(other.Transforms)) {};
 
-		virtual ~SceneNode() {};
+		virtual ~SceneNode(){};
 
 		const std::string GetName() const { return m_strName; };
 
-		// void AttachAnimationClip(int clip_index, std::shared_ptr<SceneObjectAnimationClip> clip)
-		// {
-		//     m_AnimationClips.insert({clip_index, clip});
-		// }
-
-		// inline bool GetFirstAnimationClip(animation_clip_iterator& it)
-		// {
-		//     it = m_AnimationClips.cbegin();
-		//     return it != m_AnimationClips.cend();
-		// }
-
-		// inline bool GetNextAnimationClip(animation_clip_iterator& it)
-		// {
-		//     it++;
-		//     return it != m_AnimationClips.cend();
-		// }
-
-		void AppendChild(std::shared_ptr<SceneNode>&& sub_node)
+		void AppendChild(std::shared_ptr<SceneNode> &&sub_node)
 		{
 			sub_node->m_Parent = this;
 			m_Children.push_back(std::move(sub_node));
 		}
 
-    public:
-        Matrix4X4f GetLocalTransform() const
-        {
-            // Translation, rotation, and scale properties and local space transformation are
-            // mutually exclusive in GLTF.
-            // We, however, may use non-trivial Matrix with TRS to apply transform to a model.
+	public:
+		Matrix4X4f GetLocalTransform() const
+		{
+			// Translation, rotation, and scale properties and local space transformation are
+			// mutually exclusive in GLTF.
+			// We, however, may use non-trivial Matrix with TRS to apply transform to a model.
 
 			// TODO: BULLSHIT MATH
 			Matrix4X4f matForCalc = BuildIdentityMatrix();
-            Matrix4X4f mat = Matrix;
+			Matrix4X4f mat = Matrix;
 
-            MatrixTranslation(matForCalc, Translation.x, Translation.y, Translation.z);
+			MatrixTranslation(matForCalc, Translation.x, Translation.y, Translation.z);
 			mat = mat * matForCalc;
-            MatrixRotationQuaternion(matForCalc, Rotation);
+			MatrixRotationQuaternion(matForCalc, Rotation);
 			mat = mat * matForCalc;
-            MatrixScale(matForCalc, Scale.x, Scale.y, Scale.z);
+			MatrixScale(matForCalc, Scale.x, Scale.y, Scale.z);
 			mat = mat * matForCalc;
 
-            return mat;
-        }
+			return mat;
+		}
 
-        // get matrix from child node to parent iteratively
-        Matrix4X4f GetGlobalTransform() const
-        {
-            auto mat = GetLocalTransform();
+		// get matrix from child node to parent iteratively
+		Matrix4X4f GetGlobalTransform() const
+		{
+			auto mat = GetLocalTransform();
 
-            for (auto* p = m_Parent; p != nullptr; p = p->m_Parent)
-            {
+			for (auto *p = m_Parent; p != nullptr; p = p->m_Parent)
+			{
 				auto temp = p->GetLocalTransform();
-                mat = mat * p->GetLocalTransform();
-            }
-            return mat;
-        }
+				mat = mat * p->GetLocalTransform();
+			}
+			return mat;
+		}
 
-        virtual void UpdateTransforms()
-        {
-            // Add these in derivative classed
-            const auto NodeTransform = (pMesh || pCamera) ? GetGlobalTransform() : BuildIdentityMatrix();
-            if (pMesh)
-            {
-                this->Transforms.matrix = NodeTransform;
-                // if (pSkin != nullptr)
-                // {
-                //     // Update join matrices
-                //     auto InverseTransform = pMesh->Transforms.matrix.Inverse(); // TODO: do not use inverse transform here
-                //     if (pMesh->Transforms.jointMatrices.size() != pSkin->Joints.size())
-                //         pMesh->Transforms.jointMatrices.resize(pSkin->Joints.size());
-                //     for (size_t i = 0; i < pSkin->Joints.size(); i++)
-                //     {
-                //         auto* JointNode = pSkin->Joints[i];
-                //         pMesh->Transforms.jointMatrices[i] =
-                //             pSkin->InverseBindMatrices[i] * JointNode->GetMatrix() * InverseTransform;
-                //     }
-                // }
-            }
-
-            if (pCamera)
-            {
+		void UpdateTransforms()
+		{
+			// Add these in derivative classed
+			const auto NodeTransform = (pMesh || m_type == "Camera") ? GetGlobalTransform() : BuildIdentityMatrix();
+			if (pMesh)
+			{
 				this->Transforms.matrix = NodeTransform;
-            }
+				// if (pSkin != nullptr)
+				// {
+				//     // Update join matrices
+				//     auto InverseTransform = pMesh->Transforms.matrix.Inverse(); // TODO: do not use inverse transform here
+				//     if (pMesh->Transforms.jointMatrices.size() != pSkin->Joints.size())
+				//         pMesh->Transforms.jointMatrices.resize(pSkin->Joints.size());
+				//     for (size_t i = 0; i < pSkin->Joints.size(); i++)
+				//     {
+				//         auto* JointNode = pSkin->Joints[i];
+				//         pMesh->Transforms.jointMatrices[i] =
+				//             pSkin->InverseBindMatrices[i] * JointNode->GetMatrix() * InverseTransform;
+				//     }
+				// }
+			}
 
-            for (auto& child : m_Children)
-            {
-                child->UpdateTransforms();
-            }
-        }
+			if (m_type == "Camera")
+			{
+				this->Transforms.matrix = NodeTransform;
+			}
 
-		friend std::ostream& operator<<(std::ostream& out, const SceneNode& node)
+			for (auto &child : m_Children)
+			{
+				child->UpdateTransforms();
+			}
+		}
+
+		friend std::ostream &operator<<(std::ostream &out, const SceneNode &node)
 		{
 			static thread_local int32_t indent = 0;
 			indent++;
@@ -154,23 +161,18 @@ namespace Corona
 			node.dump(out);
 			out << std::endl;
 
-			for (auto& sub_node : node.m_Children)
+			for (auto &sub_node : node.m_Children)
 			{
 				out << *sub_node << std::endl;
 			}
 
 			out << node.Matrix << std::endl;
-
-			// for (auto anim_clip : node.m_AnimationClips) {
-			//     out << *anim_clip.second << std::endl;
-			// }
-
 			indent--;
 
 			return out;
 		}
-    };
+	};
 
-    typedef SceneNode SceneEmptyNode;
+	typedef SceneNode SceneEmptyNode;
 
 }

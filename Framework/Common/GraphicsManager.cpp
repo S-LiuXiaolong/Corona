@@ -113,7 +113,7 @@ namespace Corona
         // }
 
         // use default build-in camera
-        Vector3f position = { 0.3, 0.1, 3 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
+        Vector3f position = { 0.3f, 0.1f, 3.0f }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
         // ABeautifulGame
         // Vector3f position = { 0, 0.5, 0.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
         BuildViewMatrix(m_viewMatrix, position, lookAt, up);

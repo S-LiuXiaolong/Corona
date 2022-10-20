@@ -37,7 +37,8 @@ int main(int argc, char** argv)
 	{
 		// g_pSceneManager->LoadScene("Scene/DamagedHelmet/DamagedHelmet.gltf");
 		// g_pSceneManager->LoadScene("Scene/Suzanne/Suzanne.gltf");
-		g_pSceneManager->LoadScene("Scene/ABeautifulGame/ABeautifulGame.gltf");
+		// g_pSceneManager->LoadScene("Scene/ABeautifulGame/ABeautifulGame.gltf");
+		g_pSceneManager->LoadScene("Scene/SciFiHelmet/SciFiHelmet.gltf");
 		// g_pSceneManager->LoadScene("Scene/FlightHelmet/FlightHelmet.gltf");
 	}
 	auto& scene = g_pSceneManager->GetSceneForRendering();

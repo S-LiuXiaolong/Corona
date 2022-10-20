@@ -113,9 +113,6 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
     // sort through and find what code to run for the message given
 	switch (message)
 	{
-		// TODO ?
-	case WM_PAINT:
-		break;
 	case WM_CHAR:
 		{
 			g_pInputManager->AsciiKeyDown(static_cast<char>(wParam));

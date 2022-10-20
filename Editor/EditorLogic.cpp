@@ -105,15 +105,15 @@ void EditorLogic::OnDownKeyDown()
 
 void EditorLogic::OnAnalogStick(int id, float deltaX, float deltaY)
 {
-    // if (id == 0)
-    // {
-    //     auto& scene = g_pSceneManager->GetSceneForRendering();
-    //     auto pCameraNode = scene.GetFirstCameraNode();
-    //     if (pCameraNode) {
-    //         auto screen_width = g_pApp->GetConfiguration().screenWidth;
-    //         auto screen_height = g_pApp->GetConfiguration().screenHeight;
-    //         // move camera along its local axis -y direction
-    //         pCameraNode->RotateBy(deltaX / screen_width * PI, deltaY / screen_height * PI, 0.0f);
-    //     }
-    // }
+    if (id == 0)
+    {
+        auto& scene = g_pSceneManager->GetSceneForRendering();
+        auto pCameraNode = scene.GetFirstCameraNode();
+        if (pCameraNode) {
+            auto screen_width = g_pApp->GetConfiguration().screenWidth;
+            auto screen_height = g_pApp->GetConfiguration().screenHeight;
+            // move camera along its local axis -y direction
+            pCameraNode->RotateBy(deltaX / screen_width * PI, deltaY / screen_height * PI, 0.0f);
+        }
+    }
 }

@@ -174,7 +174,9 @@ namespace Corona
                       ConvertedBufferViewMap &ConvertedBuffers,
                       std::shared_ptr<Scene> &pScene)
         {
+            std::unique_ptr<SceneNode> pTempNode(new SceneNode());
             std::shared_ptr<SceneNode> pNewNode(new SceneNode());
+            std::shared_ptr<SceneNode> pNewNodeForTest;
             pNewNode->Index = nodeIndex;
             pNewNode->m_Parent = parent;
             pNewNode->m_strName = gltf_node.name;
@@ -243,8 +245,6 @@ namespace Corona
 
             if (gltf_node.mesh >= 0)
             {
-                // TODO: Attention
-                // 妈的，vertexData取的一直都是同一组啊（都是从第零个开始取）
                 const tinygltf::Mesh &gltf_mesh = gltf_model.meshes[gltf_node.mesh];
                 std::shared_ptr<SceneObjectMesh> pNewMesh(new SceneObjectMesh);
 
@@ -316,13 +316,11 @@ namespace Corona
                             ConvertBuffers(Key, Data, gltf_model, VertexData);
                         }
 
-                        // TODO: 还是没弄对
                         vertexStart = static_cast<uint32_t>(Data.VertexBasicDataOffset);
 
                         // TODO: Skinning
 
                         // Indices
-                        // 这里取indices的过程有很大的问题：如果有多个primitives的话，后面的indexData会把前面的也算上，就会发生错误
                         if (hasIndices)
                         {
                             const tinygltf::Accessor &accessor = gltf_model.accessors[primitive.indices > -1 ? primitive.indices : 0];
@@ -387,6 +385,7 @@ namespace Corona
             // Node contains camera
             if (gltf_node.camera >= 0)
             {
+                pNewNodeForTest = std::make_shared<SceneCameraNode>(*pNewNode);
                 const auto &gltf_cam = gltf_model.cameras[gltf_node.camera];
 
                 if (gltf_cam.type == "perspective")
@@ -403,7 +402,8 @@ namespace Corona
                         static_cast<float>(gltf_cam.perspective.aspectRatio),
                         static_cast<float>(gltf_cam.perspective.yfov));
 
-                    pNewNode->pCamera = pNewCamera;
+                    // TODO: A cleaner way?
+                    std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->pCamera = pNewCamera;
                     m_Cameras[gltf_cam.name] = std::move(pNewCamera);
                     // TODO: add ref of pNewCamera and pNewCamNode
                 }
@@ -421,7 +421,7 @@ namespace Corona
                         static_cast<float>(gltf_cam.orthographic.xmag),
                         static_cast<float>(gltf_cam.orthographic.ymag));
 
-                    pNewNode->pCamera = pNewCamera;
+                    std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->pCamera = pNewCamera;
                     m_Cameras[gltf_cam.name] = std::move(pNewCamera);
                     // TODO
                 }
@@ -432,10 +432,10 @@ namespace Corona
                     printf("Unexpected camera type");
                 }
 
-                m_CameraNodes[gltf_node.name] = pNewNode; // TODO
+                m_CameraNodes[gltf_node.name] = std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest); // TODO
             }
 
-            // use dynamic_cast and dynamic_pointer_cast to get various Nodes
+            // use dynamic_cast and dynamic_pointer_cast to get various Nodes (?)
             pScene->LUT_Name_LinearNodes[gltf_node.name] = pNewNode;
             if (parent)
             {
@@ -444,6 +444,37 @@ namespace Corona
             else
             {
                 pScene->RootNodes.push_back(std::move(pNewNode));
+            }
+
+            if(m_CameraNodes.find("Default_Camera") == m_CameraNodes.end())
+            {
+                pNewNodeForTest = std::make_shared<SceneCameraNode>();
+
+                auto pNewCamera = std::make_shared<SceneObjectPerspectiveCamera>(
+                    "perspective",
+                    static_cast<float>(0.1f),
+                    static_cast<float>(100.0f),
+                    static_cast<float>(16.0f / 9.0f),
+                    static_cast<float>(PI / 2.0f));
+
+                std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->pCamera = pNewCamera;
+                m_Cameras["Default_Camera"] = std::move(pNewCamera);
+
+                std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->m_type = "Camera";
+                std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->Translation = Vector3f{ 0.3f, 0.1f, 3.0f };
+                m_CameraNodes["Default_Camera"] = std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest);
+
+                // use dynamic_cast and dynamic_pointer_cast to get various Nodes (?)
+                // Just because there is no NEW METHOD for mesh
+                pScene->LUT_Name_LinearNodes["Default_Camera"] = pNewNodeForTest;
+                if (parent)
+                {
+                    parent->m_Children.push_back(std::move(pNewNodeForTest));
+                }
+                else
+                {
+                    pScene->RootNodes.push_back(std::move(pNewNodeForTest));
+                }
             }
         }
 
