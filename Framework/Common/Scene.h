@@ -41,7 +41,7 @@ namespace Corona
         ~Scene() = default;
 
         const std::shared_ptr<SceneObjectCamera> GetCamera(const std::string &key) const;
-        const std::shared_ptr<SceneNode> GetFirstCameraNode() const;
+        const std::shared_ptr<SceneCameraNode> GetFirstCameraNode() const;
 
         const std::shared_ptr<SceneObjectLight> GetLight(const std::string &key) const;
         const std::shared_ptr<SceneNode> GetFirstLightNode() const;

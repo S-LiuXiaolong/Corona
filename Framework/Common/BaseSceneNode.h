@@ -8,20 +8,10 @@
 
 namespace Corona
 {
-	class SceneNodeCreator
-	{
-	public:
-	};
-
 	struct TransformData
 	{
 		Matrix4X4f matrix;
 		// std::vector<Matrix4X4f> jointMatrices;
-	};
-
-	// temporary only for testing LogicManager
-	struct CameraData
-	{
 	};
 
 	class SceneNode
@@ -148,6 +138,35 @@ namespace Corona
 			{
 				child->UpdateTransforms();
 			}
+		}
+
+		void RotateBy(float rotation_angle_x, float rotation_angle_y, float rotation_angle_z)
+		{
+			Matrix4X4f rotation;
+			MatrixRotationYawPitchRoll(rotation, rotation_angle_x, rotation_angle_y, rotation_angle_z);
+			// transform Euler angles into quaternion and put all them together
+			Matrix = Matrix * rotation;
+		}
+
+		void MoveBy(float distance_x, float distance_y, float distance_z)
+		{
+// 			Matrix4X4f translation;
+// 			// Just use xyz to add or subtract this->Translation
+// 			MatrixTranslation(translation, distance_x, distance_y, distance_z);
+// 			m_RuntimeTransform = m_RuntimeTransform * translation;
+		}
+
+		void MoveBy(const Vector3f& distance)
+		{
+			MoveBy(distance[0], distance[1], distance[2]);
+		}
+
+		virtual Matrix4X4f GetInitAxis()
+		{
+			return { 1.0f, 0.0f, 0.0f, 0.0f,
+					0.0f, 1.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 1.0f, 0.0f,
+					0.0f, 0.0f, 0.0f, 1.0f };
 		}
 
 		friend std::ostream &operator<<(std::ostream &out, const SceneNode &node)

@@ -20,13 +20,13 @@ int EditorLogic::Initialize()
     else
     {
         cout << "[EditorLogic] Loading Splash Scene" << endl;
-        // result = g_pSceneManager->LoadScene("Scene/Suzanne/Suzanne.gltf");
+        result = g_pSceneManager->LoadScene("Scene/Suzanne/Suzanne.gltf");
         // result = g_pSceneManager->LoadScene("Scene/DamagedHelmet/DamagedHelmet.gltf");
         // result = g_pSceneManager->LoadScene("Scene/ABeautifulGame/ABeautifulGame.gltf");
         // result = g_pSceneManager->LoadScene("Scene/Lantern/Lantern.gltf");
         // result = g_pSceneManager->LoadScene("Scene/MetalRoughSpheres/MetalRoughSpheres.gltf");
         // result = g_pSceneManager->LoadScene("Scene/FlightHelmet/FlightHelmet.gltf");
-        result = g_pSceneManager->LoadScene("Scene/SciFiHelmet/SciFiHelmet.gltf");
+        // result = g_pSceneManager->LoadScene("Scene/SciFiHelmet/SciFiHelmet.gltf");
     }
 
     return result;
@@ -87,6 +87,14 @@ void EditorLogic::OnUpKeyDown()
     //     // move camera along its local axis y direction
     //     pCameraNode->MoveBy(camera_y_axis);
     // }
+	auto& scene = g_pSceneManager->GetSceneForRendering();
+	auto pCameraNode = scene.GetFirstCameraNode();
+	if (pCameraNode) {
+		auto screen_width = g_pApp->GetConfiguration().screenWidth;
+		auto screen_height = g_pApp->GetConfiguration().screenHeight;
+		// move camera along its local axis -y direction
+		pCameraNode->RotateBy(10.0f / screen_width * PI, 0.0f, 0.0f);
+	}
 }
 
 void EditorLogic::OnDownKeyDown()
@@ -101,6 +109,14 @@ void EditorLogic::OnDownKeyDown()
     //     // move camera along its local axis -y direction
     //     pCameraNode->MoveBy(camera_y_axis * -1.0f);
     // }
+	auto& scene = g_pSceneManager->GetSceneForRendering();
+	auto pCameraNode = scene.GetFirstCameraNode();
+	if (pCameraNode) {
+		auto screen_width = g_pApp->GetConfiguration().screenWidth;
+		auto screen_height = g_pApp->GetConfiguration().screenHeight;
+		// move camera along its local axis -y direction
+        pCameraNode->Pitch(20.0f / screen_width * PI);
+	}
 }
 
 void EditorLogic::OnAnalogStick(int id, float deltaX, float deltaY)
@@ -113,7 +129,9 @@ void EditorLogic::OnAnalogStick(int id, float deltaX, float deltaY)
             auto screen_width = g_pApp->GetConfiguration().screenWidth;
             auto screen_height = g_pApp->GetConfiguration().screenHeight;
             // move camera along its local axis -y direction
-            pCameraNode->RotateBy(deltaX / screen_width * PI, deltaY / screen_height * PI, 0.0f);
+            // pCameraNode->RotateBy(deltaX / screen_width * PI, 0.0f, 0.0f);
+            pCameraNode->Pitch(deltaY / screen_width * PI);
+            pCameraNode->RotateY(deltaX / screen_width * PI);
         }
     }
 }

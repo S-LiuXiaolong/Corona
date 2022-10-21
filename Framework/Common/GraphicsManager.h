@@ -59,6 +59,7 @@ namespace Corona
         virtual void ClearBuffers();
 
         virtual void InitConstants();
+        virtual void InitCameraMatrix();
         virtual void CalculateCameraMatrix();
         virtual void CalculateLights();
         virtual void UpdateConstants();

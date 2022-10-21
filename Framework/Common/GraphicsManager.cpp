@@ -40,6 +40,16 @@ namespace Corona
 
     void GraphicsManager::UpdateConstants()
     {
+        // TODO: Update scene nodes before update constants (temporary for test)
+		auto& scene = g_pSceneManager->GetSceneForRendering();
+		for (auto& root_node : scene.RootNodes) // should calculate only those needed (camera, light, etc.)
+		{
+			root_node.lock()->UpdateTransforms();
+		}
+		// TODO: use this function to get boundbox and BVH
+		// CalculateSceneDimensions();
+		// UpdatePrimitiveData();
+
         // Generate the view matrix based on the camera's position.
         CalculateCameraMatrix();
         CalculateLights();
@@ -81,6 +91,7 @@ namespace Corona
     void GraphicsManager::InitConstants()
     {
         // Initialize the world/model matrix to the identity matrix.
+        InitCameraMatrix();
         BuildIdentityMatrix(m_worldMatrix);
     }
 
@@ -95,41 +106,49 @@ namespace Corona
         cout << "[GraphicsManager] GraphicsManager::ClearShaders()" << endl;
     }
 
+    void GraphicsManager::InitCameraMatrix()
+    {
+		auto& scene = g_pSceneManager->GetSceneForRendering();
+		auto pCameraNode = scene.GetFirstCameraNode();
+		if (pCameraNode)
+		{
+			pCameraNode->InitMatrix();
+		}
+    }
+
     void GraphicsManager::CalculateCameraMatrix()
     {
         // TODO
         auto& scene = g_pSceneManager->GetSceneForRendering();
-        // auto pCameraNode = scene.GetFirstCamera();
-        // if (pCameraNode)
-        // {
-        //     m_DrawFrameContext.m_viewMatrix = *pCameraNode->GetCalculatedTransform();
-        //     InverseMatrix4X4f(m_DrawFrameContext.m_viewMatrix);
-        // }
-        // else
-        // {
-        //     // use default build-in camera
-        //     Vector3f position = { 0, -5, 0 }, lookAt = { 0, 0, 0 }, up = { 0, 0, 1 };
-        //     BuildViewMatrix(m_DrawFrameContext.m_viewMatrix, position, lookAt, up);
-        // }
+		auto pCameraNode = scene.GetFirstCameraNode();
+		if (pCameraNode) 
+        {
+			auto transform = pCameraNode->GetViewMatrix();
+			m_viewMatrix = transform;
+		}
+		else
+        {
+			// use default build-in camera
+			Vector3f position = { 0.3f, 0.1f, 3.0f }, lookAt = { 0.0f, 0.0f, 0.0f }, up = { 0.0f, 1.0f, 0.0f };
+			BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+		}
 
-        // use default build-in camera
-        Vector3f position = { 0.3f, 0.1f, 3.0f }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
-        // ABeautifulGame
-        // Vector3f position = { 0, 0.5, 0.5 }, lookAt = { 0, 0, 0 }, up = { 0, 1, 0 };
-        BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+		// // use default build-in camera
+		// Vector3f position = { 0.3f, 0.1f, 3.0f }, lookAt = { 0.0f, 0.0f, 0.0f }, up = { 0.0f, 1.0f, 0.0f };
+		// BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 
         float fieldOfView = PI / 2.0f;
         float nearClipDistance = 0.1f;
         float farClipDistance = 100.0f;
 
-        // // if (pCameraNode) 
-        // // {
-        // //     auto pCamera = scene.GetCamera(pCameraNode->GetSceneObjectRef());
-        // //     // Set the field of view and screen aspect ratio.
-        // //     fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
-        // //     nearClipDistance = pCamera->GetNearClipDistance();
-        // //     farClipDistance = pCamera->GetFarClipDistance();
-        // // }
+        if (pCameraNode) 
+        {
+            auto pCamera = pCameraNode->pCamera;
+            // Set the field of view and screen aspect ratio.
+            fieldOfView = dynamic_pointer_cast<SceneObjectPerspectiveCamera>(pCamera)->GetFov();
+            nearClipDistance = pCamera->GetNearClipDistance();
+            farClipDistance = pCamera->GetFarClipDistance();
+        }
 
         const GfxConfiguration& conf = g_pApp->GetConfiguration();
 
@@ -139,11 +158,11 @@ namespace Corona
         // BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
 
-        // The Axis Location:
+        // The world Axis Location:
         //               Y
         //               |
         //               |
-        //               | 
+        //               |
         //    X----------|
         //              /
         //             /
@@ -154,8 +173,6 @@ namespace Corona
 		// position.z = mRadius * sinf(mPhi) * sinf(mTheta);
 		// position.y = mRadius * cosf(mPhi);
 
-        m_DrawFrameContext.m_cameraPosition = Vector4f(position, 1.0f);
-		BuildViewMatrix(m_viewMatrix, position, lookAt, up);
 		// Build the perspective projection matrix.
 		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         

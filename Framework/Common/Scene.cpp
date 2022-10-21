@@ -67,7 +67,7 @@ namespace Corona
                 : LightNodes.cbegin()->second.lock());
     }
 
-    const shared_ptr<SceneNode> Scene::GetFirstCameraNode() const
+    const shared_ptr<SceneCameraNode> Scene::GetFirstCameraNode() const
     {
         return (CameraNodes.empty()? 
                 nullptr 

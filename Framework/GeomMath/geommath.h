@@ -191,6 +191,7 @@ namespace Corona
             {
                 T r, g, b, a;
             };
+            swizzle<Vector3Type, T, 0, 1, 2> xyz;
             swizzle<Vector3Type, T, 0, 2, 1> xzy;
             swizzle<Vector3Type, T, 1, 0, 2> yxz;
             swizzle<Vector3Type, T, 1, 2, 0> yzx;
@@ -293,6 +294,14 @@ namespace Corona
     inline void MulByElement(T &result, const T &a, const T &b)
     {
         ispc::MulByElement(a, b, result, static_cast<int32_t>(countof(result.data)));
+    }
+
+    inline void QuaternionMultiply(Quaternion& result, const Quaternion& q1, const Quaternion& q2)
+    {
+        result.x = +q1.x * q2.w + q1.y * q2.z - q1.z * q2.y + q1.w * q2.x;
+        result.y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
+        result.z = +q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
+        result.w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
     }
 
     // Matrix
@@ -433,7 +442,8 @@ namespace Corona
         ispc::Normalize(result, static_cast<int32_t>(countof(result.data)));
     }
 
-    inline void MatrixRotationYawPitchRoll(Matrix4X4f &matrix, const float yaw, const float pitch, const float roll)
+    // X-Pitch, Y-Yaw, Z-Roll
+    inline void MatrixRotationYawPitchRoll(Matrix4X4f &matrix, const float pitch, const float yaw, const float roll)
     {
         float cYaw, cPitch, cRoll, sYaw, sPitch, sRoll;
 
@@ -457,9 +467,27 @@ namespace Corona
         return;
     }
 
+    // roll(x), pitch(y), yaw(z): Z-Y-X
+    inline void QuaternionRotationYawPitchRoll(Quaternion& q, const float roll, const float pitch, const float yaw)
+    {
+		float cr = cosf(roll * 0.5f);
+		float sr = sinf(roll * 0.5f);
+		float cp = cosf(pitch * 0.5f);
+		float sp = sinf(pitch * 0.5f);
+		float cy = cosf(yaw * 0.5f);
+		float sy = sinf(yaw * 0.5f);
+
+		q.w = cr * cp * cy + sr * sp * sy;
+		q.x = sr * cp * cy - cr * sp * sy;
+		q.y = cr * sp * cy + sr * cp * sy;
+		q.z = cr * cp * sy - sr * sp * cy;
+    }
+
     inline void TransformCoord(Vector3f &vector, const Matrix4X4f &matrix)
     {
-        ispc::Transform(vector, matrix);
+        auto res = Vector4f(vector, 1.0f);
+        ispc::Transform(res, matrix);
+        vector = res.xyz;
     }
 
     inline void Transform(Vector4f &vector, const Matrix4X4f &matrix)
@@ -630,6 +658,7 @@ namespace Corona
         matrix = rotation;
     }
 
+    // Quaternion: q = xi + yj + zk + w
     inline void MatrixRotationQuaternion(Matrix4X4f &matrix, Quaternion q)
     {
         Matrix4X4f rotation = {{{{1.0f - 2.0f * q.y * q.y - 2.0f * q.z * q.z, 2.0f * q.x * q.y + 2.0f * q.w * q.z, 2.0f * q.x * q.z - 2.0f * q.w * q.y, 0.0f},

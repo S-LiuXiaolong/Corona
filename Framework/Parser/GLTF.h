@@ -461,7 +461,7 @@ namespace Corona
                 m_Cameras["Default_Camera"] = std::move(pNewCamera);
 
                 std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->m_type = "Camera";
-                std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->Translation = Vector3f{ 0.3f, 0.1f, 3.0f };
+                std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest)->Translation = Vector3f{ 0.0f, 0.0f, 3.0f };
                 m_CameraNodes["Default_Camera"] = std::dynamic_pointer_cast<SceneCameraNode>(pNewNodeForTest);
 
                 // use dynamic_cast and dynamic_pointer_cast to get various Nodes (?)

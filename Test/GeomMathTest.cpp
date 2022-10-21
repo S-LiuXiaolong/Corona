@@ -120,6 +120,21 @@ void matrix_test()
 
 	Matrix4X4f mvp = view * perspective;
 	cout << "MVP:" << mvp;
+
+	Matrix4X4f result1, result2;
+	Matrix4X4f mat1, mat2, mat3, mat4;
+	Quaternion q1, q2;
+	QuaternionRotationYawPitchRoll(q1, PI / 2, PI / 4, PI / 3);
+	MatrixRotationQuaternion(mat1, q1);
+	QuaternionRotationYawPitchRoll(q2, PI / 3, PI / 4, PI / 6);
+	MatrixRotationQuaternion(mat2, q2);
+	auto q = q2 * q1;
+	MatrixRotationQuaternion(result1, q);
+
+	MatrixRotationYawPitchRoll(mat3, PI / 2, PI / 4, PI / 3);
+	MatrixRotationYawPitchRoll(mat4, PI / 3, PI / 4, PI / 6);
+	result2 = mat3 * mat4;
+
 }
 
 int main()

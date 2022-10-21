@@ -806,8 +806,8 @@ namespace Corona
     // this is the function that loads and prepares the shaders
     bool D3d12GraphicsManager::InitializeShaders() {
         HRESULT hr = S_OK;
-		const char* vsFilename = "Shaders/HLSL/pbr.vert.cso";
-		const char* fsFilename = "Shaders/HLSL/pbr.frag.cso";
+		const char* vsFilename = "Shaders/HLSL/default.vert.cso";
+		const char* fsFilename = "Shaders/HLSL/default.frag.cso";
 
         // load the shaders
         Buffer vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
