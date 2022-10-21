@@ -74,6 +74,33 @@ void WindowsApplication::Finalize()
 void WindowsApplication::Tick()
 {
     BaseApplication::Tick();
+
+	{
+		if(GetAsyncKeyState('D') & 0x8000)
+			g_pInputManager->LeftMouseDrag(-15.0f, 0);
+
+		if(GetAsyncKeyState('A') & 0x8000)
+			g_pInputManager->LeftMouseDrag(15.0f, 0);
+
+		if(GetAsyncKeyState('S') & 0x8000)
+			g_pInputManager->LeftMouseDrag(0, -15.0f);
+
+		if(GetAsyncKeyState('W') & 0x8000)
+			g_pInputManager->LeftMouseDrag(0, 15.0f);
+
+		if(GetAsyncKeyState(VK_UP) & 0x8000)
+			g_pInputManager->UpArrowKeyDown();
+
+		if(GetAsyncKeyState(VK_DOWN) & 0x8000)
+			g_pInputManager->DownArrowKeyDown();
+
+		if(GetAsyncKeyState(VK_LEFT) & 0x8000)
+			g_pInputManager->LeftArrowKeyDown();
+
+		if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
+			g_pInputManager->RightArrowKeyDown();
+	}
+
     // this struct holds Windows event messages
     MSG msg;
 
@@ -92,7 +119,6 @@ void WindowsApplication::Tick()
 // this is the main message handler for the program
 LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // ?
 	WindowsApplication* pThis;
 	if (message == WM_NCCREATE)
 	{
@@ -118,50 +144,50 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
 			g_pInputManager->AsciiKeyDown(static_cast<char>(wParam));
 		}
 		break;
-	case WM_KEYUP:
-		{
-			switch (wParam)
-			{
-			case VK_LEFT:
-				g_pInputManager->LeftArrowKeyUp();
-				break;
-			case VK_RIGHT:
-				g_pInputManager->RightArrowKeyUp();
-				break;
-			case VK_UP:
-				g_pInputManager->UpArrowKeyUp();
-				break;
-			case VK_DOWN:
-				g_pInputManager->DownArrowKeyUp();
-				break;
+	// case WM_KEYUP:
+	// 	{
+	// 		switch (wParam)
+	// 		{
+	// 		case VK_LEFT:
+	// 			g_pInputManager->LeftArrowKeyUp();
+	// 			break;
+	// 		case VK_RIGHT:
+	// 			g_pInputManager->RightArrowKeyUp();
+	// 			break;
+	// 		case VK_UP:
+	// 			g_pInputManager->UpArrowKeyUp();
+	// 			break;
+	// 		case VK_DOWN:
+	// 			g_pInputManager->DownArrowKeyUp();
+	// 			break;
 
-			default:
-				break;
-			}
-		}
-		break;
-	case WM_KEYDOWN:
-		{
-			switch (wParam)
-			{
-			case VK_LEFT:
-				g_pInputManager->LeftArrowKeyDown();
-				break;
-			case VK_RIGHT:
-				g_pInputManager->RightArrowKeyDown();
-				break;
-			case VK_UP:
-				g_pInputManager->UpArrowKeyDown();
-				break;
-			case VK_DOWN:
-				g_pInputManager->DownArrowKeyDown();
-				break;
+	// 		default:
+	// 			break;
+	// 		}
+	// 	}
+	// 	break;
+	// case WM_KEYDOWN:
+	// 	{
+	// 		switch (wParam)
+	// 		{
+	// 		case VK_LEFT:
+	// 			g_pInputManager->LeftArrowKeyDown();
+	// 			break;
+	// 		case VK_RIGHT:
+	// 			g_pInputManager->RightArrowKeyDown();
+	// 			break;
+	// 		case VK_UP:
+	// 			g_pInputManager->UpArrowKeyDown();
+	// 			break;
+	// 		case VK_DOWN:
+	// 			g_pInputManager->DownArrowKeyDown();
+	// 			break;
 
-			default:
-				break;
-			}
-		}
-		break;
+	// 		default:
+	// 			break;
+	// 		}
+	// 	}
+	// 	break;
 	case WM_LBUTTONDOWN:
 		{
 			g_pInputManager->LeftMouseButtonDown();
@@ -181,6 +207,8 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
 				int pos_x = GET_X_LPARAM(lParam);
 				int pos_y = GET_Y_LPARAM(lParam);
 				g_pInputManager->LeftMouseDrag(pos_x - pThis->m_iPreviousX, pos_y - pThis->m_iPreviousY);
+				pThis->m_iPreviousX = pos_x;
+				pThis->m_iPreviousY = pos_y;
 			}
 			break;
 			// this message is read when the window is closed
