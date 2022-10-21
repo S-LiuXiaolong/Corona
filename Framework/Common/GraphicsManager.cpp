@@ -91,7 +91,6 @@ namespace Corona
     void GraphicsManager::InitConstants()
     {
         // Initialize the world/model matrix to the identity matrix.
-        InitCameraMatrix();
         BuildIdentityMatrix(m_worldMatrix);
     }
 
@@ -110,10 +109,10 @@ namespace Corona
     {
 		auto& scene = g_pSceneManager->GetSceneForRendering();
 		auto pCameraNode = scene.GetFirstCameraNode();
-		if (pCameraNode)
-		{
-			pCameraNode->InitMatrix();
-		}
+// 		if (pCameraNode)
+// 		{
+// 			pCameraNode->InitMatrix();
+// 		}
     }
 
     void GraphicsManager::CalculateCameraMatrix()

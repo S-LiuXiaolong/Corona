@@ -49,16 +49,12 @@ void EditorLogic::DrawDebugInfo()
 
 void EditorLogic::OnLeftKeyDown()
 {
-    // auto& scene = g_pSceneManager->GetSceneForRendering();
-    // auto pCameraNode = scene.GetFirstCameraNode();
-    // if (pCameraNode) {
-    //     auto local_axis = pCameraNode->GetLocalAxis(); 
-    //     Vector3f camera_x_axis;
-    //     memcpy(camera_x_axis.data, local_axis[0], sizeof(camera_x_axis));
-
-    //     // move camera along its local axis x direction
-    //     pCameraNode->MoveBy(camera_x_axis);
-    // }
+    auto& scene = g_pSceneManager->GetSceneForRendering();
+    auto pCameraNode = scene.GetFirstCameraNode();
+    if (pCameraNode) {
+        // move camera along its local axis x direction
+        pCameraNode->Strafe(-0.1f);
+    }
 }
 
 void EditorLogic::OnRightKeyDown()
@@ -73,6 +69,12 @@ void EditorLogic::OnRightKeyDown()
     //     // move along camera local axis -x direction
     //     pCameraNode->MoveBy(camera_x_axis * -1.0f);
     // }
+    auto& scene = g_pSceneManager->GetSceneForRendering();
+    auto pCameraNode = scene.GetFirstCameraNode();
+    if (pCameraNode) {
+        // move camera along its local axis x direction
+        pCameraNode->Strafe(0.1f);
+    }
 }
 
 void EditorLogic::OnUpKeyDown()
@@ -90,10 +92,8 @@ void EditorLogic::OnUpKeyDown()
 	auto& scene = g_pSceneManager->GetSceneForRendering();
 	auto pCameraNode = scene.GetFirstCameraNode();
 	if (pCameraNode) {
-		auto screen_width = g_pApp->GetConfiguration().screenWidth;
-		auto screen_height = g_pApp->GetConfiguration().screenHeight;
-		// move camera along its local axis -y direction
-		pCameraNode->RotateBy(10.0f / screen_width * PI, 0.0f, 0.0f);
+		// move camera along its local axis z direction
+		pCameraNode->Walk(0.1f);
 	}
 }
 
@@ -112,10 +112,8 @@ void EditorLogic::OnDownKeyDown()
 	auto& scene = g_pSceneManager->GetSceneForRendering();
 	auto pCameraNode = scene.GetFirstCameraNode();
 	if (pCameraNode) {
-		auto screen_width = g_pApp->GetConfiguration().screenWidth;
-		auto screen_height = g_pApp->GetConfiguration().screenHeight;
-		// move camera along its local axis -y direction
-        pCameraNode->Pitch(20.0f / screen_width * PI);
+		// move camera along its local axis z direction
+		pCameraNode->Walk(-0.1f);
 	}
 }
 
@@ -125,13 +123,14 @@ void EditorLogic::OnAnalogStick(int id, float deltaX, float deltaY)
     {
         auto& scene = g_pSceneManager->GetSceneForRendering();
         auto pCameraNode = scene.GetFirstCameraNode();
-        if (pCameraNode) {
+        if (pCameraNode) 
+        {
             auto screen_width = g_pApp->GetConfiguration().screenWidth;
             auto screen_height = g_pApp->GetConfiguration().screenHeight;
             // move camera along its local axis -y direction
             // pCameraNode->RotateBy(deltaX / screen_width * PI, 0.0f, 0.0f);
-            pCameraNode->Pitch(deltaY / screen_width * PI);
-            pCameraNode->RotateY(deltaX / screen_width * PI);
+            pCameraNode->Pitch(-deltaY / screen_width * PI);
+            pCameraNode->RotateY(-deltaX / screen_width * PI);
         }
     }
 }

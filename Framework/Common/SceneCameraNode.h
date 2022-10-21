@@ -6,14 +6,18 @@ namespace Corona
     class SceneCameraNode : public SceneNode
     {
     public:
-        Vector3f m_Target = {0.0f}; // "look at" direction vector
+        Vector3f m_Target = { 0.0f }; // initial "look at" direction vector
 
         Vector3f WorldUp = { 0.0f, 1.0f, 0.0f };
 		Vector3f mRight = { 1.0f, 0.0f, 0.0f };
 		Vector3f mUp = { 0.0f, 1.0f, 0.0f };
 		Vector3f mLook = { 0.0f, 0.0f, 1.0f };
 
+        Vector3f mPosition = { 0.0f };
+
         std::shared_ptr<SceneObjectCamera> pCamera;
+
+        bool isInit = false;
 
     public:
         using SceneNode::SceneNode;
@@ -25,21 +29,21 @@ namespace Corona
         void SetTarget(Vector3f &target) { m_Target = target; };
         const Vector3f &GetTarget() { return m_Target; };
 
-        void InitMatrix()
-        {
-			Matrix4X4f result;
-			BuildIdentityMatrix(result);
+        // void InitMatrix()
+        // {
+		// 	Matrix4X4f result;
+		// 	BuildIdentityMatrix(result);
 
-			auto pTransform = Transforms.matrix;
-			Vector3f target = GetTarget();
-			Vector3f mPosition = { 0.0f, 0.0f, 0.0f };
-			TransformCoord(mPosition, pTransform);
+		// 	auto pTransform = Transforms.matrix;
+		// 	Vector3f target = GetTarget();
+		// 	Vector3f mPosition = { 0.0f, 0.0f, 0.0f };
+		// 	TransformCoord(mPosition, pTransform);
 
-			mLook = target - mPosition;
-			Normalize(mLook);
-			CrossProduct(mRight, WorldUp, mLook);
-			CrossProduct(mUp, mLook, mRight);
-        }
+		// 	mLook = target - mPosition;
+		// 	Normalize(mLook);
+		// 	CrossProduct(mRight, WorldUp, mLook);
+		// 	CrossProduct(mUp, mLook, mRight);
+        // }
         // TODO
         // set it from Matrix3X3f to Matrix4X4f cause of calculating conveniently
         // Matrix4X4f GetInitAxis() // Get local axis in the world space
@@ -56,6 +60,23 @@ namespace Corona
 
         Matrix4X4f GetViewMatrix()
         {
+            if (!isInit)
+            {
+				Matrix4X4f result;
+				BuildIdentityMatrix(result);
+
+				auto pTransform = Transforms.matrix;
+				Vector3f target = GetTarget();
+				// Vector3f mPosition = { 0.0f, 0.0f, 0.0f };
+				TransformCoord(mPosition, pTransform);
+
+				mLook = target - mPosition;
+				Normalize(mLook);
+				CrossProduct(mRight, WorldUp, mLook);
+				CrossProduct(mUp, mLook, mRight);
+
+                isInit = true;
+            }
             // auto& initAxis = GetInitAxis();
             Matrix4X4f result;
             auto pTransform = Transforms.matrix;
@@ -92,13 +113,13 @@ namespace Corona
             mUp = up;
             mLook = look;
 
-			DotProduct(result1, right, camera_position);
+			DotProduct(result1, right, mPosition);
 			result1 = -result1;
 
-			DotProduct(result2, up, camera_position);
+			DotProduct(result2, up, mPosition);
 			result2 = -result2;
 
-			DotProduct(result3, look, camera_position);
+			DotProduct(result3, look, mPosition);
 			result3 = -result3;
 
 			// Set the computed values in the view matrix.
@@ -108,7 +129,7 @@ namespace Corona
 								{result1, result2, result3, 1.0f}}} };
 
 			result = tmp;
-            // BuildViewMatrix(result, camera_position, look, up);
+            // BuildViewMatrix(result, camera_position, mLook, mUp);
 
             return result;
         }
@@ -132,5 +153,29 @@ namespace Corona
 			TransformCoord(mUp, R);
 			TransformCoord(mLook, R);
         }
+
+        void Strafe(float d)
+        {
+            // mPosition += d*mRight;
+            Vector3f s = { d };
+            Vector3f r = mRight;
+            Vector3f p = mPosition;
+
+            Vector3f res;
+            MulByElement(res, s, r);
+            mPosition = res + p;
+        }
+
+		void Walk(float d)
+		{
+			// mPosition += d*mRight;
+			Vector3f s = { d };
+			Vector3f l = mLook;
+			Vector3f p = mPosition;
+
+			Vector3f res;
+			MulByElement(res, s, l);
+			mPosition = res + p;
+		}
     };
 }

@@ -22,7 +22,7 @@ namespace Corona
 
 	void InputManager::UpArrowKeyDown()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Up Arrow Key Down!" << endl;
 	#endif
 		g_pGameLogic->OnUpKeyDown();
@@ -35,7 +35,7 @@ namespace Corona
 
 	void InputManager::UpArrowKeyUp()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Up Arrow Key Up!" << endl;
 	#endif
 		g_pGameLogic->OnUpKeyUp();
@@ -44,7 +44,7 @@ namespace Corona
 
 	void InputManager::DownArrowKeyDown()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Down Arrow Key Down!" << endl;
 	#endif
 		g_pGameLogic->OnDownKeyDown();
@@ -57,7 +57,7 @@ namespace Corona
 
 	void InputManager::DownArrowKeyUp()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Down Arrow Key Up!" << endl;
 	#endif
 		g_pGameLogic->OnDownKeyUp();
@@ -66,7 +66,7 @@ namespace Corona
 
 	void InputManager::LeftArrowKeyDown()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Left Arrow Key Down!" << endl;
 	#endif
 		g_pGameLogic->OnLeftKeyDown();
@@ -79,7 +79,7 @@ namespace Corona
 
 	void InputManager::LeftArrowKeyUp()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Left Arrow Key Up!" << endl;
 	#endif
 		g_pGameLogic->OnLeftKeyUp();
@@ -88,7 +88,7 @@ namespace Corona
 
 	void InputManager::RightArrowKeyDown()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Right Arrow Key Down!" << endl;
 	#endif
 		g_pGameLogic->OnRightKeyDown();
@@ -101,7 +101,7 @@ namespace Corona
 
 	void InputManager::RightArrowKeyUp()
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] Right Arrow Key Up!" << endl;
 	#endif
 		g_pGameLogic->OnRightKeyUp();
@@ -110,7 +110,7 @@ namespace Corona
 
 	void InputManager::AsciiKeyDown(char keycode)
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] ASCII Key Down! (" << keycode << ")" << endl;
 	#endif
 		switch (keycode)
@@ -133,7 +133,7 @@ namespace Corona
 
 	void InputManager::AsciiKeyUp(char keycode)
 	{
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		cerr << "[InputManager] ASCII Key Up! (" << keycode << ")" << endl;
 	#endif
 		switch (keycode)
