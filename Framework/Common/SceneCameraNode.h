@@ -154,6 +154,7 @@ namespace Corona
 			TransformCoord(mLook, R);
         }
 
+        // TODO: Temporary for testing
         void Strafe(float d)
         {
             // mPosition += d*mRight;

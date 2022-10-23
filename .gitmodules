@@ -19,3 +19,6 @@
 [submodule "External/src/stb"]
 	path = External/src/stb
 	url = https://github.com/nothings/stb.git
+[submodule "External/src/bullet3"]
+	path = External/src/bullet3
+	url = https://github.com/S-LiuXiaolong/bullet3.git

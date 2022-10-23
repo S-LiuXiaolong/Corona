@@ -194,12 +194,14 @@ LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM 
 			pThis->m_bInDrag = true;
 			pThis->m_iPreviousX = GET_X_LPARAM(lParam);
 			pThis->m_iPreviousY = GET_Y_LPARAM(lParam);
+			SetCapture(hWnd);
 		}
 		break;
 	case WM_LBUTTONUP:
 		{
 			g_pInputManager->LeftMouseButtonUp();
 			pThis->m_bInDrag = false;
+			ReleaseCapture();
 		}
 		break;
 	case WM_MOUSEMOVE:
