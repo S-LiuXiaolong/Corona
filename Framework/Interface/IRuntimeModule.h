@@ -14,7 +14,7 @@ namespace Corona
 
         virtual void Tick() = 0;
         
-#ifdef DEBUG
+#ifdef _DEBUG
 	    virtual void DrawDebugInfo() {};
 #endif
     };

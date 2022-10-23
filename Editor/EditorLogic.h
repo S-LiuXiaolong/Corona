@@ -16,7 +16,7 @@ namespace Corona {
         void OnDownKeyDown() final;
 
         void OnAnalogStick(int id, float deltaX, float deltaY) final;
-#ifdef DEBUG
+#ifdef _DEBUG
         void DrawDebugInfo() final;
 #endif
     };

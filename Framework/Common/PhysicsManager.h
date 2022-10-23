@@ -11,7 +11,7 @@ namespace Corona
         virtual void Finalize();
         virtual void Tick();
 
-        virtual void CreateRigidBody(SceneNode& node, SceneObjectMesh& geometry);
+        virtual void CreateRigidBody(SceneNode& node, const SceneObjectMesh& geometry);
         virtual void DeleteRigidBody(SceneNode& node);
 
         virtual int CreateRigidBodies();

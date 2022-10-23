@@ -236,84 +236,182 @@ namespace Corona
         cout << "[GraphicsManager] GraphicsManager::RenderBuffers()" << endl;
     }
 
-#ifdef DEBUG
-    // add debug manager operations
+#ifdef _DEBUG
+    void GraphicsManager::RenderDebugBuffers()
+    {
+        cout << "[GraphicsManager] GraphicsManager::RenderDebugBuffers()" << endl;
+    }
+
+    void GraphicsManager::DrawPoint(const Point& point, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawPoint(" << point << ","
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawPointSet(const PointSet& point_set, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawPointSet(" << point_set.size() << ","
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawPointSet(const PointSet& point_set, const Matrix4X4f& trans, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawPointSet(" << point_set.size() << ","
+            << trans << "," 
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawLine(const Point& from, const Point& to, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawLine(" << from << ","
+            << to << "," 
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawLine(const PointList& vertices, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawLine(" << vertices.size() << ","
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawLine(const PointList& vertices, const Matrix4X4f& trans, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawLine(" << vertices.size() << ","
+            << trans << "," 
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawEdgeList(const EdgeList& edges, const Vector3f& color)
+    {
+        PointList point_list;
+
+        for (auto edge : edges)
+        {
+            point_list.push_back(edge->first);
+            point_list.push_back(edge->second);
+        }
+
+        DrawLine(point_list, color);
+    }
+
+    void GraphicsManager::DrawTriangle(const PointList& vertices, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawTriangle(" << vertices.size() << ","
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawTriangle(const PointList& vertices, const Matrix4X4f& trans, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawTriangle(" << vertices.size() << ","
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawTriangleStrip(const PointList& vertices, const Vector3f& color)
+    {
+        cout << "[GraphicsManager] GraphicsManager::DrawTriangleStrip(" << vertices.size() << ","
+            << color << ")" << endl;
+    }
+
+    void GraphicsManager::DrawPolygon(const Face& polygon, const Vector3f& color)
+    {
+        PointSet vertices;
+        PointList edges;
+        for (auto pEdge : polygon.Edges)
+        {
+            vertices.insert({pEdge->first, pEdge->second});
+            edges.push_back(pEdge->first);
+            edges.push_back(pEdge->second);
+        }
+        DrawLine(edges, color);
+
+        DrawPointSet(vertices, color);
+
+        DrawTriangle(polygon.GetVertices(), color);
+    }
+
+    void GraphicsManager::DrawPolygon(const Face& polygon, const Matrix4X4f& trans, const Vector3f& color)
+    {
+        PointSet vertices;
+        PointList edges;
+        for (auto pEdge : polygon.Edges)
+        {
+            vertices.insert({pEdge->first, pEdge->second});
+            edges.push_back(pEdge->first);
+            edges.push_back(pEdge->second);
+        }
+        DrawLine(edges, trans, color);
+
+        DrawPointSet(vertices, trans, color);
+
+        DrawTriangle(polygon.GetVertices(), trans, color);
+    }
+
+    void GraphicsManager::DrawPolyhydron(const Polyhedron& polyhedron, const Vector3f& color)
+    {
+        for (auto pFace : polyhedron.Faces)
+        {
+            DrawPolygon(*pFace, color);
+        }
+    }
+
+    void GraphicsManager::DrawPolyhydron(const Polyhedron& polyhedron, const Matrix4X4f& trans, const Vector3f& color)
+    {
+        for (auto pFace : polyhedron.Faces)
+        {
+            DrawPolygon(*pFace, trans, color);
+        }
+    }
+
+    void GraphicsManager::DrawBox(const Vector3f& bbMin, const Vector3f& bbMax, const Vector3f& color)
+    {
+        //  ******0--------3********
+        //  *****/:       /|********
+        //  ****1--------2 |********
+        //  ****| :      | |********
+        //  ****| 4- - - | 7********
+        //  ****|/       |/*********
+        //  ****5--------6**********
+
+        // vertices
+        PointPtr points[8];
+        for (int i = 0; i < 8; i++)
+            points[i] = make_shared<Point>(bbMin);
+        *points[0] = *points[2] = *points[3] = *points[7] = bbMax;
+        points[0]->data[0] = bbMin[0];
+        points[2]->data[1] = bbMin[1];
+        points[7]->data[2] = bbMin[2];
+        points[1]->data[2] = bbMax[2];
+        points[4]->data[1] = bbMax[1];
+        points[6]->data[0] = bbMax[0];
+
+        // edges
+        EdgeList edges;
+        
+        // top
+        edges.push_back(make_shared<Edge>(make_pair(points[0], points[3])));
+        edges.push_back(make_shared<Edge>(make_pair(points[3], points[2])));
+        edges.push_back(make_shared<Edge>(make_pair(points[2], points[1])));
+        edges.push_back(make_shared<Edge>(make_pair(points[1], points[0])));
+
+        // bottom
+        edges.push_back(make_shared<Edge>(make_pair(points[4], points[7])));
+        edges.push_back(make_shared<Edge>(make_pair(points[7], points[6])));
+        edges.push_back(make_shared<Edge>(make_pair(points[6], points[5])));
+        edges.push_back(make_shared<Edge>(make_pair(points[5], points[4])));
+
+        // side
+        edges.push_back(make_shared<Edge>(make_pair(points[0], points[4])));
+        edges.push_back(make_shared<Edge>(make_pair(points[1], points[5])));
+        edges.push_back(make_shared<Edge>(make_pair(points[2], points[6])));
+        edges.push_back(make_shared<Edge>(make_pair(points[3], points[7])));
+
+        DrawEdgeList(edges, color);
+    }
+
+    void GraphicsManager::ClearDebugBuffers()
+    {
+        cout << "[GraphicsManager] GraphicsManager::ClearDebugBuffers(void)" << endl;
+    }
 #endif
-//     // temporary. should be moved to scene manager and script engine (policy engine)
-//     void GraphicsManager::WorldRotateX(float radians)
-//     {
-//         Matrix4X4f rotationMatrix;
-//         MatrixRotationX(rotationMatrix, radians);
-//         m_worldMatrix = m_worldMatrix * rotationMatrix;
-//     }
-
-//     void GraphicsManager::WorldRotateY(float radians)
-//     {
-//         Matrix4X4f rotationMatrix;
-//         MatrixRotationY(rotationMatrix, radians);
-//         m_worldMatrix = m_worldMatrix * rotationMatrix;
-//     }
-
-// 	void GraphicsManager::WorldRotateZ(float radians)
-// 	{
-// 		Matrix4X4f rotationMatrix;
-// 		MatrixRotationZ(rotationMatrix, radians);
-// 		m_worldMatrix = m_worldMatrix * rotationMatrix;
-// 	}
-
-// 	void GraphicsManager::CameraRotateX(float radians)
-// 	{
-//         mPhi += radians;
-//         // mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
-// 	}
-
-// 	void GraphicsManager::CameraRotateZ(float radians)
-// 	{
-//         mTheta += radians;
-// 	}
-
-//     void GraphicsManager::CameraTranslationX(float distance)
-// 	{
-// 		position = position + Vector3f(distance, 0, 0);
-//         lookAt = lookAt + Vector3f(distance, 0, 0);
-// 	}
-
-// 	void GraphicsManager::CameraTranslationY(float distance)
-// 	{
-//         position = position + Vector3f(0, distance, 0);
-//         lookAt = lookAt + Vector3f(0, distance, 0);
-// 	}
-
-
-// 	void GraphicsManager::OnMouseDown(int x, int y)
-// 	{
-// 		mLastMousePos_x = x;
-// 		mLastMousePos_y = y;
-// 	}
-
-// 	void GraphicsManager::OnMouseMoveL(int x, int y)
-// 	{
-// 		// Make each pixel correspond to a quarter of a degree.
-// 		float dx = (0.05f * static_cast<float>(x - mLastMousePos_x)) * PI / 180;
-// 		float dy = (0.05f * static_cast<float>(y - mLastMousePos_y)) * PI / 180;
-//         mTheta -= dx;
-// 		mPhi -= dy;
-
-//         mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
-// 	}
-
-// 	void GraphicsManager::OnMouseMoveR(int x, int y)
-// 	{
-// // 		float dx = 0.0005f * static_cast<float>(x - mLastMousePos_x);
-// // 		float dy = 0.0005f * static_cast<float>(y - mLastMousePos_y);
-// // 
-// // 		position = position + Vector3f(-dy, dx, 0.0f);
-// // 		lookAt = lookAt + Vector3f(-dy, dx, 0.0f);
-// 	}
-
-// 	void GraphicsManager::OnMouseWheel(int delta)
-// 	{
-//          fieldOfView += 0.05f * delta * PI / 180;
-// 	}
 
 }

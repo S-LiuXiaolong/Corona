@@ -7,7 +7,7 @@
 using namespace Corona;
 using namespace std;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 int DebugManager::Initialize()
 {
     return 0;
@@ -25,7 +25,7 @@ void DebugManager::Tick()
     if(m_bDrawDebugInfo)
     {
         DrawDebugInfo();
-        g_pPhysicsManager->DrawDebugInfo();
+        // g_pPhysicsManager->DrawDebugInfo();
         g_pGameLogic->DrawDebugInfo();
     }
 }
@@ -50,15 +50,15 @@ void DebugManager::DrawAxis()
     g_pGraphicsManager->DrawLine(from, to, color);
 
     // y - axis
-    from.Set({0.0f, -1000.0f, 0.0f});
-    to.Set({0.0f, 1000.0f, 0.0f});
-    color.Set({0.0f, 1.0f, 0.0f});
+    from = {0.0f, -1000.0f, 0.0f};
+    to = {0.0f, 1000.0f, 0.0f};
+    color = {0.0f, 1.0f, 0.0f};
     g_pGraphicsManager->DrawLine(from, to, color);
 
     // z - axis
-    from.Set({0.0f, 0.0f, -1000.0f});
-    to.Set({0.0f, 0.0f, 1000.0f});
-    color.Set({0.0f, 0.0f, 1.0f});
+    from = {0.0f, 0.0f, -1000.0f};
+    to = {0.0f, 0.0f, 1000.0f};
+    color = {0.0f, 0.0f, 1.0f};
     g_pGraphicsManager->DrawLine(from, to, color);
 }
 

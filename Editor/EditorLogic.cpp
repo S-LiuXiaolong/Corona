@@ -20,10 +20,11 @@ int EditorLogic::Initialize()
     else
     {
         cout << "[EditorLogic] Loading Splash Scene" << endl;
-        result = g_pSceneManager->LoadScene("Scene/Suzanne/Suzanne.gltf");
+        // result = g_pSceneManager->LoadScene("Scene/Suzanne/Suzanne.gltf");
         // result = g_pSceneManager->LoadScene("Scene/DamagedHelmet/DamagedHelmet.gltf");
+        // result = g_pSceneManager->LoadScene("Scene/Sponza/Sponza.gltf");
         // result = g_pSceneManager->LoadScene("Scene/ABeautifulGame/ABeautifulGame.gltf");
-        // result = g_pSceneManager->LoadScene("Scene/Lantern/Lantern.gltf");
+        result = g_pSceneManager->LoadScene("Scene/Lantern/Lantern.gltf");
         // result = g_pSceneManager->LoadScene("Scene/MetalRoughSpheres/MetalRoughSpheres.gltf");
         // result = g_pSceneManager->LoadScene("Scene/FlightHelmet/FlightHelmet.gltf");
         // result = g_pSceneManager->LoadScene("Scene/SciFiHelmet/SciFiHelmet.gltf");
@@ -41,7 +42,7 @@ void EditorLogic::Tick()
 {
 }
 
-#ifdef DEBUG
+#ifdef _DEBUG
 void EditorLogic::DrawDebugInfo()
 {
 }

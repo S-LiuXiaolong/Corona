@@ -1,6 +1,7 @@
 #pragma once
 #include "IRuntimeModule.h"
 #include "geommath.h"
+#include "Polyhedron.h"
 
 namespace Corona
 {
@@ -33,7 +34,7 @@ namespace Corona
         // void OnMouseMoveR(int x, int y);
         // void OnMouseWheel(int delta);
 
-#ifdef DEBUG
+#ifdef _DEBUG
         virtual void DrawPoint(const Point& point, const Vector3f& color);
         virtual void DrawPointSet(const PointSet& point_set, const Vector3f& color);
         virtual void DrawPointSet(const PointSet& point_set, const Matrix4X4f& trans, const Vector3f& color);
@@ -64,6 +65,9 @@ namespace Corona
         virtual void CalculateLights();
         virtual void UpdateConstants();
         virtual void RenderBuffers();
+#ifdef _DEBUG
+        virtual void RenderDebugBuffers();
+#endif
 
     protected:
         struct DrawFrameContext 

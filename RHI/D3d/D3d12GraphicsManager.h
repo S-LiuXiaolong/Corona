@@ -69,7 +69,8 @@ namespace Corona
         ID3D12DescriptorHeap*           m_pDsvHeap = nullptr;               // an array of descriptors of GPU objects
         ID3D12DescriptorHeap*           m_pCbvHeap = nullptr;                   // an array of descriptors of GPU objects
         ID3D12DescriptorHeap*           m_pSamplerHeap;                     // an array of descriptors of GPU objects
-        ID3D12PipelineState*            m_pPipelineState = nullptr;         // an object maintains the state of all currently set shaders
+        std::unordered_map<std::string, ID3D12PipelineState*>            
+                                        m_pPipelineState;                   // an object maintains the state of all currently set shaders
                                                                             // and certain fixed function state objects
                                                                             // such as the input assembler, tesselator, rasterizer and output manager
         ID3D12GraphicsCommandList*      m_pCommandList = nullptr;           // a list to store GPU commands, which will be submitted to GPU to execute when done

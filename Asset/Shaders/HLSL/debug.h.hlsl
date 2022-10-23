@@ -1,0 +1,37 @@
+#ifndef __STDCBUFFER_H__
+#define __STDCBUFFER_H__
+
+struct a2v_default
+{
+	float3 Position		: POSITION;
+    float3 color        : COLOR;
+};
+
+// ? it seems 4 float4x4 exceed the maximum of a constant buffer (i don't know)
+cbuffer PerFrameConstants : register(b0)
+{
+    float4x4 m_worldMatrix;
+	// float4x4 m_viewMatrix;
+	// float4x4 m_projectionMatrix;
+	float4x4 m_worldViewMatrix;
+	float4x4 m_worldViewProjectionMatrix; // this 5 matrix cannot live together
+};
+
+cbuffer PerBatchConstants : register(b1)
+{
+	float4x4 m_objectMatrix;
+};
+
+#endif // !__STDCBUFFER_H__
+
+#ifndef __VSOUTPUT_H__
+#define __VSOUTPUT_H__
+
+struct default_vert_output
+{
+    float4 Position      : SV_POSITION;
+    float3 color         : COLOR;
+};
+
+#endif // !__VSOUTPUT_H__
+

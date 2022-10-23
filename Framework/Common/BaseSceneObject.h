@@ -22,6 +22,21 @@ namespace Corona
         kSceneObjectTypeTrack = "TRAC"_i32
     };
 
+    ENUM(SceneObjectCollisionType) {
+        kSceneObjectCollisionTypeNone   =   "CNON"_i32,
+        kSceneObjectCollisionTypeSphere =   "CSPH"_i32,
+        kSceneObjectCollisionTypeBox    =   "CBOX"_i32,
+        kSceneObjectCollisionTypeCylinder = "CCYL"_i32,
+        kSceneObjectCollisionTypeCapsule  = "CCAP"_i32,
+        kSceneObjectCollisionTypeCone   =   "CCON"_i32,
+        kSceneObjectCollisionTypeMultiSphere = "CMUL"_i32,
+        kSceneObjectCollisionTypeConvexHull =  "CCVH"_i32,
+        kSceneObjectCollisionTypeConvexMesh =  "CCVM"_i32,
+        kSceneObjectCollisionTypeBvhMesh =  "CBVM"_i32,
+        kSceneObjectCollisionTypeHeightfield = "CHIG"_i32,
+        kSceneObjectCollisionTypePlane  =   "CPLN"_i32,
+    };
+
     using namespace xg;
     class BaseSceneObject
     {

@@ -1,5 +1,5 @@
 #pragma once
-#ifdef DEBUG
+#ifdef _DEBUG
 #include "IRuntimeModule.h"
 
 namespace Corona {

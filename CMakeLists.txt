@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(CoronaEngine)
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Ability")
+include_directories("${PROJECT_SOURCE_DIR}/Framework/Algorism")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Common")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/GeomMath")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Geometries")

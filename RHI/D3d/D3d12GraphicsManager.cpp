@@ -806,8 +806,8 @@ namespace Corona
     // this is the function that loads and prepares the shaders
     bool D3d12GraphicsManager::InitializeShaders() {
         HRESULT hr = S_OK;
-		const char* vsFilename = "Shaders/HLSL/default.vert.cso";
-		const char* fsFilename = "Shaders/HLSL/default.frag.cso";
+		const char* vsFilename = "Shaders/HLSL/pbr.vert.cso";
+		const char* fsFilename = "Shaders/HLSL/pbr.frag.cso";
 
         // load the shaders
         Buffer vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
@@ -880,7 +880,7 @@ namespace Corona
         psod.DSVFormat = DXGI_FORMAT_D32_FLOAT;
         psod.SampleDesc.Count = 1;
 
-        if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState))))
+        if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState["opaque"]))))
         {
             return hr;
         }
@@ -890,12 +890,37 @@ namespace Corona
             if (FAILED(hr = m_pDev->CreateCommandList(0, 
                         D3D12_COMMAND_LIST_TYPE_DIRECT, 
                         m_pCommandAllocator, 
-                        m_pPipelineState, 
+                        m_pPipelineState["opaque"], 
                         IID_PPV_ARGS(&m_pCommandList))))
             {
                 return false;
             }
         }
+
+		// vsFilename = "Shaders/HLSL/debug.vert.cso";
+		// fsFilename = "Shaders/HLSL/debug.frag.cso";
+
+        // // load the shaders
+        // vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
+        // pixelShader = g_pAssetLoader->SyncOpenAndReadBinary(fsFilename);
+
+        // vertexShaderByteCode.pShaderBytecode = vertexShader.GetData();
+        // vertexShaderByteCode.BytecodeLength = vertexShader.GetDataSize();
+
+        // pixelShaderByteCode.pShaderBytecode = pixelShader.GetData();
+        // pixelShaderByteCode.BytecodeLength = pixelShader.GetDataSize();
+
+        // // create the input layout object
+        // D3D12_INPUT_ELEMENT_DESC ied[] =
+        // {
+        //     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        //     {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        // };
+
+        // psod.VS             = vertexShaderByteCode;
+        // psod.PS             = pixelShaderByteCode;
+        // psod.InputLayout    = { ied, _countof(ied) };
+        // psod.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
         return hr;
     }
@@ -903,7 +928,10 @@ namespace Corona
 	void D3d12GraphicsManager::ClearShaders()
 	{
 		SafeRelease(&m_pCommandList);
-		SafeRelease(&m_pPipelineState);
+        for (auto _it : m_pPipelineState)
+        {
+		    SafeRelease(&_it.second);
+        }
 	}
 
     bool D3d12GraphicsManager::InitializeBuffers()
@@ -1098,7 +1126,7 @@ namespace Corona
         // however, when ExecuteCommandList() is called on a particular command 
         // list, that command list can then be reset at any time and must be before 
         // re-recording.
-        if (FAILED(hr = m_pCommandList->Reset(m_pCommandAllocator, m_pPipelineState)))
+        if (FAILED(hr = m_pCommandList->Reset(m_pCommandAllocator, m_pPipelineState["opaque"])))
         {
             return hr;
         }
@@ -1119,7 +1147,7 @@ namespace Corona
         dsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
         m_pCommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
-        // clear the back buffer to a deep blue
+        // clear the back buffer to blue
         const FLOAT clearColor[] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
         m_pCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
         m_pCommandList->ClearDepthStencilView(m_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <limits>
 #include <math.h>
+#include <unordered_set>
+#include <assert.h>
 #include "include/CrossProduct.h"
 #include "include/DotProduct.h"
 #include "include/MulByElement.h"
@@ -686,5 +688,67 @@ namespace Corona
         Matrix8X8f result;
         ispc::IDCT8X8(matrix, result);
         return result;
+    }
+
+    typedef Vector3Type<float> Point;
+    typedef std::shared_ptr<Point> PointPtr;
+    typedef std::unordered_set<PointPtr> PointSet;
+    typedef std::vector<PointPtr> PointList;
+    typedef std::pair<PointPtr, PointPtr> Edge;
+    inline bool operator==(const Edge& a, const Edge& b)
+    {
+        return (a.first == b.first && a.second == b.second) || (a.first == b.second && a.second == b.first);
+    }
+    typedef std::shared_ptr<Edge> EdgePtr;
+    inline bool operator==(const EdgePtr& a, const EdgePtr& b)
+    {
+        return (a->first == b->first && a->second == b->second) || (a->first == b->second && a->second == b->first);
+    }
+    typedef std::unordered_set<EdgePtr> EdgeSet;
+    typedef std::vector<EdgePtr> EdgeList;
+    struct Face
+    {
+        EdgeList    Edges;
+        Vector3f    Normal;
+        PointList GetVertices() const 
+        {
+            PointList vertices;
+            for (auto edge : Edges)
+            {
+                vertices.push_back(edge->first);
+            }
+
+            return vertices;
+        }
+    };
+    typedef std::shared_ptr<Face> FacePtr;
+    typedef std::unordered_set<FacePtr> FaceSet;
+    typedef std::vector<FacePtr> FaceList;
+
+    inline float PointToPlaneDistance(const PointList& vertices, const Point& point)
+    {
+        Vector3f normal;
+        float distance;
+        assert(vertices.size() > 2);
+        auto A = vertices[0];
+        auto B = vertices[1];
+        auto C = vertices[2];
+        CrossProduct(normal, *B - *A, *C - *A);
+        Normalize(normal);
+        DotProduct(distance, normal, point - *A);
+
+        return distance;
+    }
+
+    inline bool isPointAbovePlane(const PointList& vertices, const Point& point)
+    {
+        return PointToPlaneDistance(vertices, point) > 0;
+    }
+
+    inline bool isPointAbovePlane(const FacePtr& pface, const Point& point)
+    {
+        assert(pface->Edges.size() > 2);
+        PointList vertices = {pface->Edges[0]->first, pface->Edges[1]->first, pface->Edges[2]->first};
+        return isPointAbovePlane(vertices, point);
     }
 }
