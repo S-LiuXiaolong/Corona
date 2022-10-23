@@ -1002,7 +1002,11 @@ namespace Corona
                 startVertex += vertexCount;
 
                 auto material_index = pMesh->GetMaterial();
-                auto material = scene.LinearMaterials[material_index].lock();
+                std::shared_ptr<SceneObjectMaterial> material = nullptr;
+                if (material_index < scene.LinearMaterials.size())
+                {
+                    material = scene.LinearMaterials[material_index].lock();
+                }
 
                 if (material)
                 {
