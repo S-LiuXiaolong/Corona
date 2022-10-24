@@ -102,11 +102,12 @@ namespace Corona
         g_pInputManager->Tick();
         // g_pPhysicsManager->Tick();
         // g_pAnimationManager->Tick();
+#ifdef _DEBUG
+		g_pDebugManager->Tick();
+#endif
         g_pGraphicsManager->Tick();
         g_pGameLogic->Tick();
-#ifdef DEBUG
-        g_pDebugManager->Tick();
-#endif
+
     }
 
     bool BaseApplication::IsQuit()

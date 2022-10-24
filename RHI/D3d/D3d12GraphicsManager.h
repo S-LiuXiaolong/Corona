@@ -23,6 +23,11 @@ namespace Corona
         virtual void Clear();
         virtual void Draw();
 
+#ifdef _DEBUG
+        void DrawLine(const Point& from, const Point& to, const Vector3f& color) override;
+        void InitializeDebugBuffers();
+#endif
+
     protected:
         bool SetPerFrameShaderParameters();
         bool SetPerBatchShaderParameters(int32_t index);
@@ -83,7 +88,18 @@ namespace Corona
         std::map<std::string, int32_t>  m_TextureIndex;
         std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_VertexBufferView;                 // a view of the vertex buffer
         std::vector<D3D12_INDEX_BUFFER_VIEW>        m_IndexBufferView;                  // a view of the vertex buffer
-
+#ifdef _DEBUG
+        std::vector<ID3D12Resource*>    m_DebugBuffers;
+        std::vector<D3D12_VERTEX_BUFFER_VIEW>       m_DebugVertexBufferView;
+        std::vector<D3D12_INDEX_BUFFER_VIEW>        m_DebugIndexBufferView;
+		struct DebugVertex
+		{
+			Vector3f pos;
+			Vector3f color;
+		};
+        std::vector<DebugVertex>       m_DebugVertice;
+        std::vector<uint32_t>          m_DebugIndices;
+#endif
         struct PerBatchConstants
         {
             Matrix4X4f objectMatrix;

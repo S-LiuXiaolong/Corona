@@ -204,6 +204,186 @@ namespace Corona
         return hr;
     }
 
+#ifdef _DEBUG
+    void D3d12GraphicsManager::DrawLine(const Point& from, const Point& to, const Vector3f& color)
+    {
+        m_DebugVertice.push_back({ from , color });
+        m_DebugVertice.push_back({ to, color });
+        Point middle;
+        MulByElement(middle, from + to, Point({ 0.5f, 0.5f, 0.5f }));
+        m_DebugVertice.push_back({ middle, color });
+
+        m_DebugIndices.push_back(m_DebugIndices.size());
+        m_DebugIndices.push_back(m_DebugIndices.size());
+        m_DebugIndices.push_back(m_DebugIndices.size());
+    }
+
+    void D3d12GraphicsManager::InitializeDebugBuffers()
+    {
+        HRESULT hr;
+
+		ID3D12Resource* pDebugVertexBufferUploadHeap;
+
+		// create vertex GPU heap 
+		D3D12_HEAP_PROPERTIES prop = {};
+		prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask = 1;
+		prop.VisibleNodeMask = 1;
+
+		D3D12_RESOURCE_DESC resourceDesc = {};
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.Alignment = 0;
+		// size in byte of resource
+		// TODO
+		resourceDesc.Width = m_DebugVertice.size() * sizeof(DebugVertex);
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* pDebugVertexBuffer;
+
+		if (FAILED(hr = m_pDev->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&pDebugVertexBuffer)
+		)))
+		{
+			return;
+		}
+
+		prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask = 1;
+		prop.VisibleNodeMask = 1;
+
+		if (FAILED(hr = m_pDev->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&pDebugVertexBufferUploadHeap)
+		)))
+		{
+			return;
+		}
+
+		D3D12_SUBRESOURCE_DATA debugVertexData = {};
+		debugVertexData.pData = m_DebugVertice.data();
+
+		UpdateSubresources<1>(m_pCommandList, pDebugVertexBuffer, pDebugVertexBufferUploadHeap, 0, 0, 1, &debugVertexData);
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = pDebugVertexBuffer;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		m_pCommandList->ResourceBarrier(1, &barrier);
+
+		// initialize the vertex buffer view
+		D3D12_VERTEX_BUFFER_VIEW debugVertexBufferView;
+        debugVertexBufferView.BufferLocation = pDebugVertexBuffer->GetGPUVirtualAddress();
+		// TODO: automatically calculate stride and size
+        debugVertexBufferView.StrideInBytes = sizeof(DebugVertex);
+        debugVertexBufferView.SizeInBytes = m_DebugVertice.size() * sizeof(DebugVertex);
+		m_DebugVertexBufferView.push_back(debugVertexBufferView);
+
+		m_DebugBuffers.push_back(pDebugVertexBuffer);
+        m_DebugBuffers.push_back(pDebugVertexBufferUploadHeap);
+
+        // INDEX
+		ID3D12Resource* pDebugIndexBufferUploadHeap;
+
+		// create index GPU heap 
+		prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask = 1;
+		prop.VisibleNodeMask = 1;
+
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.Alignment = 0;
+		// size in byte of resource
+		// TODO
+		resourceDesc.Width = m_DebugIndices.size() * 4;
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* pDebugIndexBuffer;
+
+		if (FAILED(hr = m_pDev->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&pDebugIndexBuffer)
+		)))
+		{
+			return;
+		}
+
+		prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask = 1;
+		prop.VisibleNodeMask = 1;
+
+		if (FAILED(hr = m_pDev->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&pDebugIndexBufferUploadHeap)
+		)))
+		{
+			return;
+		}
+
+		D3D12_SUBRESOURCE_DATA debugIndexData = {};
+		debugIndexData.pData = m_DebugIndices.data();
+
+		UpdateSubresources<1>(m_pCommandList, pDebugIndexBuffer, pDebugIndexBufferUploadHeap, 0, 0, 1, &debugIndexData);
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = pDebugIndexBuffer;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		m_pCommandList->ResourceBarrier(1, &barrier);
+
+		// initialize the Index buffer view
+		D3D12_INDEX_BUFFER_VIEW debugIndexBufferView;
+		debugIndexBufferView.BufferLocation = pDebugIndexBuffer->GetGPUVirtualAddress();
+        debugIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
+		// TODO: automatically calculate stride and size
+		debugIndexBufferView.SizeInBytes = m_DebugIndices.size() * 4;
+		m_DebugIndexBufferView.push_back(debugIndexBufferView);
+
+		m_DebugBuffers.push_back(pDebugIndexBuffer);
+		m_DebugBuffers.push_back(pDebugIndexBufferUploadHeap);
+	}
+#endif
+
     HRESULT D3d12GraphicsManager::CreateVertexBuffer(std::vector<VertexBasicAttribs>& vertex_array)
     {
         HRESULT hr;
@@ -897,30 +1077,47 @@ namespace Corona
             }
         }
 
-		// vsFilename = "Shaders/HLSL/debug.vert.cso";
-		// fsFilename = "Shaders/HLSL/debug.frag.cso";
+        // PSO for debug
+		vsFilename = "Shaders/HLSL/debug.vert.cso";
+		fsFilename = "Shaders/HLSL/debug.frag.cso";
 
-        // // load the shaders
-        // vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
-        // pixelShader = g_pAssetLoader->SyncOpenAndReadBinary(fsFilename);
+        // load the shaders
+        vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
+        pixelShader = g_pAssetLoader->SyncOpenAndReadBinary(fsFilename);
 
-        // vertexShaderByteCode.pShaderBytecode = vertexShader.GetData();
-        // vertexShaderByteCode.BytecodeLength = vertexShader.GetDataSize();
+        vertexShaderByteCode.pShaderBytecode = vertexShader.GetData();
+        vertexShaderByteCode.BytecodeLength = vertexShader.GetDataSize();
 
-        // pixelShaderByteCode.pShaderBytecode = pixelShader.GetData();
-        // pixelShaderByteCode.BytecodeLength = pixelShader.GetDataSize();
+        pixelShaderByteCode.pShaderBytecode = pixelShader.GetData();
+        pixelShaderByteCode.BytecodeLength = pixelShader.GetDataSize();
 
-        // // create the input layout object
-        // D3D12_INPUT_ELEMENT_DESC ied[] =
-        // {
-        //     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-        //     {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-        // };
+        // create the input layout object
+        D3D12_INPUT_ELEMENT_DESC ied_debug[] =
+        {
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+            {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        };
 
-        // psod.VS             = vertexShaderByteCode;
-        // psod.PS             = pixelShaderByteCode;
-        // psod.InputLayout    = { ied, _countof(ied) };
-        // psod.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		psod.pRootSignature = m_pRootSignature;
+		psod.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psod.SampleMask = UINT_MAX;
+		psod.RasterizerState = rsd;
+		psod.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		psod.NumRenderTargets = 1;
+		psod.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		psod.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		psod.SampleDesc.Count = 1;
+
+        psod.VS             = vertexShaderByteCode;
+        psod.PS             = pixelShaderByteCode;
+        psod.InputLayout    = { ied_debug, _countof(ied_debug) };
+        psod.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+        psod.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+
+		if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState["debug"]))))
+		{
+			return hr;
+		}
 
         return hr;
     }
@@ -937,6 +1134,12 @@ namespace Corona
     bool D3d12GraphicsManager::InitializeBuffers()
     {
         HRESULT hr = S_OK;
+
+#ifdef _DEBUG
+        InitializeDebugBuffers();
+        m_DebugVertice.clear();
+        m_DebugIndices.clear();
+#endif
 
         if (FAILED(hr = CreateDepthStencil())) {
             return hr;
@@ -1249,6 +1452,26 @@ namespace Corona
 		    m_pCommandList->DrawIndexedInstanced(dbc.IndexCount, 1, 0, 0, 0);
 		    i++;
 		}
+
+        m_pCommandList->SetPipelineState(m_pPipelineState["debug"]);
+        m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
+        for (int i = 0; i < 3; i++)
+        {
+			// CBV Per Batch
+			D3D12_GPU_DESCRIPTOR_HANDLE cbvSrvHandle;
+			uint32_t nFrameResourceDescriptorOffset = m_nFrameIndex * (2 * kMaxSceneObjectCount);
+			cbvSrvHandle.ptr = m_pCbvHeap->GetGPUDescriptorHandleForHeapStart().ptr
+				+ (nFrameResourceDescriptorOffset + i * 2 /* 2 descriptors for each batch */) * m_nCbvSrvDescriptorSize;
+			m_pCommandList->SetGraphicsRootDescriptorTable(0, cbvSrvHandle);
+
+			// select which vertex buffer(s) to use
+			m_pCommandList->IASetVertexBuffers(0, 1, &m_DebugVertexBufferView[0]);
+			// select which index buffer to use
+			m_pCommandList->IASetIndexBuffer(&m_DebugIndexBufferView[0]);
+
+            m_pCommandList->DrawIndexedInstanced(3, 1, i * 3, 0, 0);
+        }
+        
 
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;

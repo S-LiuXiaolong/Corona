@@ -137,3 +137,16 @@ float3 fresnelSchlick(float cosTheta, float3 F0)
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 // ----------------------------------------------------------------------------
+
+struct a2v_debug
+{
+	float3 Position		: POSITION;
+    float3 Color        : COLOR;
+};
+
+struct debug_vert_output
+{
+    float4 Position      : SV_POSITION;
+    float3 Color         : COLOR;
+	float2 TextureUV     : TEXCOORD0;
+};
