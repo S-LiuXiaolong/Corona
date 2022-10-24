@@ -85,11 +85,11 @@ namespace Corona
 			Matrix4X4f mat = Matrix;
 
 			MatrixTranslation(matForCalc, Translation.x, Translation.y, Translation.z);
-			mat = mat * matForCalc;
+			mat = matForCalc * mat;
 			MatrixRotationQuaternion(matForCalc, Rotation);
-			mat = mat * matForCalc;
+			mat = matForCalc * mat;
 			MatrixScale(matForCalc, Scale.x, Scale.y, Scale.z);
-			mat = mat * matForCalc;
+			mat = matForCalc * mat;
 
 			return mat;
 		}

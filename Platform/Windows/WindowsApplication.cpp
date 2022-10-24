@@ -76,28 +76,28 @@ void WindowsApplication::Tick()
     BaseApplication::Tick();
 
 	{
-		if(GetAsyncKeyState('D') & 0x8000)
+		if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
 			g_pInputManager->LeftMouseDrag(-15.0f, 0);
 
-		if(GetAsyncKeyState('A') & 0x8000)
+		if(GetAsyncKeyState(VK_LEFT) & 0x8000)
 			g_pInputManager->LeftMouseDrag(15.0f, 0);
 
-		if(GetAsyncKeyState('S') & 0x8000)
+		if(GetAsyncKeyState(VK_DOWN) & 0x8000)
 			g_pInputManager->LeftMouseDrag(0, -15.0f);
 
-		if(GetAsyncKeyState('W') & 0x8000)
+		if(GetAsyncKeyState(VK_UP) & 0x8000)
 			g_pInputManager->LeftMouseDrag(0, 15.0f);
 
-		if(GetAsyncKeyState(VK_UP) & 0x8000)
+		if(GetAsyncKeyState('W') & 0x8000)
 			g_pInputManager->UpArrowKeyDown();
 
-		if(GetAsyncKeyState(VK_DOWN) & 0x8000)
+		if(GetAsyncKeyState('S') & 0x8000)
 			g_pInputManager->DownArrowKeyDown();
 
-		if(GetAsyncKeyState(VK_LEFT) & 0x8000)
+		if(GetAsyncKeyState('A') & 0x8000)
 			g_pInputManager->LeftArrowKeyDown();
 
-		if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		if(GetAsyncKeyState('D') & 0x8000)
 			g_pInputManager->RightArrowKeyDown();
 	}
 
