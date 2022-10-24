@@ -191,6 +191,7 @@ namespace Corona
         Transpose(m_DrawFrameContext.m_worldMatrix);
         Transpose(m_DrawFrameContext.m_worldViewMatrix);
         Transpose(m_DrawFrameContext.m_worldViewProjectionMatrix);
+        
     }
 
     void GraphicsManager::CalculateLights()

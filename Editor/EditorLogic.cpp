@@ -25,7 +25,7 @@ int EditorLogic::Initialize()
         result = g_pSceneManager->LoadScene("Scene/test/test.gltf");
         // result = g_pSceneManager->LoadScene("Scene/ABeautifulGame/ABeautifulGame.gltf");
         // result = g_pSceneManager->LoadScene("Scene/Lantern/Lantern.gltf");
-        // result = g_pSceneManager->LoadScene("Scene/MetalRoughSpheres/MetalRoughSpheres.gltf");
+        // result = g_pSceneManager->LoadScene("Scene/NormalTangentTest/NormalTangentTest.gltf");
         // result = g_pSceneManager->LoadScene("Scene/FlightHelmet/FlightHelmet.gltf");
         // result = g_pSceneManager->LoadScene("Scene/SciFiHelmet/SciFiHelmet.gltf");
     }

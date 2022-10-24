@@ -101,9 +101,12 @@ namespace Corona
 
 			for (auto *p = m_Parent; p != nullptr; p = p->m_Parent)
 			{
-				auto temp = p->GetLocalTransform();
 				mat = mat * p->GetLocalTransform();
 			}
+
+			Matrix4X4f scaleMat;
+			MatrixScale(scaleMat, -1, 1, 1);
+			mat = mat * scaleMat;
 			return mat;
 		}
 
@@ -113,7 +116,7 @@ namespace Corona
 			const auto NodeTransform = (pMesh || m_type == "Camera") ? GetGlobalTransform() : BuildIdentityMatrix();
 			if (pMesh)
 			{
-				this->Transforms.matrix = NodeTransform;
+				Transforms.matrix = NodeTransform;
 				// if (pSkin != nullptr)
 				// {
 				//     // Update join matrices
@@ -131,7 +134,7 @@ namespace Corona
 
 			if (m_type == "Camera")
 			{
-				this->Transforms.matrix = NodeTransform;
+				Transforms.matrix = NodeTransform;
 			}
 
 			for (auto &child : m_Children)

@@ -113,13 +113,13 @@ namespace Corona
             mUp = up;
             mLook = look;
 
-			DotProduct(result1, right, mPosition);
+			DotProduct(result1, mPosition, right);
 			result1 = -result1;
 
-			DotProduct(result2, up, mPosition);
+			DotProduct(result2, mPosition, up);
 			result2 = -result2;
 
-			DotProduct(result3, look, mPosition);
+			DotProduct(result3, mPosition, look);
 			result3 = -result3;
 
 			// Set the computed values in the view matrix.
