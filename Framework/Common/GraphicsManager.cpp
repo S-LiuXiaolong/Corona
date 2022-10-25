@@ -217,7 +217,7 @@ namespace Corona
         // }
 
         // only support default light at the time
-        m_DrawFrameContext.m_lightPosition = { 0.0f, 1.0f, 1.0f};
+        m_DrawFrameContext.m_lightPosition = { 0.0f, 1.0f, 0.0f};
         m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
 

@@ -233,16 +233,6 @@ namespace Corona
                     };
             }
 
-            // Node with children
-            if (gltf_node.children.size() > 0)
-            {
-                for (size_t i = 0; i < gltf_node.children.size(); i++)
-                {
-                    LoadNode(pNewNode.get(), gltf_model.nodes[gltf_node.children[i]], gltf_node.children[i],
-                             gltf_model, VertexData, IndexData, ConvertedBuffers, pScene);
-                }
-            }
-
             if (gltf_node.mesh >= 0)
             {
                 const tinygltf::Mesh &gltf_mesh = gltf_model.meshes[gltf_node.mesh];
@@ -437,6 +427,18 @@ namespace Corona
 
             // use dynamic_cast and dynamic_pointer_cast to get various Nodes (?)
             pScene->LUT_Name_LinearNodes[gltf_node.name] = pNewNode;
+
+			// temporary for light
+			if (gltf_node.extensions.find("KHR_lights_punctual") != gltf_node.extensions.end())
+            {
+                pScene->LUT_Name_LinearNodes[parent->GetName()]->m_type = "Light";
+				m_LightNodes[parent->GetName()] = pScene->LUT_Name_LinearNodes[parent->GetName()];
+				auto _it = gltf_node.extensions.find("KHR_lights_punctual");
+                pNewNode->m_type = "Light_Orietation";
+				pNewNode->lightIndex = ((*_it).second).Get("light").GetNumberAsInt();
+                m_LightNodes[pNewNode->GetName()] = pNewNode;
+			}
+
             if (parent)
             {
                 parent->m_Children.push_back(std::move(pNewNode));
@@ -476,6 +478,17 @@ namespace Corona
                     pScene->RootNodes.push_back(std::move(pNewNodeForTest));
                 }
             }
+
+			// Node with children
+			if (gltf_node.children.size() > 0)
+			{
+				for (size_t i = 0; i < gltf_node.children.size(); i++)
+				{
+					LoadNode(pNewNode.get(), gltf_model.nodes[gltf_node.children[i]], gltf_node.children[i],
+						gltf_model, VertexData, IndexData, ConvertedBuffers, pScene);
+				}
+			}
+
         }
 
         void ParseImage(std::string &imagePath, std::shared_ptr<Image> &pImage)
@@ -754,6 +767,36 @@ namespace Corona
 //             }
         }
 
+        void LoadLights(const tinygltf::Model& gltf_model, std::shared_ptr<Scene>& pScene)
+        {
+			auto& m_Lights = pScene->Lights;
+			auto& m_LightNodes = pScene->LightNodes;
+
+            for (auto light : gltf_model.lights)
+            {
+                if (light.type == "point")
+                {
+                    std::shared_ptr<SceneObjectOmniLight> m_Light(new SceneObjectOmniLight());
+					Vector4f color = Vector4f(Vector3f(light.color), 1.0f);
+					m_Light->SetColor("light", color);
+                    m_Light->SetParam("intensity", light.intensity);
+
+                    m_Lights[light.name] = m_Light;
+                }
+                else if (light.type == "spot")
+                {
+					std::shared_ptr<SceneObjectSpotLight> m_Light(new SceneObjectSpotLight());
+					Vector4f color = Vector4f(Vector3f(light.color), 1.0f);
+					m_Light->SetColor("light", color);
+					m_Light->SetParam("intensity", light.intensity);
+                    m_Light->SetInnerConeAngle(light.spot.innerConeAngle);
+                    m_Light->SetOuterConeAngle(light.spot.outerConeAngle);
+
+					m_Lights[light.name] = m_Light;
+                }
+            }
+        }
+
         virtual std::shared_ptr<Scene> Parse(const std::string &FileName) final
         {
             std::shared_ptr<Scene> pScene(new Scene(FileName));
@@ -803,6 +846,8 @@ namespace Corona
 
             // LoadTextureSamplers(pDevice, gltf_model);
             LoadMaterialsAndTextures(gltf_model, pScene, basePath);
+
+            LoadLights(gltf_model, pScene);
 
             // these are vertices and indices of all primitive (accumulated)
             std::vector<VertexBasicAttribs> VertexData;

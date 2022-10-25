@@ -15,7 +15,8 @@ namespace Corona
     public:
         void SetIfCastShadow(bool shadow) { m_bCastShadows = shadow; };
 
-        void SetColor(std::string &attrib, Vector4f &color)
+        // TODO: clean these
+        void SetColor(std::string attrib, Vector4f& color)
         {
             if (attrib == "light")
             {
@@ -23,7 +24,7 @@ namespace Corona
             }
         };
 
-        void SetParam(std::string &attrib, float param)
+        void SetParam(std::string attrib, float param)
         {
             if (attrib == "intensity")
             {
@@ -60,6 +61,15 @@ namespace Corona
         float m_fOuterConeAngle;
 
     public:
+
+        void SetInnerConeAngle(float innerConeAngle)
+        {
+            m_fInnerConeAngle = innerConeAngle;
+        }
+        void SetOuterConeAngle(float outerConeAngle)
+        {
+            m_fOuterConeAngle = outerConeAngle;
+        }
         SceneObjectSpotLight(void) : SceneObjectLight(), m_fInnerConeAngle(0.0f), m_fOuterConeAngle(0.7853981634f){}; // PI / 4 = 0.785
 
         friend std::ostream &operator<<(std::ostream &out, const SceneObjectSpotLight &obj);

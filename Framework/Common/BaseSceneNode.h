@@ -19,7 +19,9 @@ namespace Corona
 	public:
 		std::string m_strName;
 		std::string m_type;
+		// temporary
 		std::shared_ptr<SceneObjectMesh> pMesh;
+		int32_t lightIndex = -1;
 
 		SceneNode *m_Parent = nullptr;
 		// ? index
@@ -56,12 +58,22 @@ namespace Corona
 			pMesh(std::move(other.pMesh)),
 			m_Parent(std::move(other.m_Parent)),
 			Index(std::move(other.Index)),
+			lightIndex(std::move(other.lightIndex)),
 			m_Children(std::move(other.m_Children)),
 			Matrix(std::move(other.Matrix)),
 			Translation(std::move(other.Translation)),
 			Scale(std::move(other.Scale)),
 			Rotation(std::move(other.Rotation)),
-			Transforms(std::move(other.Transforms)) {};
+			Transforms(std::move(other.Transforms)) 
+		{
+			printf("right here");
+		};
+
+		SceneNode(SceneNode* other)
+		{
+			printf("here");
+		};
+
 
 		virtual ~SceneNode(){};
 
@@ -113,7 +125,7 @@ namespace Corona
 		void UpdateTransforms()
 		{
 			// Add these in derivative classed
-			const auto NodeTransform = (pMesh || m_type == "Camera") ? GetGlobalTransform() : BuildIdentityMatrix();
+			const auto NodeTransform = (pMesh || m_type == "Camera" || m_type == "Light" || m_type == "Light_Orietation") ? GetGlobalTransform() : BuildIdentityMatrix();
 			if (pMesh)
 			{
 				Transforms.matrix = NodeTransform;
@@ -133,6 +145,16 @@ namespace Corona
 			}
 
 			if (m_type == "Camera")
+			{
+				Transforms.matrix = NodeTransform;
+			}
+
+			if (m_type == "Light")
+			{
+				Transforms.matrix = NodeTransform;
+			}
+
+			if (m_type == "Light_Orietation")
 			{
 				Transforms.matrix = NodeTransform;
 			}

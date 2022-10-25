@@ -39,7 +39,7 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 
         float distance = length(m_lightPosition - input.WorldPosition);
         float attenuation = 1.0 / (distance * distance);
-        float3 radiance = m_lightColor * attenuation;
+        float3 radiance = m_lightColor * attenuation * 10;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   
@@ -65,12 +65,12 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
         float NdotL = max(dot(N, L), 0.0);        
 
         // add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL * 25;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 	}
 
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
-    float3 ambient = 0.5 * albedo * ao;
+    float3 ambient = 0.03 * albedo * ao;
     float3 color = Lo + ambient;
     // HDR tonemapping
     color = color / (color + 1.0);

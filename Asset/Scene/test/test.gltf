@@ -3,6 +3,52 @@
         "generator" : "Khronos glTF Blender I/O v1.6.16",
         "version" : "2.0"
     },
+    "extensionsUsed" : [
+        "KHR_lights_punctual"
+    ],
+    "extensionsRequired" : [
+        "KHR_lights_punctual"
+    ],
+    "extensions" : {
+        "KHR_lights_punctual" : {
+            "lights" : [
+                {
+                    "color" : [
+                        1,
+                        1,
+                        1
+                    ],
+                    "intensity" : 10,
+                    "spot" : {
+                        "innerConeAngle" : 0.09134028340900446,
+                        "outerConeAngle" : 0.107459157705307
+                    },
+                    "type" : "spot",
+                    "name" : "SpotLight_000"
+                },
+                {
+                    "color" : [
+                        1,
+                        1,
+                        1
+                    ],
+                    "intensity" : 10,
+                    "type" : "point",
+                    "name" : "PointLight_000"
+                },
+                {
+                    "color" : [
+                        1,
+                        1,
+                        1
+                    ],
+                    "intensity" : 10,
+                    "type" : "point",
+                    "name" : "PointLight_001"
+                }
+            ]
+        }
+    },
     "scene" : 0,
     "scenes" : [
         {
@@ -40,7 +86,10 @@
                 45,
                 46,
                 47,
-                48
+                48,
+                50,
+                52,
+                54
             ]
         }
     ],
@@ -544,6 +593,87 @@
                 -0.09416553378105164,
                 0.01697981357574463,
                 -0.22063007950782776
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 0
+                }
+            },
+            "name" : "SpotLightNode_000_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                49
+            ],
+            "name" : "SpotLightNode_000",
+            "rotation" : [
+                0.06726086139678955,
+                0.13524934649467468,
+                0.21662160754203796,
+                0.964499294757843
+            ],
+            "translation" : [
+                -0.5408002138137817,
+                1.1257686614990234,
+                0.2690904140472412
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 1
+                }
+            },
+            "name" : "PointLightNode_000_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                51
+            ],
+            "name" : "PointLightNode_000",
+            "translation" : [
+                0.19287951290607452,
+                0.08467836678028107,
+                -0.2452126294374466
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 2
+                }
+            },
+            "name" : "PointLightNode_001_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                53
+            ],
+            "name" : "PointLightNode_001",
+            "translation" : [
+                -0.1301390528678894,
+                -0.04641316086053848,
+                0.2142002433538437
             ]
         }
     ],
