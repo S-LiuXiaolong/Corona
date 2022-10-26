@@ -12,8 +12,8 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 
     // used for ABeautifulGame
 	float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
-	float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
-	float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
+	float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
+	float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
     float3 normal = normalMap.Sample(samp0, input.TextureUV).rgb;
     float3 ao = AOMap.Sample(samp0, input.TextureUV).r;
 
@@ -27,7 +27,8 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
     float3 N = NormalSampleToWorldSpace(normal, input.vNorm, input.vTangent);
 
 	// Fresnel reflectance at normal incidence (for metals use albedo color).
-	float3 F0 = lerp(Fdielectric, albedo, metallic);
+	float3 F0 = 0.04;
+    F0 = lerp(F0, albedo, metallic);
 
 	// Direct lighting calculation for analytical lights.
 	float3 Lo = 0.0;
@@ -42,7 +43,9 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 
         float distance = length(light.m_lightPosition - input.WorldPosition.xyz);
         float attenuation = 1.0 / (distance * distance);
-        float3 radiance = light.m_lightColor * attenuation * 10;
+        // float3 radiance = light.m_lightColor * attenuation * 10;
+        // TODO
+        float3 radiance = light.m_lightColor * ComputeSpotLightStrength(light, input.WorldPosition.xyz, N);
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   

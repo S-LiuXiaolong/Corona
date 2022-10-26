@@ -20,8 +20,8 @@
                     ],
                     "intensity" : 10,
                     "spot" : {
-                        "innerConeAngle" : 0.12036097263335499,
-                        "outerConeAngle" : 0.14160114526748657
+                        "innerConeAngle" : 0.24369683094798233,
+                        "outerConeAngle" : 0.28670215606689453
                     },
                     "type" : "spot",
                     "name" : "SpotLight_000"
@@ -34,11 +34,25 @@
                     ],
                     "intensity" : 10,
                     "spot" : {
-                        "innerConeAngle" : 0.11723097927618742,
-                        "outerConeAngle" : 0.13791880011558533
+                        "innerConeAngle" : 0.24749961619868266,
+                        "outerConeAngle" : 0.2911760210990906
                     },
                     "type" : "spot",
                     "name" : "SpotLight_001"
+                },
+                {
+                    "color" : [
+                        1,
+                        0,
+                        0
+                    ],
+                    "intensity" : 10,
+                    "spot" : {
+                        "innerConeAngle" : 0.1688527669092994,
+                        "outerConeAngle" : 0.1986503154039383
+                    },
+                    "type" : "spot",
+                    "name" : "\u805a\u5149"
                 }
             ]
         }
@@ -50,7 +64,8 @@
             "nodes" : [
                 0,
                 2,
-                4
+                4,
+                6
             ]
         }
     ],
@@ -119,6 +134,37 @@
                 4.311348915100098,
                 0.7783058881759644,
                 4.3443098068237305
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 2
+                }
+            },
+            "name" : "\u805a\u5149_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                5
+            ],
+            "name" : "\u805a\u5149",
+            "rotation" : [
+                -0.6975804567337036,
+                0.08091457188129425,
+                -0.08173885941505432,
+                0.7072150707244873
+            ],
+            "translation" : [
+                0.009290143847465515,
+                -0.005378931760787964,
+                -4.853039741516113
             ]
         }
     ],

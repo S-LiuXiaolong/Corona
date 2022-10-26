@@ -6,9 +6,6 @@ static const float Epsilon = 0.00001;
 
 static const uint NumLights = 3;
 
-// Constant normal incidence Fresnel factor for all dielectrics.
-static const float3 Fdielectric = 0.04;
-
 struct a2v_pbr
 {
 	float3 Position		: POSITION;
@@ -133,6 +130,52 @@ float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
 float3 fresnelSchlick(float cosTheta, float3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+// ----------------------------------------------------------------------------
+float linear_interpolate(float t, float begin, float end)
+{
+    if (t < begin)
+    {
+        return 1.0f;
+    }
+    else if (t > end)
+    {
+        return 0.0f;
+    }
+    else
+    {
+        return (end - t) / (end - begin);
+    }
+}
+
+float CalcAttentuation(float angle, float fallOffStart, float fallOffEnd)
+{
+	// smooth
+	float begin_atten = fallOffStart;
+	float end_atten = fallOffEnd;
+	float tmp = linear_interpolate(angle, begin_atten, end_atten);
+	float atten = 3.0f * pow(tmp, 2.0f) - 2.0f * pow(tmp, 3.0f);
+
+	return atten;
+}
+
+float3 ComputeSpotLightStrength(Light light, float3 pos, float3 normal)
+{
+    // The vector from the light to the surface.
+    float3 lightVec = normalize(pos - light.m_lightPosition);
+	float3 L = -lightVec;
+
+	float lightToSurfAngle = acos(dot(lightVec, normalize(light.m_lightDirection)));
+
+    // Scale light down by Lambert's cosine law.
+    float ndotl = max(dot(normal, L), 0.0f);
+    float3 lightStrength = light.m_lightIntensity * ndotl;
+
+	// Attenuate light by angle.
+	float atten = CalcAttentuation(lightToSurfAngle, light.m_fallOffStart, light.m_fallOffEnd);
+	
+	lightStrength *= atten;
+	return lightStrength;
 }
 // ----------------------------------------------------------------------------
 

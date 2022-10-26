@@ -228,8 +228,10 @@ namespace Corona
 				auto trans_ptr = pLightNode->Transforms.matrix;
 				light.m_lightPosition = { 0.0f, 0.0f, 0.0f};
                 TransformCoord(light.m_lightPosition, trans_ptr);
-				light.m_lightDirection = { 0.0f, -1.0f, 0.0f };
-				TransformCoord(light.m_lightDirection, trans_ptr);
+                // TransformCoord cannot be used here
+                Vector4f direction = { 0.0f, -1.0f, 0.0f, 0.0f };
+				Transform(direction, trans_ptr);
+				light.m_lightDirection = direction.xyz;
 
                 auto pOrientationNode = pLightNode->m_Children;
                 auto pLight = scene.LinearLights[pOrientationNode[0]->lightIndex].lock();
