@@ -1,4 +1,4 @@
-#include "pbr.h.hlsl"
+#include "Common.h.hlsl"
 
 pbr_vert_output pbr_vert_main(a2v_pbr input)
 {

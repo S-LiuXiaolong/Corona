@@ -121,7 +121,7 @@ namespace Corona
         std::vector<DrawBatchContext> m_DrawBatchContext;
 
         uint8_t*                        m_pCbvDataBegin = nullptr;
-		static const size_t				kSizePerFrameConstantBuffer = (sizeof(DrawFrameContext) + 255) & 256; // CB size is required to be 256-byte aligned.
+		static const size_t				kSizePerFrameConstantBuffer = (sizeof(DrawFrameContext) + 1023) & 1024; // CB size is required to be 1024-byte aligned.
 		static const size_t				kSizePerBatchConstantBuffer = (sizeof(DrawBatchContext) + 255) & 256; // CB size is required to be 256-byte aligned.
 		static const size_t				kSizeConstantBufferPerFrame = kSizePerFrameConstantBuffer + kSizePerBatchConstantBuffer * kMaxSceneObjectCount;
 

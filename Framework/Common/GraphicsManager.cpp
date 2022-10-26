@@ -124,6 +124,8 @@ namespace Corona
         {
 			auto transform = pCameraNode->GetViewMatrix();
 			m_viewMatrix = transform;
+            m_DrawFrameContext.m_cameraPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
+            Transform(m_DrawFrameContext.m_cameraPosition, transform);
 		}
 		else
         {
@@ -198,27 +200,64 @@ namespace Corona
     {
         // TODO
         auto& scene = g_pSceneManager->GetSceneForRendering();
-        // auto pLightNode = scene.GetFirstLight();
-        // if (pLightNode) 
-        // {
-        //     m_DrawFrameContext.m_lightPosition = { 0.0f, 0.0f, 0.0f };
-        //     TransformCoord(m_DrawFrameContext.m_lightPosition, *pLightNode->GetCalculatedTransform());
+//         auto pLightNode = scene.GetFirstLight();
+//         if (pLightNode) 
+//         {
+//             m_DrawFrameContext.m_lightPosition = { 0.0f, 0.0f, 0.0f };
+//             TransformCoord(m_DrawFrameContext.m_lightPosition, *pLightNode->GetCalculatedTransform());
+// 
+//             auto pLight = scene.GetLight(pLightNode->GetSceneObjectRef());
+//             if (pLight) {
+//                 m_DrawFrameContext.m_lightColor = pLight->GetColor().Value;
+//             }
+//         }
+//         else 
+//         {
+//             // use default build-in light 
+//             m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
+//             m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+//         }
+        int i = 0;
+        for (auto LightNode : scene.LightNodes)
+        {
+            Light light;
+            auto pLightNode = LightNode.second.lock();
+            if (!pLightNode) continue;
+            if (!pLightNode->m_Parent)
+            {
+				auto trans_ptr = pLightNode->Transforms.matrix;
+				light.m_lightPosition = { 0.0f, 0.0f, 0.0f};
+                TransformCoord(light.m_lightPosition, trans_ptr);
+				light.m_lightDirection = { 0.0f, -1.0f, 0.0f };
+				TransformCoord(light.m_lightDirection, trans_ptr);
 
-        //     auto pLight = scene.GetLight(pLightNode->GetSceneObjectRef());
-        //     if (pLight) {
-        //         m_DrawFrameContext.m_lightColor = pLight->GetColor().Value;
-        //     }
-        // }
-        // else 
-        // {
-        //     // use default build-in light 
-        //     m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
-        //     m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-        // }
+                auto pOrientationNode = pLightNode->m_Children;
+                auto pLight = scene.LinearLights[pOrientationNode[0]->lightIndex].lock();
+                if (pLight)
+                {
+                    light.m_lightColor = pLight->GetColor().xyz;
+                    light.m_lightIntensity = pLight->GetIntensity();
+                    if (pLight->GetType() == SceneObjectType::kSceneObjectTypeLightSpot)
+                    {
+                        auto pSpotLight = dynamic_pointer_cast<SceneObjectSpotLight>(pLight);
+                        light.m_fallOffStart = pSpotLight->GetInnerConeAngle();
+                        light.m_fallOffEnd = pSpotLight->GetOuterConeAngle();
+                    }
+                }
+                else
+                {
+                    assert(0);
+                }
 
-        // only support default light at the time
-        m_DrawFrameContext.m_lightPosition = { 0.0f, 1.0f, 0.0f};
-        m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+                m_DrawFrameContext.m_lights[i] = light;
+                ++i;
+            }
+
+        }
+
+		// // only support default light at the time
+		// m_DrawFrameContext.m_lightPosition = { 0.0f, 0.0f, 10.0f};
+		// m_DrawFrameContext.m_lightColor = { 0.0f, 0.0f, 1.0f, 1.0f }; // ARGB
     }
 
     bool GraphicsManager::InitializeBuffers()

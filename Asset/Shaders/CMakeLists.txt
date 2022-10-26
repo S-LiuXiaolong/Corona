@@ -28,30 +28,31 @@ IF(WIN32)
 
     foreach(SHADER IN LISTS HLSL_SHADER_SOURCES)
         set(SHADER_BIN ${SHADER_BIN_DIR}/${SHADER}.cso)
+        set(SHADER_PDB ${SHADER_BIN_DIR}/${SHADER}.pdb)
         if (SHADER MATCHES "^([a-zA-Z0-9_]*)\.vert$")
             add_custom_command(TARGET Engine_Asset_Shaders POST_BUILD
-                COMMAND ${DXC} -T vs_6_1 -E ${CMAKE_MATCH_1}_vert_main -Fo ${SHADER_BIN} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
+                COMMAND ${DXC} -T vs_6_1 -E ${CMAKE_MATCH_1}_vert_main -Fo ${SHADER_BIN} -Zi -Fd ${SHADER_PDB} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
                 COMMENT "Compile ${SHADER}.hlsl --> ${SHADER}.cso"
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL
                 DEPENDS ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL/${SHADER}.hlsl
             )
         elseif (SHADER MATCHES "^([a-zA-Z0-9_]*)\.frag$")
             add_custom_command(TARGET Engine_Asset_Shaders POST_BUILD
-                COMMAND ${DXC} -T ps_6_1 -E ${CMAKE_MATCH_1}_frag_main -Fo ${SHADER_BIN} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
+                COMMAND ${DXC} -T ps_6_1 -E ${CMAKE_MATCH_1}_frag_main -Fo ${SHADER_BIN} -Zi -Fd ${SHADER_PDB} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
                 COMMENT "Compile ${SHADER}.hlsl --> ${SHADER}.cso"
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL
                 DEPENDS ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL/${SHADER}.hlsl
             )
         elseif (SHADER MATCHES "^([a-zA-Z0-9_]*)\.comp$")
             add_custom_command(TARGET Engine_Asset_Shaders POST_BUILD
-                COMMAND ${DXC} -T cs_6_1 -E ${CMAKE_MATCH_1}_comp_main -Fo ${SHADER_BIN} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
+                COMMAND ${DXC} -T cs_6_1 -E ${CMAKE_MATCH_1}_comp_main -Fo ${SHADER_BIN} -Zi -Fd ${SHADER_PDB} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
                 COMMENT "Compile ${SHADER}.hlsl --> ${SHADER}.cso"
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL
                 DEPENDS ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL/${SHADER}.hlsl
             )
         elseif (SHADER MATCHES "^([a-zA-Z0-9_]*)\.geom$")
             add_custom_command(TARGET Engine_Asset_Shaders POST_BUILD
-                COMMAND ${DXC} -T gs_6_1 -E ${CMAKE_MATCH_1}_geom_main -Fo ${SHADER_BIN} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
+                COMMAND ${DXC} -T gs_6_1 -E ${CMAKE_MATCH_1}_geom_main -Fo ${SHADER_BIN} -Zi -Fd ${SHADER_PDB} -I ..\\..\\..\\ -I ..\\..\\..\\Framework\\Common ${SHADER}.hlsl
                 COMMENT "Compile ${SHADER}.hlsl --> ${SHADER}.cso"
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL
                 DEPENDS ${PROJECT_SOURCE_DIR}/Asset/Shaders/HLSL/${SHADER}.hlsl

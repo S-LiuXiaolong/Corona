@@ -1,4 +1,4 @@
-#include "pbr.h.hlsl"
+#include "Common.h.hlsl"
 
 debug_vert_output debug_vert_main(a2v_debug input)
 {

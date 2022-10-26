@@ -1,6 +1,7 @@
 #pragma once
 #include "IRuntimeModule.h"
 #include "geommath.h"
+#include "Scene.h"
 #include "Polyhedron.h"
 
 namespace Corona
@@ -70,6 +71,18 @@ namespace Corona
 #endif
 
     protected:
+        struct Light
+        {
+			Vector3f    m_lightPosition;
+			float       m_lightIntensity = 10.0f;
+			Vector3f    m_lightColor;
+            float       m_fallOffStart = 0.0f;
+			Vector3f    m_lightDirection;
+            float       m_fallOffEnd = PI / 4;
+        };
+
+        static const uint32_t NumLights = 3;
+
         struct DrawFrameContext 
         {
             Matrix4X4f  m_worldMatrix;
@@ -77,9 +90,9 @@ namespace Corona
 //             Matrix4X4f  m_projectionMatrix;
             Matrix4X4f  m_worldViewMatrix;
             Matrix4X4f  m_worldViewProjectionMatrix;
-            Vector3f    m_lightPosition;
-            Vector4f    m_lightColor;
             Vector4f    m_cameraPosition;
+
+            Light m_lights[3];
         };
 
         DrawFrameContext    m_DrawFrameContext;

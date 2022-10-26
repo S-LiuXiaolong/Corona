@@ -128,8 +128,8 @@ void matrix_test()
 	MatrixRotationQuaternion(mat1, q1);
 	QuaternionRotationYawPitchRoll(q2, PI / 3, PI / 4, PI / 6);
 	MatrixRotationQuaternion(mat2, q2);
-	auto q = q2 * q1;
-	MatrixRotationQuaternion(result1, q);
+	// auto q = q2 * q1;
+	// MatrixRotationQuaternion(result1, q);
 
 	MatrixRotationYawPitchRoll(mat3, PI / 2, PI / 4, PI / 3);
 	MatrixRotationYawPitchRoll(mat4, PI / 3, PI / 4, PI / 6);
@@ -147,6 +147,10 @@ int main()
 	cout << "Vector2f: ";
 	cout << x;
 
+	Matrix4X4f mat;
+	Quaternion q = { -0.7071067690849304, 0, 0, 0.7071067690849304 };
+	MatrixRotationQuaternion(mat, q);
+	Vector4f vec = { 0, 0, -1, 0 };
 
 	return 0;
 }

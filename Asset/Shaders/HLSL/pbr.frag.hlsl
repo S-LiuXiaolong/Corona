@@ -1,4 +1,4 @@
-#include "pbr.h.hlsl"
+#include "Common.h.hlsl"
 #include "LightingUtil.h.hlsl"
 
 float4 pbr_frag_main(pbr_vert_output input) : SV_Target
@@ -12,13 +12,15 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 
     // used for ABeautifulGame
 	float3 albedo = pow(colorMap.Sample(samp0, input.TextureUV).rgb, 2.2);
-	float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
-	float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
+	float metallic = physicsDescriptorMap.Sample(samp0, input.TextureUV).g;
+	float roughness = physicsDescriptorMap.Sample(samp0, input.TextureUV).b;
     float3 normal = normalMap.Sample(samp0, input.TextureUV).rgb;
     float3 ao = AOMap.Sample(samp0, input.TextureUV).r;
 
 	// Outgoing light direction (vector from world-space fragment position to the "camera").
-	float3 V = normalize(m_cameraPosition - input.WorldPosition).xyz;
+	float3 V = normalize((m_cameraPosition - input.WorldPosition).xyz);
+    // TODO: wrong here
+    // float3 V = normalize((-m_cameraPosition + input.WorldPosition).xyz);
 
 	// Get current fragment's normal and transform to world space (no normal map support yet).
 	// float3 N = input.vNorm;
@@ -29,21 +31,28 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
 
 	// Direct lighting calculation for analytical lights.
 	float3 Lo = 0.0;
-    float3 lightDir = normalize((input.WorldPosition - m_lightPosition).xyz);
-	// for(uint i=0; i<NumLights; ++i)
+	for(uint i = 0; i < NumLights; ++i)
 	{
+        Light light = m_lights[i];
+        float3 lightDir = normalize(input.WorldPosition.xyz - light.m_lightPosition);
 		float3 L = -lightDir;
         
 		// Half-vector between Li and Lo.
 		float3 H = normalize(V + L);
 
-        float distance = length(m_lightPosition - input.WorldPosition);
+        float distance = length(light.m_lightPosition - input.WorldPosition.xyz);
         float attenuation = 1.0 / (distance * distance);
-        float3 radiance = m_lightColor * attenuation * 10;
+        float3 radiance = light.m_lightColor * attenuation * 10;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
+        // float G   = GeometrySmith(N, V, L, roughness);      
+        float NdotV = max(dot(N, V), 0.0);
+        float NdotL = max(dot(N, L), 0.0);
+        float temp = N * 2;
+        float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+        float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+        float G = ggx1 * ggx2;
         float3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
            
         float3 numerator    = NDF * G * F; 
@@ -62,7 +71,7 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
         kD *= 1.0 - metallic;	  
 
         // scale light by NdotL
-        float NdotL = max(dot(N, L), 0.0);        
+        // float NdotL = max(dot(N, L), 0.0);        
 
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
@@ -78,4 +87,5 @@ float4 pbr_frag_main(pbr_vert_output input) : SV_Target
     color = pow(color, 1.0/2.2); 
 
     return float4(color + emissiveMap.Sample(samp0, input.TextureUV).rgb, 1.0);
+    // return float4(N, 1.0) + float4(color + emissiveMap.Sample(samp0, input.TextureUV).rgb, 1.0);
 }

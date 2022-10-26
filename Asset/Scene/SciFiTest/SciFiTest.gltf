@@ -1,0 +1,273 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.16",
+        "version" : "2.0"
+    },
+    "extensionsUsed" : [
+        "KHR_lights_punctual"
+    ],
+    "extensionsRequired" : [
+        "KHR_lights_punctual"
+    ],
+    "extensions" : {
+        "KHR_lights_punctual" : {
+            "lights" : [
+                {
+                    "color" : [
+                        0,
+                        1,
+                        1
+                    ],
+                    "intensity" : 10,
+                    "spot" : {
+                        "innerConeAngle" : 0.12036097263335499,
+                        "outerConeAngle" : 0.14160114526748657
+                    },
+                    "type" : "spot",
+                    "name" : "SpotLight_000"
+                },
+                {
+                    "color" : [
+                        1,
+                        0.3032054007053375,
+                        0.3032054007053375
+                    ],
+                    "intensity" : 10,
+                    "spot" : {
+                        "innerConeAngle" : 0.11723097927618742,
+                        "outerConeAngle" : 0.13791880011558533
+                    },
+                    "type" : "spot",
+                    "name" : "SpotLight_001"
+                }
+            ]
+        }
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0,
+                2,
+                4
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "SciFiHelmet"
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 0
+                }
+            },
+            "name" : "SpotLightNode_000_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                1
+            ],
+            "name" : "SpotLightNode_000",
+            "rotation" : [
+                0.2549664080142975,
+                0.017570825293660164,
+                0.5258887410163879,
+                0.8112486600875854
+            ],
+            "translation" : [
+                -4.892153739929199,
+                2.0390353202819824,
+                2.6045234203338623
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 1
+                }
+            },
+            "name" : "SpotLightNode_001_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                3
+            ],
+            "name" : "SpotLightNode_001",
+            "rotation" : [
+                0.27894046902656555,
+                -0.25680238008499146,
+                -0.5987125039100647,
+                0.7055409550666809
+            ],
+            "translation" : [
+                4.311348915100098,
+                0.7783058881759644,
+                4.3443098068237305
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "name" : "SciFiHelmet",
+            "normalTexture" : {
+                "index" : 0
+            },
+            "occlusionTexture" : {
+                "index" : 1
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 2
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 1
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "SciFiHelmet",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TANGENT" : 2,
+                        "TEXCOORD_0" : 3
+                    },
+                    "indices" : 4,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "sampler" : 0,
+            "source" : 2
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "SciFiHelmet_Normal",
+            "uri" : "SciFiHelmet_Normal.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "SciFiHelmet_AmbientOcclusion-SciFiHelmet_MetallicRoughness",
+            "uri" : "SciFiHelmet_AmbientOcclusion-SciFiHelmet_MetallicRoughness.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "SciFiHelmet_BaseColor",
+            "uri" : "SciFiHelmet_BaseColor.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 70074,
+            "max" : [
+                1.151152491569519,
+                1.4587184190750122,
+                1.2511277198791504
+            ],
+            "min" : [
+                -1.151152491569519,
+                -1.4587182998657227,
+                -1.2511286735534668
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 70074,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 70074,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 70074,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5125,
+            "count" : 70074,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 840888,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 840888,
+            "byteOffset" : 840888
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 1121184,
+            "byteOffset" : 1681776
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 560592,
+            "byteOffset" : 2802960
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 280296,
+            "byteOffset" : 3363552
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 3643848,
+            "uri" : "SciFiTest.bin"
+        }
+    ]
+}

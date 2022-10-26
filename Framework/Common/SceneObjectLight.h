@@ -4,6 +4,27 @@
 
 namespace Corona
 {
+	ENUM(AttenCurveType) {
+		kLinear = 0,
+			kSmooth = 1,
+			kInverse = 2,
+			kInverseSquare = 3
+	};
+
+	struct AttenCurve {
+		AttenCurveType type;
+		union AttenCurveParams {
+			struct LinearParam { float begin_atten; float end_atten; } linear_params;
+			struct SmoothParam { float begin_atten; float end_atten; } smooth_params;
+			struct InverseParam { float scale; float offset; float kl; float kc; } inverse_params;
+			struct InverseSquareParam { float scale; float offset; float kq; float kl; float kc; } inverse_squre_params;
+		} u;
+
+		AttenCurve() : type(AttenCurveType::kLinear),
+			u({ {0.0f, 1.0f} })
+		{}
+	};
+
     class SceneObjectLight : public BaseSceneObject
     {
     protected:
@@ -11,6 +32,9 @@ namespace Corona
         float m_fIntensity;
         float m_fRange; // 0.0 = infinite
         bool m_bCastShadows;
+
+    public:
+        std::string m_type;
 
     public:
         void SetIfCastShadow(bool shadow) { m_bCastShadows = shadow; };
@@ -37,7 +61,7 @@ namespace Corona
 
     protected:
         // can only be used as base class of delivered lighting objects
-        SceneObjectLight(void) : BaseSceneObject(SceneObjectType::kSceneObjectTypeLight),
+        SceneObjectLight(const SceneObjectType type) : BaseSceneObject(type),
                                 m_LightColor(Vector4f(1.0f)),
                                 m_fIntensity(100.0f),
                                 m_bCastShadows(false),
@@ -49,7 +73,7 @@ namespace Corona
     class SceneObjectOmniLight : public SceneObjectLight
     {
     public:
-        using SceneObjectLight::SceneObjectLight;
+        SceneObjectOmniLight(void) : SceneObjectLight(SceneObjectType::kSceneObjectTypeLightOmni) {}
 
         friend std::ostream &operator<<(std::ostream &out, const SceneObjectOmniLight &obj);
     };
@@ -70,7 +94,15 @@ namespace Corona
         {
             m_fOuterConeAngle = outerConeAngle;
         }
-        SceneObjectSpotLight(void) : SceneObjectLight(), m_fInnerConeAngle(0.0f), m_fOuterConeAngle(0.7853981634f){}; // PI / 4 = 0.785
+        float GetInnerConeAngle()
+        {
+            return m_fInnerConeAngle;
+        }
+        float GetOuterConeAngle()
+        {
+            return m_fOuterConeAngle;
+        }
+        SceneObjectSpotLight(void) : SceneObjectLight(SceneObjectType::kSceneObjectTypeLightSpot), m_fInnerConeAngle(0.0f), m_fOuterConeAngle(0.7853981634f){}; // PI / 4 = 0.785
 
         friend std::ostream &operator<<(std::ostream &out, const SceneObjectSpotLight &obj);
     };
@@ -78,7 +110,7 @@ namespace Corona
     class SceneObjectInfiniteLight : public SceneObjectLight
     {
     public:
-        using SceneObjectLight::SceneObjectLight;
+        SceneObjectInfiniteLight(void) : SceneObjectLight(SceneObjectType::kSceneObjectTypeLightInfi) {}
 
         friend std::ostream &operator<<(std::ostream &out, const SceneObjectInfiniteLight &obj);
     };

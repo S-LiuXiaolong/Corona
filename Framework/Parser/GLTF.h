@@ -770,6 +770,7 @@ namespace Corona
         void LoadLights(const tinygltf::Model& gltf_model, std::shared_ptr<Scene>& pScene)
         {
 			auto& m_Lights = pScene->Lights;
+            auto& m_LinearLights = pScene->LinearLights;
 			auto& m_LightNodes = pScene->LightNodes;
 
             for (auto light : gltf_model.lights)
@@ -780,8 +781,10 @@ namespace Corona
 					Vector4f color = Vector4f(Vector3f(light.color), 1.0f);
 					m_Light->SetColor("light", color);
                     m_Light->SetParam("intensity", light.intensity);
+                    m_Light->m_type = "point";
 
                     m_Lights[light.name] = m_Light;
+                    m_LinearLights.emplace_back(m_Light);
                 }
                 else if (light.type == "spot")
                 {
@@ -791,8 +794,10 @@ namespace Corona
 					m_Light->SetParam("intensity", light.intensity);
                     m_Light->SetInnerConeAngle(light.spot.innerConeAngle);
                     m_Light->SetOuterConeAngle(light.spot.outerConeAngle);
+                    m_Light->m_type = "spot";
 
 					m_Lights[light.name] = m_Light;
+                    m_LinearLights.emplace_back(m_Light);
                 }
             }
         }
