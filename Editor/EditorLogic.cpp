@@ -20,8 +20,8 @@ int EditorLogic::Initialize()
     else
     {
         cout << "[EditorLogic] Loading Splash Scene" << endl;
-        result = g_pSceneManager->LoadScene("Scene/test/test.gltf");
-        // result = g_pSceneManager->LoadScene("Scene/SciFiTest/SciFiTest.gltf");
+        // result = g_pSceneManager->LoadScene("Scene/test/test.gltf");
+        result = g_pSceneManager->LoadScene("Scene/SciFiTest/SciFiTest.gltf");
         // result = g_pSceneManager->LoadScene("Scene/DamagedHelmetTest/DamagedHelmetTest.gltf");
         // result = g_pSceneManager->LoadScene("Scene/box.glb");
         // result = g_pSceneManager->LoadScene("Scene/NormalTangentTest/NormalTangentTest.gltf");

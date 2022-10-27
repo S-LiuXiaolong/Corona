@@ -83,7 +83,7 @@ namespace Corona
 
         // Describe and create a render target view (RTV) descriptor heap.
         D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-        rtvHeapDesc.NumDescriptors = kFrameCount;
+        rtvHeapDesc.NumDescriptors = kFrameCount + 1; // +1 for MSAA Resolver
         rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
         rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
         if(FAILED(hr = m_pDev->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_pRtvHeap)))) {
@@ -148,6 +148,63 @@ namespace Corona
             rtvHandle.ptr += m_nRtvDescriptorSize;
         }
 
+        // Create intermediate MSAA RT
+        D3D12_RENDER_TARGET_VIEW_DESC renderTargetDesc = {};
+        renderTargetDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        renderTargetDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
+
+        D3D12_CLEAR_VALUE optimizedClearValue = {};
+        optimizedClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        optimizedClearValue.Color[0] = 0.690196097f;
+        optimizedClearValue.Color[1] = 0.768627524f;
+        optimizedClearValue.Color[2] = 0.870588303f;
+        optimizedClearValue.Color[3] = 1.000000000f;
+
+        D3D12_HEAP_PROPERTIES prop = {};
+        prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        prop.CreationNodeMask = 1;
+        prop.VisibleNodeMask = 1;
+        
+        D3D12_RESOURCE_DESC textureDesc = {};
+        textureDesc.MipLevels = 1;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.Width = g_pApp->GetConfiguration().screenWidth;
+        textureDesc.Height = g_pApp->GetConfiguration().screenHeight;
+        textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+        textureDesc.DepthOrArraySize = 1;
+        textureDesc.SampleDesc.Count = 4;
+        textureDesc.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
+        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+        if (FAILED(hr = m_pDev->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &textureDesc,
+            D3D12_RESOURCE_STATE_RENDER_TARGET,
+            &optimizedClearValue,
+            IID_PPV_ARGS(&m_pMsaaRenderTarget)
+        )))
+        {
+            return hr;
+        }
+
+        // Describe and create a SRV for the texture.
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
+        srvDesc.Texture2D.MipLevels = 4;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
+        size_t texture_id = static_cast<uint32_t>(m_TextureIndex.size());
+        srvHandle.ptr = m_pCbvHeap->GetCPUDescriptorHandleForHeapStart().ptr + (kTextureDescStartIndex + texture_id) * m_nCbvSrvDescriptorSize;
+        m_pDev->CreateShaderResourceView(m_pMsaaRenderTarget, &srvDesc, srvHandle);
+        m_TextureIndex["MSAA"] = texture_id;
+
+        m_pDev->CreateRenderTargetView(m_pMsaaRenderTarget, &renderTargetDesc, rtvHandle);
+
         return hr;
     }
 
@@ -158,7 +215,7 @@ namespace Corona
         // Create the depth stencil view.
         D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
         depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
-        depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+        depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
         depthStencilDesc.Flags = D3D12_DSV_FLAG_NONE;
 
         D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
@@ -181,10 +238,10 @@ namespace Corona
         resourceDesc.Width = width;
         resourceDesc.Height = height;
         resourceDesc.DepthOrArraySize = 1;
-        resourceDesc.MipLevels = 0;
+        resourceDesc.MipLevels = 1;
         resourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
-        resourceDesc.SampleDesc.Count = 1;
-        resourceDesc.SampleDesc.Quality = 0;
+        resourceDesc.SampleDesc.Count = 4;
+        resourceDesc.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
         resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
@@ -1058,7 +1115,8 @@ namespace Corona
         psod.NumRenderTargets = 1;
         psod.RTVFormats[0]  = DXGI_FORMAT_R8G8B8A8_UNORM;
         psod.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-        psod.SampleDesc.Count = 1;
+        psod.SampleDesc.Count = 4; // 4X MSAA
+        psod.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
 
         if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState["opaque"]))))
         {
@@ -1106,12 +1164,13 @@ namespace Corona
 		psod.NumRenderTargets = 1;
 		psod.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		psod.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-		psod.SampleDesc.Count = 1;
+        psod.SampleDesc.Count = 4; // 4X MSAA
+        psod.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
 
         psod.VS             = vertexShaderByteCode;
         psod.PS             = pixelShaderByteCode;
         psod.InputLayout    = { ied_debug, _countof(ied_debug) };
-        psod.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+        psod.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
         psod.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
 		if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState["debug"]))))
@@ -1342,14 +1401,16 @@ namespace Corona
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource = m_pRenderTargets[m_nFrameIndex];
-        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        barrier.Transition.pResource = m_pMsaaRenderTarget;
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
         barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_RENDER_TARGET;
         barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
         m_pCommandList->ResourceBarrier(1, &barrier);
 
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
-        rtvHandle.ptr = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + m_nFrameIndex * m_nRtvDescriptorSize;
+        // rtvHandle.ptr = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + m_nFrameIndex * m_nRtvDescriptorSize;
+        // bind the MSAA buffer
+        rtvHandle.ptr = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + kFrameCount * m_nRtvDescriptorSize;
         D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
         dsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
         m_pCommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
@@ -1358,7 +1419,6 @@ namespace Corona
         const FLOAT clearColor[] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
         m_pCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
         m_pCommandList->ClearDepthStencilView(m_pDsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    
 
         // Set necessary state.
         m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
@@ -1453,6 +1513,7 @@ namespace Corona
 		    i++;
 		}
 
+#ifdef _DEBUG
         m_pCommandList->SetPipelineState(m_pPipelineState["debug"]);
         m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
         for (int i = 0; i < 3; i++)
@@ -1471,15 +1532,52 @@ namespace Corona
 
             m_pCommandList->DrawIndexedInstanced(3, 1, i * 3, 0, 0);
         }
-        
+#endif
 
-        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource = m_pRenderTargets[m_nFrameIndex];
-        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-        barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_PRESENT;
-        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        m_pCommandList->ResourceBarrier(1, &barrier);
+		// Use ResolveSubresource method to implement MSAA
+		{
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = m_pMsaaRenderTarget;
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RESOLVE_SOURCE;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			m_pCommandList->ResourceBarrier(1, &barrier);
+
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = m_pRenderTargets[m_nFrameIndex];
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RESOLVE_DEST;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			m_pCommandList->ResourceBarrier(1, &barrier);
+
+			m_pCommandList->ResolveSubresource(m_pRenderTargets[m_nFrameIndex], 0, m_pMsaaRenderTarget, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = m_pMsaaRenderTarget;
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RESOLVE_SOURCE;
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			m_pCommandList->ResourceBarrier(1, &barrier);
+
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = m_pRenderTargets[m_nFrameIndex];
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RESOLVE_DEST;
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			m_pCommandList->ResourceBarrier(1, &barrier);
+		}
+
+        // barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        // barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        // barrier.Transition.pResource = m_pRenderTargets[m_nFrameIndex];
+        // barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        // barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_PRESENT;
+        // barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        // m_pCommandList->ResourceBarrier(1, &barrier);
 
         hr = m_pCommandList->Close();
 
