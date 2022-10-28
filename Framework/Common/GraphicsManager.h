@@ -1,5 +1,8 @@
 #pragma once
+#include "GfxStructures.h"
 #include "IRuntimeModule.h"
+#include "IDrawPass.h"
+#include "IShaderManager.h"
 #include "geommath.h"
 #include "Scene.h"
 #include "Polyhedron.h"
@@ -21,19 +24,16 @@ namespace Corona
         virtual void Clear();
         virtual void Draw();
 
-        // temporary. should be moved to scene manager and script engine (policy engine)
-        // void WorldRotateX(float radians);
-        // void WorldRotateY(float radians);
-        // void WorldRotateZ(float radians);
+        virtual void UseShaderProgram(const intptr_t shaderProgram);
+        virtual void SetPerFrameConstants(const DrawFrameContext& context);
+        virtual void DrawBatch(const DrawBatchContext& context);
+        virtual void DrawBatchDepthOnly(const DrawBatchContext& context);
 
-		// void CameraRotateX(float radians);
-		// void CameraRotateZ(float radians);
-        // void CameraTranslationX(float distance);
-        // void CameraTranslationY(float distance);
-        // void OnMouseDown(int x, int y);
-        // void OnMouseMoveL(int x, int y);
-        // void OnMouseMoveR(int x, int y);
-        // void OnMouseWheel(int delta);
+        virtual intptr_t GenerateShadowMapArray(uint32_t count);
+        virtual void BeginShadowMap(const Light& light, const intptr_t shadowmap, uint32_t layer_index);
+        virtual void EndShadowMap(const intptr_t shadowmap, uint32_t layer_index);
+        virtual void SetShadowMap(const intptr_t shadowmap);
+        virtual void DestroyShadowMap(intptr_t& shadowmap);
 
 #ifdef _DEBUG
         virtual void DrawPoint(const Point& point, const Vector3f& color);
@@ -71,37 +71,6 @@ namespace Corona
 #endif
 
     protected:
-        struct Light
-        {
-			Vector3f    m_lightPosition;
-			float       m_lightIntensity = 10.0f;
-			Vector3f    m_lightColor;
-            float       m_fallOffStart = 0.0f;
-			Vector3f    m_lightDirection;
-            float       m_fallOffEnd = PI / 4;
-        };
-
-        static const uint32_t NumLights = 3;
-
-        struct DrawFrameContext 
-        {
-            Matrix4X4f  m_worldMatrix;
-//             Matrix4X4f  m_viewMatrix;
-//             Matrix4X4f  m_projectionMatrix;
-            Matrix4X4f  m_worldViewMatrix;
-            Matrix4X4f  m_worldViewProjectionMatrix;
-            Vector4f    m_cameraPosition;
-
-            Light m_lights[3];
-        };
-
-        DrawFrameContext    m_DrawFrameContext;
-
-        // TODO
-        Matrix4X4f m_worldMatrix;
-        Matrix4X4f m_viewMatrix;
-        Matrix4X4f m_projectionMatrix;
-
         // Vector3f position, lookAt, up;
         // float fieldOfView;
 		// float nearClipDistance;
@@ -114,6 +83,18 @@ namespace Corona
 
         // int mLastMousePos_x;
         // int mLastMousePos_y;
+
+        static const uint32_t kFrameCount = 2;
+        static const uint32_t kMaxSceneObjectCount = 65535;
+        static const uint32_t kMaxTextureCount = 2048;
+
+        uint32_t m_nFrameIndex = 0;
+
+        const int32_t kShadowMapWidth = 512;
+        const int32_t kShadowMapHeight = 512;
+
+        std::vector<Frame> m_Frames;
+        std::vector<std::shared_ptr<IDrawPass>> m_DrawPasses;
     };
 
     extern GraphicsManager* g_pGraphicsManager;

@@ -2,6 +2,9 @@
 #include "GraphicsManager.h"
 #include "SceneManager.h"
 #include "IApplication.h"
+#include "ForwardRenderPass.h"
+#include "ShadowMapPass.h"
+#include "HUDPass.h"
 
 using namespace std;
 
@@ -11,7 +14,11 @@ namespace Corona
     int GraphicsManager::Initialize()
     {
         int result = 0;
+        m_Frames.resize(kFrameCount);
         InitConstants();
+        // m_DrawPasses.push_back(make_shared<ShadowMapPass>());
+        m_DrawPasses.push_back(make_shared<ForwardRenderPass>());
+        // m_DrawPasses.push_back(make_shared<HUDPass>());
         return result;
     }
 
@@ -40,6 +47,14 @@ namespace Corona
 
     void GraphicsManager::UpdateConstants()
     {
+        // update scene object position
+        auto& frame = m_Frames[m_nFrameIndex];
+
+        for (auto dbc : frame.batchContexts)
+        {
+            dbc->trans = dbc->node->Transforms.matrix;
+        }
+
         // TODO: Update scene nodes before update constants (temporary for test)
 		auto& scene = g_pSceneManager->GetSceneForRendering();
 		for (auto& root_node : scene.RootNodes) // should calculate only those needed (camera, light, etc.)
@@ -61,12 +76,19 @@ namespace Corona
 
     void GraphicsManager::Draw()
     {
-        UpdateConstants();
+        auto& frame = m_Frames[m_nFrameIndex];
 
-        RenderBuffers();
-#ifdef DEBUG
-        RenderDebugBuffers();
-#endif
+        for (auto pDrawPass : m_DrawPasses)
+        {
+            pDrawPass->Draw(frame);
+        }
+
+//         UpdateConstants();
+
+//         RenderBuffers();
+// #ifdef DEBUG
+//         RenderDebugBuffers();
+// #endif
     }
 
     // void GraphicsManager::InitConstants()
@@ -91,7 +113,7 @@ namespace Corona
     void GraphicsManager::InitConstants()
     {
         // Initialize the world/model matrix to the identity matrix.
-        BuildIdentityMatrix(m_worldMatrix);
+        BuildIdentityMatrix(m_Frames[m_nFrameIndex].m_worldMatrix);
     }
 
     bool GraphicsManager::InitializeShaders()
@@ -120,18 +142,19 @@ namespace Corona
         // TODO
         auto& scene = g_pSceneManager->GetSceneForRendering();
 		auto pCameraNode = scene.GetFirstCameraNode();
+        DrawFrameContext& frameContext = m_Frames[m_nFrameIndex].frameContext;
 		if (pCameraNode) 
         {
 			auto transform = pCameraNode->GetViewMatrix();
-			m_viewMatrix = transform;
-            m_DrawFrameContext.m_cameraPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
-            Transform(m_DrawFrameContext.m_cameraPosition, transform);
+			m_Frames[m_nFrameIndex].m_viewMatrix = transform;
+            frameContext.m_cameraPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
+            Transform(frameContext.m_cameraPosition, transform);
 		}
 		else
         {
 			// use default build-in camera
 			Vector3f position = { 0.3f, 0.1f, 3.0f }, lookAt = { 0.0f, 0.0f, 0.0f }, up = { 0.0f, 1.0f, 0.0f };
-			BuildViewMatrix(m_viewMatrix, position, lookAt, up);
+			BuildViewMatrix(m_Frames[m_nFrameIndex].m_viewMatrix, position, lookAt, up);
 		}
 
 		// // use default build-in camera
@@ -157,7 +180,7 @@ namespace Corona
 
         // // Build the perspective projection matrix.
         // BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
-        //BuildIdentityMatrix(m_DrawFrameContext.m_projectionMatrix);
+        //BuildIdentityMatrix(frameContext.m_projectionMatrix);
 
         // The world Axis Location:
         //               Y
@@ -175,12 +198,13 @@ namespace Corona
 		// position.y = mRadius * cosf(mPhi);
 
 		// Build the perspective projection matrix.
-		BuildPerspectiveFovLHMatrix(m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
+		BuildPerspectiveFovLHMatrix(m_Frames[m_nFrameIndex].m_projectionMatrix, fieldOfView, screenAspect, nearClipDistance, farClipDistance);
         
         // 能不能传入各个单独矩阵的逆然后在里面相乘得到整体的逆？（我估计是不行（没准齐次矩阵可以））
-        m_DrawFrameContext.m_worldMatrix = m_worldMatrix;
-        m_DrawFrameContext.m_worldViewMatrix = m_worldMatrix * m_viewMatrix;
-        m_DrawFrameContext.m_worldViewProjectionMatrix = m_worldMatrix * m_viewMatrix * m_projectionMatrix;
+        // TODO
+        frameContext.m_worldMatrix = m_Frames[m_nFrameIndex].m_worldMatrix;
+        frameContext.m_worldViewMatrix = m_Frames[m_nFrameIndex].m_worldMatrix * m_Frames[m_nFrameIndex].m_viewMatrix;
+        frameContext.m_worldViewProjectionMatrix = m_Frames[m_nFrameIndex].m_worldMatrix * m_Frames[m_nFrameIndex].m_viewMatrix * m_Frames[m_nFrameIndex].m_projectionMatrix;
         
         // 在C++的DirectXMath中，无论是XMFLOAT4X4，还是使用函数生成的XMMATRIX，都是采用行主序矩阵的解释方式,
         // 而在HLSL中，默认的matrix或float4x4采用的是列主序矩阵的解释形式。
@@ -190,33 +214,34 @@ namespace Corona
         // 2、C++代码端进行转置，HLSL中使用matrix(列主序矩阵) ，mul函数让向量放在左边(行向量)，这样就是(行向量 X 列主序矩阵)，但C++这边需要进行一次矩阵转置，HLSL内部不产生转置 。这是官方例程所使用的方式，这样可以使得dp4运算可以直接取列主序矩阵的行，从而避免内部产生大量的转置指令。后续也使用这种方式。
         // 3、C++代码端不进行转置，HLSL中使用matrix(列主序矩阵)，mul函数让向量放在右边(列向量)，实际运算是(列主序矩阵 X 列向量)。这种方法的确可行，取列矩阵的行也比较方便，效率上又和2等同，就是HLSL那边的矩阵乘法都要反过来写，然而DX本身就是崇尚行主矩阵的，把OpenGL的习惯带来这边有点。。。
         // 4、C++代码端进行转置，HLSL中使用row_major matrix(行主序矩阵)，mul函数让向量放在右边(列向量)，实际运算是(行主序矩阵 X 列向量)。 就算这种方法也可以绘制出来，但还是很让人难受。
-        Transpose(m_DrawFrameContext.m_worldMatrix);
-        Transpose(m_DrawFrameContext.m_worldViewMatrix);
-        Transpose(m_DrawFrameContext.m_worldViewProjectionMatrix);
-        
+        Transpose(frameContext.m_worldMatrix);
+        Transpose(frameContext.m_worldViewMatrix);
+        Transpose(frameContext.m_worldViewProjectionMatrix);
     }
 
     void GraphicsManager::CalculateLights()
     {
-        // TODO
+        DrawFrameContext& frameContext = m_Frames[m_nFrameIndex].frameContext;
         auto& scene = g_pSceneManager->GetSceneForRendering();
 //         auto pLightNode = scene.GetFirstLight();
 //         if (pLightNode) 
 //         {
-//             m_DrawFrameContext.m_lightPosition = { 0.0f, 0.0f, 0.0f };
-//             TransformCoord(m_DrawFrameContext.m_lightPosition, *pLightNode->GetCalculatedTransform());
+//             frameContext.m_lightPosition = { 0.0f, 0.0f, 0.0f };
+//             TransformCoord(frameContext.m_lightPosition, *pLightNode->GetCalculatedTransform());
 // 
 //             auto pLight = scene.GetLight(pLightNode->GetSceneObjectRef());
 //             if (pLight) {
-//                 m_DrawFrameContext.m_lightColor = pLight->GetColor().Value;
+//                 frameContext.m_lightColor = pLight->GetColor().Value;
 //             }
 //         }
 //         else 
 //         {
-//             // use default build-in light 
-//             m_DrawFrameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
-//             m_DrawFrameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+//             // use default build-in light
+//             frameContext.m_lightPosition = { -1.0f, -5.0f, 0.0f};
+//             frameContext.m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 //         }
+
+        // TODO: Add light-pos camera to get shadowMap
         int i = 0;
         for (auto LightNode : scene.LightNodes)
         {
@@ -251,15 +276,15 @@ namespace Corona
                     assert(0);
                 }
 
-                m_DrawFrameContext.m_lights[i] = light;
+                frameContext.m_lights[i] = light;
                 ++i;
             }
 
         }
 
 		// // only support default light at the time
-		// m_DrawFrameContext.m_lightPosition = { 0.0f, 0.0f, 10.0f};
-		// m_DrawFrameContext.m_lightColor = { 0.0f, 0.0f, 1.0f, 1.0f }; // ARGB
+		// frameContext.m_lightPosition = { 0.0f, 0.0f, 10.0f};
+		// frameContext.m_lightColor = { 0.0f, 0.0f, 1.0f, 1.0f }; // ARGB
     }
 
     bool GraphicsManager::InitializeBuffers()
@@ -455,5 +480,52 @@ namespace Corona
         cout << "[GraphicsManager] GraphicsManager::ClearDebugBuffers(void)" << endl;
     }
 #endif
+
+    void GraphicsManager::UseShaderProgram(const intptr_t shaderProgram)
+    {
+        cout << "[GraphicsManager] UseShaderProgram(" << shaderProgram << ")" << endl;
+    }
+
+    void GraphicsManager::SetPerFrameConstants(const DrawFrameContext& context)
+    {
+        cout << "[GraphicsManager] SetPerFrameConstants(" << &context << ")" << endl;
+    }
+
+    void GraphicsManager::DrawBatch(const DrawBatchContext& context)
+    {
+        cout << "[GraphicsManager] DrawBatch(" << &context << ")" << endl;
+    }
+
+    void GraphicsManager::DrawBatchDepthOnly(const DrawBatchContext& context)
+    {
+        cout << "[GraphicsManager] DrawBatchDepthOnly(" << &context << ")" << endl;
+    }
+
+    intptr_t GraphicsManager::GenerateShadowMapArray(uint32_t count)
+    {
+        cout << "[GraphicsManager] GenerateShadowMap(" << count << ")" << endl;
+        return 0;
+    }
+
+    void GraphicsManager::BeginShadowMap(const Light& light, const intptr_t shadowmap, uint32_t layer_index)
+    {
+        cout << "[GraphicsManager] BeginShadowMap(" << shadowmap << ", " << layer_index << ")" << endl;
+    }
+
+    void GraphicsManager::EndShadowMap(const intptr_t shadowmap, uint32_t layer_index)
+    {
+        cout << "[GraphicsManager] EndShadowMap(" << shadowmap << ", " << layer_index << ")" << endl;
+    }
+
+    void GraphicsManager::SetShadowMap(const intptr_t shadowmap)
+    {
+        cout << "[GraphicsManager] SetShadowMap(" << shadowmap << ")" << endl;
+    }
+
+    void GraphicsManager::DestroyShadowMap(intptr_t& shadowmap)
+    {
+        cout << "[GraphicsManager] DestroyShadowMap(" << shadowmap << ")" << endl;
+        shadowmap = -1;
+    }
 
 }
